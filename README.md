@@ -46,24 +46,24 @@ PDFConverter pdfConverter = PDFConverter(
     frontMatterDelta: null,
     customConverters: [],
     document: _quillController.document.toDelta(),
-    fallbacks: [...loader.allFonts()],
+    fallbacks: [...your global fonts],
     onRequestBoldFont: (String fontFamily) async {
-    return loader.getFontByName(fontFamily: fontFamily, bold: true);
+       ...your local font implementation
     },
     onRequestBoldItalicFont: (String fontFamily) async {
-                    return loader.getFontByName(fontFamily: fontFamily, bold: true, italic: true);
+       ...your local font implementation
     },
     onRequestFallbackFont: (String fontFamily) async {
-      return null;
+       ...your local font implementation
     },
     onRequestItalicFont: (String fontFamily) async {
-        return loader.getFontByName(fontFamily: fontFamily, italic: true);
+       ...your local font implementation
     },
     onRequestFont: (String fontFamily) async {
-        return loader.getFontByName(fontFamily: fontFamily);
+       ...your local font implementation
     },
-    params: params,
-    );
+    params: PDFConverterParams(...),// this decide the page format
+);
 final pw.Document? document = await pdfConverter.createDocument();
 ```
 
