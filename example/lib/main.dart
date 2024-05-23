@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:example/example_editor/editor/custom_quill_editor.dart';
@@ -6,14 +5,10 @@ import 'package:example/fonts_loader/fonts_loader.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_quill/quill_delta.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/quill_to_pdf.dart';
 
 import 'example_editor/toolbar/custom_quill_toolbar.dart';
-
-const jsonDefaultRichDelta =
-    r'[{"insert":"Thesis Proposal"},{"insert":"\n","attributes":{"header":1}},{"insert":"\n\n\n\n\n\n\n"},{"insert":"Your Name"},{"insert":"\n","attributes":{"align":"right"}},{"insert":"Degree and Program"},{"insert":"\n","attributes":{"align":"right"}},{"insert":"Department"},{"insert":"\n","attributes":{"align":"right"}},{"insert":"University Name"},{"insert":"\n","attributes":{"align":"right"}},{"insert":"\n\n\n\n\n\n\n\n"},{"insert":"Committe Chair(s)","attributes":{"bold":true,"underline":true}},{"insert":"\n"},{"insert":"Professor Luck, John. Daniel"},{"insert":"\n"},{"insert":"Professor Jefferson, Chris. Ph"},{"insert":"\n"},{"insert":"Committe Member(s)","attributes":{"bold":true}},{"insert":"\n"},{"insert":"Professor Weushaupt, Ph. Daniel"},{"insert":"\n"},{"insert":"Professor Wilson, Jesus. D"},{"insert":"\n"}]';
 
 final FontsLoader loader = FontsLoader();
 
@@ -49,11 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool firstEntry = false;
   final PDFConverterParams params = PDFConverterParams.a4;
   final QuillController _quillController = QuillController(
-      document: Document.fromDelta(
-        Delta.fromJson(
-          jsonDecode(jsonDefaultRichDelta),
-        ),
-      ),
+      document: Document(),
       selection: const TextSelection.collapsed(offset: 0));
   final FocusNode _editorNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -77,15 +68,15 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
               onPressed: () async {
-                // showDialog(
-                //     context: context,
-                //     builder: (context) {
-                //       return const LoadingWithAnimtedWidget(
-                //         text: 'Creating document...',
-                //         infinite: true,
-                //         loadingColor: Color.fromARGB(255, 108, 189, 255),
-                //       );
-                //     });
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const LoadingWithAnimtedWidget(
+                        text: 'Creating document...',
+                        infinite: true,
+                        loadingColor: Color.fromARGB(255, 108, 189, 255),
+                      );
+                    });
                 final String? result = await FilePicker.platform.getDirectoryPath();
                 if (result == null) {
                   Navigator.pop(context);
@@ -122,13 +113,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                   _editorNode.unfocus();
                   _shouldShowToolbar.value = false;
-                  // Navigator.pop(context);
+                  Navigator.pop(context);
                   return;
                 }
                 await file.writeAsBytes(await document.save());
                 _editorNode.unfocus();
                 _shouldShowToolbar.value = false;
-                // Navigator.pop(context);
+                Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Generated document at path: ${file.path}')),
                 );

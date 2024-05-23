@@ -541,12 +541,12 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         widgets.add(
           pw.WidgetSpan(
             child: pw.Container(
-              padding: const pw.EdgeInsets.only(left: 15, top: 1.5, bottom: 1.5),
+              padding: const pw.EdgeInsets.only(left: 15, bottom: 1.5),
               child: pw.RichText(
                 softWrap: true,
                 overflow: pw.TextOverflow.span,
                 text: pw.TextSpan(
-                  text: '\n• ',
+                  text: '• ',
                   children: <pw.InlineSpan>[
                     pw.TextSpan(children: styledWidgets),
                   ],
@@ -560,12 +560,12 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       widgets.add(
         pw.WidgetSpan(
           child: pw.Container(
-            padding: const pw.EdgeInsets.only(left: 15, top: 1.5, bottom: 1.5),
+            padding: const pw.EdgeInsets.only(left: 15, bottom: 1.5),
             child: pw.RichText(
               softWrap: true,
               overflow: pw.TextOverflow.span,
               text: pw.TextSpan(
-                text: '\n$typeList ',
+                text: '$typeList ',
                 children: <pw.InlineSpan>[
                   pw.TextSpan(children: styledWidgets),
                 ],
@@ -587,16 +587,13 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       styledWidgets.addAll(await _getStylesSpans(content, style));
       widgets.add(pw.WidgetSpan(
         child: pw.Container(
-          padding: const pw.EdgeInsets.only(left: 15, bottom: 1.5, top: 1.5),
+          padding: const pw.EdgeInsets.only(left: 15, bottom: 1.5),
           child: pw.Row(
             children: <pw.Widget>[
               pw.Checkbox(
                 activeColor: PdfColors.blue400,
                 name: 'check ${Random.secure().nextInt(9999999) + 50}',
                 value: checked,
-              ),
-              pw.SizedBox(
-                width: 7,
               ),
               pw.Expanded(
                 child: pw.RichText(
@@ -605,7 +602,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
                   overflow: pw.TextOverflow.span,
                   text: pw.TextSpan(
                     children: <pw.InlineSpan>[
-                      pw.TextSpan(children: <pw.InlineSpan>[const pw.TextSpan(text: '\n'), ...styledWidgets])
+                      pw.TextSpan(children: <pw.InlineSpan>[...styledWidgets])
                     ],
                   ),
                 ),

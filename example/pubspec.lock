@@ -13,10 +13,10 @@ packages:
     dependency: transitive
     description:
       name: archive
-      sha256: ecf4273855368121b1caed0d10d4513c7241dfc813f7d3c8933b36622ae9b265
+      sha256: "6bd38d335f0954f5fad9c79e614604fbf03a0e5b975923dd001b6ea965ef5b4b"
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.1"
+    version: "3.6.0"
   args:
     dependency: transitive
     description:
@@ -125,10 +125,10 @@ packages:
     dependency: transitive
     description:
       name: dart_quill_delta
-      sha256: e2f0be62c733a1f2ba51f70a8b544acd5a19ea726e409dd341e5f4a35582cfe0
+      sha256: e302834747f0ce555d82d337f5a55dfd271231f03800ad8131fe9445c676c215
       url: "https://pub.dev"
     source: hosted
-    version: "9.3.18"
+    version: "9.3.19"
   device_info_plus:
     dependency: transitive
     description:
@@ -401,7 +401,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.0"
+    version: "1.0.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -472,10 +472,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: "4c68bfd5ae83e700b5204c1e74451e7bf3cf750e6843c6e158289cf56bda018e"
+      sha256: "2237616a36c0d69aef7549ab439b833fb7f9fb9fc861af2cc9ac3eedddd69ca8"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.7"
+    version: "4.2.0"
   image_picker:
     dependency: transitive
     description:
