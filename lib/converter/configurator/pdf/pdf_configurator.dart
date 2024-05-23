@@ -6,7 +6,7 @@ import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/list_extension.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:flutter_quill_to_pdf/quill_to_pdf.dart';
+import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import '../attribute_functions.dart';
 import '../book_functions.dart';
 import '../abstract_converter.dart';

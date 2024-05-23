@@ -3,7 +3,7 @@ import 'package:flutter_quill/extensions.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/translations.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
-import 'package:flutter_quill_to_pdf/quill_to_pdf.dart';
+import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 
 class QuillLineHeightButton extends QuillToolbarBaseValueButton<QuillLineHeightButtonOptions, QuillLineHeightButtonExtraOptions> {
   QuillLineHeightButton({
