@@ -78,4 +78,4 @@ final pw.Document? document = await pdfConverter.createDocument();
 * indented list (bullet, unordered, check)
 * formula 
 
-You can contribute to this package to: 
+You can contribute reporting issues or requesting to add new features in: https://github.com/CatHood0/quill_to_pdf 
