@@ -3,7 +3,7 @@ library quill_to_pdf;
 export 'package:flutter_quill_to_pdf/converter/configurator/pdf/pdf_configurator.dart';
 export 'package:flutter_quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
 export 'package:flutter_quill_to_pdf/converter/delta_processor/delta_processor.dart';
-export 'package:flutter_quill_to_pdf/converter/configurator/converter_option/pdf_converter_option_model.dart';
+export 'package:flutter_quill_to_pdf/converter/configurator/converter_option/pdf_page_format.dart';
 export 'package:flutter_quill_to_pdf/core/extensions/color_extension.dart';
 export 'package:flutter_quill_to_pdf/core/extensions/delta_extension_utils.dart';
 export 'package:flutter_quill_to_pdf/core/extensions/md_extension.dart';

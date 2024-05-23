@@ -383,18 +383,18 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_quill
-      sha256: da6f19abda6662dd3a4da7e16f17492e3205b20d09f68ffd8c0b19ec0688a343
+      sha256: eb5c4ef32dddbff94babe05c1f39aae1c6d7234d6cc331b8a8e8d0e342658bf7
       url: "https://pub.dev"
     source: hosted
-    version: "9.3.19"
+    version: "9.3.20"
   flutter_quill_extensions:
     dependency: "direct main"
     description:
       name: flutter_quill_extensions
-      sha256: "199922f2992c46bb9a59fa2ed5453be8ec7758797ed14b17a9644081c04f3be1"
+      sha256: "09c45ee6dcd22ae54d9bb37ae095b75f255cd619e07d23049998acf257489cac"
       url: "https://pub.dev"
     source: hosted
-    version: "9.3.19"
+    version: "9.3.20"
   flutter_quill_to_pdf:
     dependency: "direct main"
     description:

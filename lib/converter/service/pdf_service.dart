@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-import 'package:flutter_quill_to_pdf/converter/configurator/converter_option/pdf_converter_option_model.dart';
+import 'package:flutter_quill_to_pdf/converter/configurator/converter_option/pdf_page_format.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/pdf_extension.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/quill_delta_to_html_converter.dart';
@@ -30,7 +30,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   final ConverterOptions? converterOptions;
 
   PdfService({
-    required PDFConverterParams params,
+    required PDFPageFormat params,
     required List<pw.Font> fonts,
     required super.onRequestBoldFont,
     required super.onRequestBothFont,
@@ -57,10 +57,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       fontSize: defaultFontSize.toDouble(),
       fontFallback: <pw.Font>[..._fonts],
     );
-    _marginLeft = params.marginAll ? params.marginAllPositions : params.marginLeft;
-    _marginBottom = params.marginAll ? params.marginAllPositions : params.marginBottom;
-    _marginTop = params.marginAll ? params.marginAllPositions : params.marginTop;
-    _marginRight = params.marginAll ? params.marginAllPositions : params.marginRight;
+    _marginLeft = params.marginLeft;
+    _marginBottom = params.marginBottom;
+    _marginTop = params.marginTop;
+    _marginRight = params.marginRight;
     _width = params.width;
     _height = params.height;
     pageWidth = params.width;

@@ -8,7 +8,7 @@ You can configure:
 * The fonts that the PDF can use for your text.
 * `CustomConverter`, which helps you create custom PDF widgets using custom regular expressions.
 * Optional front matter and back matter.
-* Even the page format.
+* Even the page format using `PDFPageFormat` class.
 
 > By default, the delta when creating the document is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes, making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
 
@@ -29,7 +29,33 @@ dependencies:
 ### Import package
 
 ```dart
-import 'package:flutter_quill_to_pdf/quill_to_pdf.dart':
+import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
+```
+
+### Personalize the settings of the page that will be printed (height,width,margins)
+
+We can use two types differents constructors of the same `PDFPageFormat` class
+
+##### The common, with all set params: 
+```dart
+final PDFPageFormat pageFormat = PDFPageFormat(
+   width: ..., //max width of the page
+   height: ..., //max height of the page,
+   marginTop: ..., 
+   marginBottom: ...,
+   marginLeft: ...,
+   marginRight: ...,
+);
+```
+
+##### The marginize all `PDFPageFormat` implementation
+
+```dart
+final PDFPageFormat pageFormat = PDFPageFormat.all(
+   width: ..., //max width of the page
+   height: ..., //max height of the page,
+   margin: ..., //will set the property to the others margins
+);
 ```
 
 ### Using pdf converter and required params
@@ -56,7 +82,7 @@ PDFConverter pdfConverter = PDFConverter(
     onRequestFont: (String fontFamily) async {
        ...your local font implementation
     },
-    params: PDFConverterParams(...),// this decide the page format
+    params: pageFormat,
 );
 final pw.Document? document = await pdfConverter.createDocument();
 ```

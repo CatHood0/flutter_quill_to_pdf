@@ -42,7 +42,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   bool firstEntry = false;
-  final PDFConverterParams params = PDFConverterParams.a4;
+  final PDFPageFormat params = PDFPageFormat.a4;
   final QuillController _quillController = QuillController(
       document: Document(),
       selection: const TextSelection.collapsed(offset: 0));

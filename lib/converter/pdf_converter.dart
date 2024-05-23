@@ -18,7 +18,7 @@ class PDFConverter {
 
   ///This [delta] is used after the main content
   final Delta? backMatterDelta;
-  final qpdf.PDFConverterParams params;
+  final qpdf.PDFPageFormat params;
 
   ///This allow detect and create custom widgets
   final List<CustomConverter> customConverters;
