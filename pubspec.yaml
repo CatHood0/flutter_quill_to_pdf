@@ -9,6 +9,12 @@ environment:
   sdk: '>=3.4.0 <4.0.0'
   flutter: ">=1.17.0"
 
+screenshots:
+  - description: "Delta in editor"
+    path: example/assets/delta_to_convert.jpg
+  - description: "Delta converted in PDF"
+    path: example/assets/delta_converted.jpg
+
 platforms:
   android:
   ios:
@@ -16,6 +22,7 @@ platforms:
   macos:
   web:
   windows:
+
 
 dependencies:
   flutter:
