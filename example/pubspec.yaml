@@ -1,0 +1,189 @@
+name: example
+description: "A new Flutter project."
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+
+  quill_to_pdf:
+    path: ../
+  pdf: ^3.10.8
+  flutter_hooks: ^0.20.5
+  flutter_quill_extensions: ^9.3.18  
+  flutter_quill: ^9.3.18
+  file_picker: ^8.0.3
+  animated_text_kit: 
+
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+  
+
+flutter:
+
+  uses-material-design: true
+
+  
+  fonts:
+    - family: Lora
+      fonts:
+        - asset: assets/fonts/lora/Lora-Regular.ttf
+        - asset: assets/fonts/lora/Lora-Italic.ttf
+          style: italic
+        - asset: assets/fonts/lora/Lora-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/lora/Lora-BoldItalic.ttf
+          weight: 700
+          style: italic
+
+    - family: Courier
+      fonts:
+        - asset: assets/fonts/Courier/CourierPrime-Regular.ttf
+        - asset: assets/fonts/Courier/CourierPrime-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Courier/CourierPrime-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Courier/CourierPrime-BoldItalic.ttf
+          weight: 700
+          style: italic
+
+    - family: Crimson 
+      fonts:
+        - asset: assets/fonts/crimson/crimson.ttf
+        - asset: assets/fonts/crimson/crimson-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/crimson/crimson-Italic.ttf
+          style: italic
+        - asset: assets/fonts/crimson/crimson-BoldItalic.ttf
+          weight: 700
+          style: italic
+
+    - family: Philosopher 
+      fonts:
+        - asset: assets/fonts/philosopher/philosopher.ttf
+        - asset: assets/fonts/philosopher/philosopher-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/philosopher/philosopher-Italic.ttf
+          style: italic
+        - asset: assets/fonts/philosopher/philosopher-BoldItalic.ttf
+          weight: 700
+          style: italic
+
+    - family: LobsterTwo 
+      fonts:
+        - asset: assets/fonts/lobster/lobsterTwo.ttf
+        - asset: assets/fonts/lobster/lobsterTwo-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/lobster/lobsterTwo-Italic.ttf
+          style: italic
+        - asset: assets/fonts/lobster/lobsterTwo-BoldItalic.ttf
+          weight: 700
+          style: italic
+    
+    - family: Tinos 
+      fonts:
+        - asset: assets/fonts/Tinos/Tinos-Regular.ttf
+          weight: 300
+        - asset: assets/fonts/Tinos/Tinos-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Tinos/Tinos-Italic.ttf
+          style: italic
+          weight: 400
+        - asset: assets/fonts/Tinos/Tinos-BoldItalic.ttf
+          weight: 700
+          style: italic
+    
+    - family: Inria Serif
+      fonts:
+        - asset: assets/fonts/Inria_Serif/InriaSerif-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inria_Serif/InriaSerif-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Inria_Serif/InriaSerif-Italic.ttf
+          style: italic
+          weight: 400
+        - asset: assets/fonts/Inria_Serif/InriaSerif-BoldItalic.ttf
+          weight: 700
+          style: italic
+
+    - family: Open Sans 
+      fonts:
+        - asset: assets/fonts/Open_Sans/static/OpenSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Open_Sans/static/OpenSans-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Open_Sans/static/OpenSans-Italic.ttf
+          style: italic
+          weight: 400
+        - asset: assets/fonts/Open_Sans/static/OpenSans-Regular.ttf
+          weight: 400
+    
+    - family: Noto Sans 
+      fonts:
+
+        - asset: assets/fonts/Noto_Sans/static/NotoSans-Light.ttf
+          weight: 200
+        - asset: assets/fonts/Noto_Sans/static/NotoSans-Black.ttf
+          weight: 800
+        - asset: assets/fonts/Noto_Sans/static/NotoSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Noto_Sans/static/NotoSans-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Noto_Sans/static/NotoSans-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Noto_Sans/static/NotoSans-Regular.ttf
+          weight: 400
+
+    - family: raleway 
+      fonts:
+        - asset: assets/fonts/Raleway/Raleway-VariableFont_wght.ttf
+          weight: 500
+
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato/Lato-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Lato/Lato-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Lato/Lato-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Lato/Lato-BoldItalic.ttf
+          weight: 700
+          style: italic
+    
+    - family: Noto Emojis
+      fonts:
+        - asset: assets/fonts/unicodes/Noto_Emoji/NotoEmoji-VariableFont_wght.ttf
+
+    - family: Ubuntu Mono
+      fonts:
+        - asset: assets/fonts/Ubuntu_Mono/UbuntuMono-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Ubuntu_Mono/UbuntuMono-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Ubuntu_Mono/UbuntuMono-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Ubuntu_Mono/UbuntuMono-BoldItalic.ttf
+          weight: 700
+          style: italic
+
+assets:
+  - assets/
