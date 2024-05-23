@@ -1,3 +1,5 @@
+// ignore_for_file: use_string_buffers
+
 import 'package:collection/collection.dart' show IterableExtension;
 
 import 'node.dart';
@@ -77,7 +79,7 @@ class Rule {
   }
 
   bool _check(Node node) =>
-      _realFilterFn == null ? false : _realFilterFn!(node);
+      _realFilterFn == null ? false : _realFilterFn(node);
 
   static void addIgnore(List<String> names) {
     if (names.isNotEmpty) {
