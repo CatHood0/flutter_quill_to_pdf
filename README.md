@@ -4,26 +4,20 @@ This package allows you to create PDFs using deltas from Quill.
 
 You can configure:
 
-* `DeltaAttributesOptions` (this are attributes that will appear in the delta if certain attributes are not found in the delta.
+* `DeltaAttributesOptions` (this are attributes that will appear in the delta if certain attributes are not found in the delta).
 * The fonts that the PDF can use for your text.
 * `CustomConverter`, which helps you create custom PDF widgets using custom regular expressions.
 * Optional front matter and back matter.
 * Even the page format.
 
-> By default, the delta when create document are processed by a local implementation that use `DeltaAttributesOptions`to apply custom attrs make more easy add a attribute to whole delta. If you want just make you're own implementation, or just use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`
+> By default, the delta when creating the document is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes, making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
 
-<img src="./example/assets/delta_to_convert.jpg" width="250" alt="Screenshot 1">
-<img src="./example/assets/delta_converted.jpg" width="250" alt="Screenshot 2">
-
-### Suppoted
-
-* Image embed (Files path yet)
-* Header
-* Link
-* Inline attributes (font, size, bold, italic, underline)
-* line-height (custom attribute used from this package)
-* Align
-* List (check, bullet, ordered)
+<details>
+    <summary>Tap to show/hide screenshots</summary>
+    <br>
+<img src="./example/assets/delta_to_convert.jpg" width="250" alt="Delta in editor">
+<img src="./example/assets/delta_converted.jpg" width="350" alt="Delta converted in PDF">
+</details>
 
 ### Add dependency
 
@@ -66,6 +60,19 @@ PDFConverter pdfConverter = PDFConverter(
 );
 final pw.Document? document = await pdfConverter.createDocument();
 ```
+### Suppoted
+
+* font family
+* size
+* bold
+* italic
+* underline
+* Link
+* line-height (custom attribute used from this package)
+* Align
+* Embed image (File path yet)
+* Header
+* List (check, bullet, ordered)
 
 ## Not support yet
 
@@ -78,4 +85,4 @@ final pw.Document? document = await pdfConverter.createDocument();
 * indented list (bullet, unordered, check)
 * formula 
 
-You can contribute to this package to: 
+You can contribute reporting issues or requesting to add new features in: https://github.com/CatHood0/quill_to_pdf 
