@@ -2,7 +2,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
-import 'package:quill_to_pdf/packages/vsc_quill_delta_to_html/src/funcs_html.dart';
+import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/funcs_html.dart';
 
 import '../vsc_quill_delta_to_html.dart';
 

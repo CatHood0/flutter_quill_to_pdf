@@ -1,6 +1,6 @@
 // ignore_for_file: always_specify_types
 
-import 'package:quill_to_pdf/packages/vsc_quill_delta_to_html/src/helpers/array.dart';
+import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/helpers/array.dart';
 
 import 'group_types.dart';
 

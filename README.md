@@ -29,7 +29,7 @@ dependencies:
 ### Import package
 
 ```dart
-import 'package:quill_to_pdf/quill_to_pdf.dart':
+import 'package:flutter_quill_to_pdf/quill_to_pdf.dart':
 ```
 
 ### Using pdf converter and required params

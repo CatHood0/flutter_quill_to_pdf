@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_dynamic_calls, always_specify_types
 
 import 'package:flutter/foundation.dart';
-import 'package:quill_to_pdf/packages/vsc_quill_delta_to_html/src/mentions/mention_sanitizer.dart';
+import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/mentions/mention_sanitizer.dart';
 
 import 'delta_insert_op.dart';
 import 'funcs_html.dart';
@@ -419,7 +419,7 @@ class OpToHtmlConverter {
     ];
 
     final List<List<String>> tl = <List<String>>[
-      ...inlineTags.where((List<String> item) => isTruthy(attrs[item[0]])).toList(),
+      ...inlineTags.where((List<String> item) => isTruthy(attrs[item[0]])),
       ...customTagsMap.keys
           .where((String t) => !inlineTags.any((List<String> it) => it[0] == t))
           .map((String t) => <String>[t, customTagsMap[t]!]),

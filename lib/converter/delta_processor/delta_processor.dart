@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:dart_quill_delta/dart_quill_delta.dart' as fq;
 import 'package:dart_quill_delta/dart_quill_delta.dart' as ops;
-import 'package:quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
-import 'package:quill_to_pdf/core/extensions/delta_extension_utils.dart';
-import 'package:quill_to_pdf/core/extensions/map_extension.dart';
-import 'package:quill_to_pdf/core/extensions/string_extension.dart';
-import 'package:quill_to_pdf/utils/utils.dart';
+import 'package:flutter_quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
+import 'package:flutter_quill_to_pdf/core/extensions/delta_extension_utils.dart';
+import 'package:flutter_quill_to_pdf/core/extensions/map_extension.dart';
+import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/utils/utils.dart';
 
 import '../../core/constant/constants.dart';
 import 'search_attr_in_delta.dart';

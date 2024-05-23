@@ -1,7 +1,7 @@
 // ignore_for_file: always_specify_types
 
-import 'package:quill_to_pdf/packages/vsc_quill_delta_to_html/src/helpers/string.dart';
-import 'package:quill_to_pdf/packages/vsc_quill_delta_to_html/src/value_types.dart';
+import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/helpers/string.dart';
+import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/value_types.dart';
 
 /// Denormalization is splitting a text insert operation that has new lines into multiple
 /// ops where each op is either a new line or a text containing no new lines.

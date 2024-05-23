@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart' show Alignment, TextAlign;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
-import 'package:quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 
 //calculate spacing for 0.6,0.8,1.0,1.1,1.2,1.3,1.4,1.5
 extension PdfDoubleExtension on double {

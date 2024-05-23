@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:quill_to_pdf/quill_to_pdf.dart';
+import 'package:flutter_quill_to_pdf/quill_to_pdf.dart';
 
 import 'example_editor/toolbar/custom_quill_toolbar.dart';
 

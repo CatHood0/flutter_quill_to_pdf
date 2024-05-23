@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 // import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
-import 'package:quill_to_pdf/core/constant/constants.dart';
+import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 
 import '../buttons/line_height_button.dart';
 import 'utils/quill_toolbar_arrows_indicators.dart';

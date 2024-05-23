@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:dart_quill_delta/dart_quill_delta.dart' as fq;
-import 'package:quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 
 import '../../packages/vsc_quill_delta_to_html/src/helpers/string.dart';
 import '../../utils/utils.dart';
@@ -13,11 +13,11 @@ extension DeltaDenormilazer on fq.Delta {
 
     final List<Map<String, dynamic>> denormalizedOps =
         map<List<Map<String, dynamic>>>((fq.Operation op) => denormalize(op.toJson())).flattened.toList();
-    return fq.Delta.fromOperations(denormalizedOps.map<fq.Operation>((e) => fq.Operation.fromJson(e)).toList());
+    return fq.Delta.fromOperations(denormalizedOps.map<fq.Operation>((Map<String, dynamic> e) => fq.Operation.fromJson(e)).toList());
   }
 
   List<Map<String, dynamic>> denormalize(Map<String, dynamic> op) {
-    const newLine = '\n';
+    const String newLine = '\n';
     final insertValue = op['insert'];
     if (insertValue is Map || insertValue == newLine) {
       return <Map<String, dynamic>>[op];

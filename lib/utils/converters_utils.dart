@@ -1,7 +1,7 @@
 import 'package:dart_quill_delta/dart_quill_delta.dart';
-import 'package:quill_to_pdf/core/extensions/string_extension.dart';
-import 'package:quill_to_pdf/core/options/html_converter_options.dart';
-import 'package:quill_to_pdf/packages/html2md/lib/html2md.dart' as hm2;
+import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/core/options/html_converter_options.dart';
+import 'package:flutter_quill_to_pdf/packages/html2md/lib/html2md.dart' as hm2;
 import '../packages/vsc_quill_delta_to_html/src/quill_delta_to_html_converter.dart';
 
 bool? stringToSafeBool(String? str) {

@@ -4,8 +4,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 // import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
-import 'package:quill_to_pdf/core/constant/constants.dart';
-import 'package:quill_to_pdf/quill_to_pdf.dart';
+import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
+import 'package:flutter_quill_to_pdf/quill_to_pdf.dart';
 
 class CustomQuillEditor extends HookWidget {
   final void Function(Document document) onChange;
@@ -38,7 +38,7 @@ class CustomQuillEditor extends HookWidget {
         detectWordBoundary: true,
         placeholder: 'Write something',
         magnifierConfiguration: TextMagnifier.adaptiveMagnifierConfiguration,
-        padding: EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.only(bottom: 20),
         autoFocus: false,
         enableSelectionToolbar: true,
         enableInteractiveSelection: true,

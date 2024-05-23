@@ -1,6 +1,6 @@
 // ignore_for_file: always_specify_types
 
-import 'package:quill_to_pdf/packages/vsc_quill_delta_to_html/src/helpers/array.dart';
+import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/helpers/array.dart';
 
 import 'group_types.dart';
 
@@ -31,8 +31,7 @@ class ListNester {
         return v as TDataGroup;
       }
 
-      final listOfItems =
-          List.castFrom<dynamic, ListGroup>(v).map((g) => g.items);
+      final listOfItems = List.castFrom<dynamic, ListGroup>(v).map((g) => g.items);
       return ListGroup(flatten(listOfItems));
     }).toList();
   }
@@ -58,8 +57,7 @@ class ListNester {
     }).toList();
   }
 
-  List<dynamic /*Array<TDataGroup | List<ListGroup>*/ >
-      _groupConsecutiveListGroups(List<TDataGroup> items) {
+  List<dynamic /*Array<TDataGroup | List<ListGroup>*/ > _groupConsecutiveListGroups(List<TDataGroup> items) {
     return groupConsecutiveElementsWhile(items, (curr, prev) {
       return curr is ListGroup && prev is ListGroup;
     });

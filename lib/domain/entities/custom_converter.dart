@@ -1,4 +1,4 @@
-import 'package:quill_to_pdf/utils/typedefs.dart';
+import 'package:flutter_quill_to_pdf/utils/typedefs.dart';
 
 class CustomConverter {
   final RegExp predicate;

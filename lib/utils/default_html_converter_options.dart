@@ -1,8 +1,6 @@
-
-
-import 'package:quill_to_pdf/core/constant/constants.dart';
-import 'package:quill_to_pdf/core/extensions/string_extension.dart';
-import 'package:quill_to_pdf/utils/typedefs.dart';
+import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
+import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/utils/typedefs.dart';
 
 import '../packages/vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
@@ -40,7 +38,7 @@ class HTMLConverterOptions {
                       'max-width: 100%',
                       'object-fit: ${Constant.DEFAULT_OBJECT_FIT}',
                       // cover makes the page document height and width
-                      '${attrs != null ? attrs : ''}'
+                      (attrs ?? '')
                     ];
                   }
                   if (op.attributes['wiki'] != null) {

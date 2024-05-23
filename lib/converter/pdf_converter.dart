@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:quill_to_pdf/converter/configurator/abstract_converter.dart';
-import 'package:quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
-import 'package:quill_to_pdf/converter/delta_processor/delta_processor.dart';
-import 'package:quill_to_pdf/converter/service/pdf_service.dart';
-import 'package:quill_to_pdf/domain/entities/custom_converter.dart';
-import 'package:quill_to_pdf/packages/vsc_quill_delta_to_html/src/quill_delta_to_html_converter.dart';
-import 'package:quill_to_pdf/quill_to_pdf.dart' as qpdf;
+import 'package:flutter_quill_to_pdf/converter/configurator/abstract_converter.dart';
+import 'package:flutter_quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
+import 'package:flutter_quill_to_pdf/converter/delta_processor/delta_processor.dart';
+import 'package:flutter_quill_to_pdf/converter/service/pdf_service.dart';
+import 'package:flutter_quill_to_pdf/domain/entities/custom_converter.dart';
+import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/quill_delta_to_html_converter.dart';
+import 'package:flutter_quill_to_pdf/quill_to_pdf.dart' as qpdf;
 
 class PDFConverter {
   //Is the main body of the PDF document

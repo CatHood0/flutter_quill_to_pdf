@@ -3,7 +3,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 
 import 'helpers/js.dart';
 import 'mentions/mention_sanitizer.dart';
@@ -173,7 +173,7 @@ class OpAttributes {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is OpAttributes && runtimeType == other.runtimeType && DeepCollectionEquality().equals(attrs, other.attrs);
+      other is OpAttributes && runtimeType == other.runtimeType && const DeepCollectionEquality().equals(attrs, other.attrs);
 
   @override
   int get hashCode => attrs.hashCode;

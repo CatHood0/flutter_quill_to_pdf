@@ -1,4 +1,4 @@
-import 'package:quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 
 import '../../packages/vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 import '../../utils/typedefs.dart';

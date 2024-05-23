@@ -395,6 +395,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.3.19"
+  flutter_quill_to_pdf:
+    dependency: "direct main"
+    description:
+      path: ".."
+      relative: true
+    source: path
+    version: "1.0.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -701,13 +708,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
-  quill_to_pdf:
-    dependency: "direct main"
-    description:
-      path: ".."
-      relative: true
-    source: path
-    version: "1.0.0"
   quiver:
     dependency: transitive
     description:

@@ -1,7 +1,7 @@
 // ignore_for_file: always_specify_types
 
 import 'package:collection/collection.dart';
-import 'package:quill_to_pdf/packages/vsc_quill_delta_to_html/src/helpers/array.dart';
+import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/helpers/array.dart';
 import '../delta_insert_op.dart';
 import 'group_types.dart';
 
@@ -10,10 +10,7 @@ class Grouper {
     final result = <TDataGroup>[];
 
     bool canBeInBlock(DeltaInsertOp op) {
-      return !(op.isJustNewline() ||
-          op.isCustomEmbedBlock() ||
-          op.isVideo() ||
-          op.isContainerBlock());
+      return !(op.isJustNewline() || op.isCustomEmbedBlock() || op.isVideo() || op.isContainerBlock());
     }
 
     bool isInlineData(DeltaInsertOp op) => op.isInline();
@@ -39,8 +36,7 @@ class Grouper {
     return result.reversed.toList();
   }
 
-  static List<dynamic /*TDataGroup | BlockGroup[]*/ >
-      groupConsecutiveSameStyleBlocks(
+  static List<dynamic /*TDataGroup | BlockGroup[]*/ > groupConsecutiveSameStyleBlocks(
     List<TDataGroup> groups, {
     // blocksOf:
     bool header = true,
@@ -62,8 +58,7 @@ class Grouper {
 
   // Moves all ops of same style consecutive blocks to the ops of first block
   // and discards the rest.
-  static List<TDataGroup> reduceConsecutiveSameStyleBlocksToOne(
-      List<dynamic /*TDataGroup | BlockGroup[]*/ > groups) {
+  static List<TDataGroup> reduceConsecutiveSameStyleBlocksToOne(List<dynamic /*TDataGroup | BlockGroup[]*/ > groups) {
     var newLineOp = DeltaInsertOp.createNewLineOp();
     final result = groups.map((elm) {
       if (elm is! List) {
@@ -91,9 +86,7 @@ class Grouper {
   }
 
   static bool areBothCodeblocksWithSameLang(BlockGroup g1, BlockGroup gOther) {
-    return (g1.op.isCodeBlock() &&
-        gOther.op.isCodeBlock() &&
-        g1.op.hasSameLangAs(gOther.op));
+    return (g1.op.isCodeBlock() && gOther.op.isCodeBlock() && g1.op.hasSameLangAs(gOther.op));
   }
 
   static bool areBothSameHeadersWithSameAdi(BlockGroup g1, BlockGroup gOther) {
@@ -101,14 +94,10 @@ class Grouper {
   }
 
   static bool areBothBlockquotesWithSameAdi(BlockGroup g, BlockGroup gOther) {
-    return (g.op.isBlockquote() &&
-        gOther.op.isBlockquote() &&
-        g.op.hasSameAdiAs(gOther.op));
+    return (g.op.isBlockquote() && gOther.op.isBlockquote() && g.op.hasSameAdiAs(gOther.op));
   }
 
   static bool areBothCustomBlockWithSameAttr(BlockGroup g, BlockGroup gOther) {
-    return (g.op.isCustomTextBlock() &&
-        gOther.op.isCustomTextBlock() &&
-        g.op.hasSameAttr(gOther.op));
+    return (g.op.isCustomTextBlock() && gOther.op.isCustomTextBlock() && g.op.hasSameAttr(gOther.op));
   }
 }

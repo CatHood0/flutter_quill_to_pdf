@@ -1,4 +1,4 @@
-import 'package:quill_to_pdf/core/constant/constants.dart';
+import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 
 final StringBuffer _buffer = StringBuffer();
 

@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:quill_to_pdf/core/extensions/string_extension.dart';
-import 'package:quill_to_pdf/packages/html2md/lib/src/options.dart';
+import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/packages/html2md/lib/src/options.dart';
 
-import 'package:quill_to_pdf/packages/html2md/lib/html2md.dart' as hm2;
-import 'package:quill_to_pdf/packages/html2md/lib/src/utils.dart' as util;
+import 'package:flutter_quill_to_pdf/packages/html2md/lib/html2md.dart' as hm2;
+import 'package:flutter_quill_to_pdf/packages/html2md/lib/src/utils.dart' as util;
 
 import '../core/constant/constants.dart';
 
