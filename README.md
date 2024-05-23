@@ -13,12 +13,16 @@ We can configure: the attributes that will appears in delta using `DeltaAttribut
 
 ### Suppoted
 
-* Image embed (Files path yet)
-* Header
+* font family
+* size
+* bold
+* italic
+* underline
 * Link
-* Inline attributes (font, size, bold, italic, underline)
 * line-height (custom attribute used from this package)
 * Align
+* Image embed (Files path yet)
+* Header
 * List (check, bullet, ordered)
 
 ### Add dependency
