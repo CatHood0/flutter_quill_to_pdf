@@ -12,11 +12,12 @@ You can configure:
 
 > By default, the delta when creating the document is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes, making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
 
-<Screenshots>
+<details>
+    <summary>Tap to show/hide screenshots</summary>
     <br>
 <img src="./example/assets/delta_to_convert.jpg" width="250" alt="Delta in editor">
 <img src="./example/assets/delta_converted.jpg" width="350" alt="Delta converted in PDF">
-</Screenshots>
+</details>
 
 ### Add dependency
 
