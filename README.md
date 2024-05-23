@@ -69,7 +69,7 @@ final pw.Document? document = await pdfConverter.createDocument();
 * Link
 * line-height (custom attribute used from this package)
 * Align
-* Image embed (Files path yet)
+* Embed image (File path yet)
 * Header
 * List (check, bullet, ordered)
 
