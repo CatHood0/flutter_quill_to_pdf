@@ -33,7 +33,7 @@ dependencies:
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
 ```
 
-### Personalize the settings of the page that will be printed (height,width,margins)
+### Personalize the settings of the page (height,width,margins)
 
 We can use two types differents constructors of the same `PDFPageFormat` class
 
@@ -61,9 +61,9 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 
 ### Configure delta to html options (optional)
 
-_This is a fragment from: [vsc_quill_delta_to_html](https://github.com/VisualSystemsCorp/vsc_quill_delta_to_html) description (If you want to know more about these configs, and custom attributes rendering, visit his github)_
-
 We can configure a custom `ConverterOptions` using the param `convertOptions` from `PDFConverter()`
+
+_This is a fragment from: [vsc_quill_delta_to_html](https://github.com/VisualSystemsCorp/vsc_quill_delta_to_html) description (If you want to know more about these configs, and custom attributes rendering, visit his github)_
 
 `QuillDeltaToHtmlConverter` accepts a few configuration (`ConverterOptions`, `OpConverterOptions`, 
 and `OpAttributeSanitizerOptions`) options as shown below:
@@ -188,7 +188,7 @@ PDFConverter pdfConverter = PDFConverter(
 final pw.Document? document = await pdfConverter.createDocument();
 ```
 
-#### Or just use this, that creates PDF document and writed in the selected file path
+#### Or just use this. It creates the PDF document and write in the selected file path
 ```dart
 await pdfConverter.createDocumentFile(path: filepath, ...other optional params);
 ```
