@@ -8,10 +8,7 @@ final RegExp ITALIC_AND_STRONG_PATTERN = RegExp(r'^(\*\*\*(?<boldItalic>(?:(?!\*
 final RegExp ITALIC_AND_STRONG_AND_UNDERLINE_PATTERN = RegExp(r'^(\*\*\*\_(?<boldItalicUnderline>(?:(?!\_\*\*\*).)+)\_\*\*\*)$');
 final RegExp UNDERLINE_WITH_OPTIONAL_STYLES_PATTERN = RegExp(r'^(\*\*)?(\*)?\_((?:(?!\_\*\*\*).)+)\_(\2)?(\1)?$');
 
-// for commit
-// [Fix] issues related with matches about abstract and non absolute patterns
-// [Feat] patterns with better matches instead of .startWith or .endWith functions
-// [Fix] improvements in replaceMarkdownTags (before removes unnecessary tags from the editor)
+///an extension used to detect inline markdown styles in plain text
 extension MdInlineStringExtension on String {
   bool get isJustItalic {
     return ITALIC_PATTERN.hasMatch(this);
@@ -40,7 +37,7 @@ extension MdInlineStringExtension on String {
   bool get isAllStylesCombined {
     return ITALIC_AND_STRONG_AND_UNDERLINE_PATTERN.hasMatch(this);
   }
-
+  ///Remove markdown inlines styles. Like: **bold** -> bold
   String get replaceMd {
     return replaceAllMapped(STRONG_PATTERN, (Match match) {
       final String contentWithoutStrong = match.group(1)!;
@@ -55,6 +52,7 @@ extension MdInlineStringExtension on String {
   }
 }
 
+//TODO: remove resolveSize since this doesn't be need it into this extension
 extension MdHeaderLevelExtension on String {
   double resolveHeaderLevel({List<double> headingSizes = Constant.default_heading_size}) {
     return this == '#' || this == '1'
