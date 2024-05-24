@@ -24,16 +24,16 @@ class PDFConverter {
   ///[CustomConverter] allow devs to use [custom] regex patterns to detect and [create] custom widgets
   final List<CustomConverter> customConverters;
 
-  ///A simple [request] font when converter detect a font that don't is default
+  ///A simple [request] font when converter detect a font
   final Future<pw.Font> Function(String) onRequestFont;
 
-  ///A simple [request] font when converter detect a font that don't is default
+  ///A simple [request] font when converter detect a font
   final Future<pw.Font> Function(String) onRequestBoldFont;
 
-  ///A simple [request] font when converter detect a font that don't is default
+  ///A simple [request] font when converter detect a font
   final Future<pw.Font> Function(String) onRequestItalicFont;
 
-  ///A simple [request] font when converter detect a font that don't is default
+  ///A simple [request] font when converter detect a font
   final Future<pw.Font> Function(String) onRequestBoldItalicFont;
 
   ///Used by PDF converter to transform [delta to html].
@@ -109,8 +109,8 @@ class PDFConverter {
     this.onDetectLink,
     this.onDetectList,
     this.convertOptions,
-  })  : assert(params.height > 70, 'Page size height isn\'t valid'),
-        assert(params.width > 70, 'Page size width isn\'t valid'),
+  })  : assert(params.height > 50, 'Page size height isn\'t valid'),
+        assert(params.width > 50, 'Page size width isn\'t valid'),
         assert(params.marginBottom >= 0.0, 'Margin to bottom with value ${params.marginBottom}'),
         assert(params.marginLeft >= 0.0, 'Margin to left with value ${params.marginLeft}'),
         assert(params.marginRight >= 0.0, 'Margin to right with value ${params.marginRight}'),
@@ -169,7 +169,7 @@ class PDFConverter {
     if (customRules != null) {
       assert(customRules!.isNotEmpty, 'Cannot be passed a list of new rules empty');
       final List<qpdf.Rule>? rules = customRules;
-      converter.customRules(rules!);
+      converter.customRules(rules!, clearDefaultRules: true);
     }
     try {
       return await converter.generateDoc();
@@ -219,7 +219,7 @@ class PDFConverter {
     if (customRules != null) {
       assert(customRules!.isNotEmpty, 'Cannot be passed a list of new rules empty');
       final List<qpdf.Rule>? rules = customRules;
-      converter.customRules(rules!);
+      converter.customRules(rules!, clearDefaultRules: true);
     }
     try {
       final pw.Document doc = await converter.generateDoc();

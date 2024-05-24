@@ -11,6 +11,11 @@ bool? stringToSafeBool(String? str) {
   return null;
 }
 
+bool isHTML(String str) {
+  final RegExp htmlRegExp = RegExp('<[^>]*>', multiLine: true, caseSensitive: false);
+  return htmlRegExp.hasMatch(str);
+}
+
 bool isEmptyDeltaJson(String content) {
-  return content.equals(r'[{"insert":"\n"}]');
+  return content.equals('[{"insert":"$newLine"}]');
 }

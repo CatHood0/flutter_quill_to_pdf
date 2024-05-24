@@ -4,11 +4,11 @@ This package allows you to create PDFs using deltas from Quill.
 
 You can configure:
 
-* `DeltaAttributesOptions` (this are attributes that will appear in the delta if certain attributes are not found in the delta).
-* We can use custom fonts. Using `onRequest` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package.
+* `DeltaAttributesOptions` (this are attributes that will appear in the delta if certain attributes are not found in the delta)
+* We can use custom fonts. Using `onRequest` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package _Just works with the default library implementation_
 * `CustomConverter`, which helps you create custom PDF widgets using custom regular expressions.
-* Optional front matter and back matter.
-* Page format using `PDFPageFormat` class.
+* Optional front matter and back matter
+* Page format using `PDFPageFormat` class
 * `CustomPDFWidget` functions in `PDFConverter`that let us customize the detected style, and create a custom pdf widget implementation
 * `ThemeData` optional theme data that let us changes the theme for to pdf document
 * Set custom rules from `html2md` to customize your own markdown style detection _(It could have conflicts if don't customize the `CustomPDFWidget` functions to detect your custom markdown style implementation)_
@@ -27,7 +27,7 @@ You can configure:
 
 ```yaml
 dependencies: 
-    quill_to_pdf: ^1.1.0
+    quill_to_pdf: ^1.1.1
 ```
 
 ### Import package

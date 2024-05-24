@@ -1,26 +1,26 @@
-import '../../utils/typedefs.dart';
+typedef MapEntryPredicate<K, V> = bool Function(K key, V value);
 
 extension MapExtension<K, V> on Map<K, V> {
   Map<K, V>? firstEntryWhere({required MapEntryPredicate<K, V> predicate}) {
-    final MapEntry<K, V>? entry = this.entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
+    final MapEntry<K, V>? entry = entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
     if (entry == null) return null;
     return <K, V>{entry.key: entry.value};
   }
 
   K? firstKeyWhere({required MapEntryPredicate<K, V> predicate}) {
-    final MapEntry<K, V>? entry = this.entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
+    final MapEntry<K, V>? entry = entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
     if (entry == null) return null;
     return entry.key;
   }
 
   V? firstValueWhere({required MapEntryPredicate<K, V> predicate}) {
-    final MapEntry<K, V>? entry = this.entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
+    final MapEntry<K, V>? entry = entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
     if (entry == null) return null;
     return entry.value;
   }
 
   bool updateValueWhere({required MapEntryPredicate<K, V> predicate, required V value}) {
-    final MapEntry<K, V>? entry = this.entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
+    final MapEntry<K, V>? entry = entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
     if (entry == null) return false;
     this[entry.key] = value;
     return this[entry.key] == value;

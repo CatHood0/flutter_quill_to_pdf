@@ -31,7 +31,7 @@ class DeltaAttributesOptions {
     this.link,
     this.indent = -1,
     this.image,
-  })  : assert(lineSpacing <= 3.0 && lineSpacing >= 1.0),
+  })  : assert(lineSpacing <= 2.0 && lineSpacing >= 1.0),
         assert(indent == -1 || (indent > 0 && indent <= 4)),
         assert(align == null || (align.equals('left') || align.equals('right') || align.equals('center') || align.equals('justify')));
 
