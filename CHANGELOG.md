@@ -1,3 +1,7 @@
+# 1.1.3
+
+* [Fix] README bad dependecy name
+
 # 1.1.1
 
 * [Feat] improved README 
