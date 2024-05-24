@@ -1,14 +1,18 @@
-# Quill Delta to PDF
+# Flutter quill to PDF
 
 This package allows you to create PDFs using deltas from Quill.
 
 You can configure:
 
 * `DeltaAttributesOptions` (this are attributes that will appear in the delta if certain attributes are not found in the delta).
-* The fonts that the PDF can use for your text.
+* We can use custom fonts. Using `onRequest` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package.
 * `CustomConverter`, which helps you create custom PDF widgets using custom regular expressions.
 * Optional front matter and back matter.
-* Even the page format using `PDFPageFormat` class.
+* Page format using `PDFPageFormat` class.
+* `CustomPDFWidget` functions in `PDFConverter`that let us customize the detected style, and create a custom pdf widget implementation
+* `ThemeData` optional theme data that let us changes the theme for to pdf document
+* Set custom rules from `html2md` to customize your own markdown style detection _(It could have conflicts if don't customize the `CustomPDFWidget` functions to detect your custom markdown style implementation)_
+* Set a custom `ConverterOption` to `PDFConverter` to customize your own html rendering implementation _(It could have conflicts if you don't also make your own `CustomPDFWidget` functions, to detect your new html style. And you should also have to change the default rules of the package to make correct detect of this custom implemenation)_
 
 > By default, the delta when creating the document is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes, making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
 
@@ -23,7 +27,6 @@ You can configure:
 
 ```yaml
 dependencies: 
-    pdf: <latest_version>
     quill_to_pdf: ^1.1.0
 ```
 
@@ -33,7 +36,7 @@ dependencies:
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
 ```
 
-### Personalize the settings of the page (height,width,margins)
+### Personalize the settings of the page that will be printed (height,width,margins)
 
 We can use two types differents constructors of the same `PDFPageFormat` class
 
@@ -59,11 +62,120 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 );
 ```
 
+### Use PDF converter to start creating your document
+
+```dart
+PDFConverter pdfConverter = PDFConverter(
+    backMatterDelta: null,
+    frontMatterDelta: null,
+    customConverters: [],
+    document: QuillController.basic().document.toDelta(),
+    fallbacks: [...your global fonts],
+    onRequestBoldFont: (String fontFamily) async {
+       ...your local font implementation
+    },
+    onRequestBoldItalicFont: (String fontFamily) async {
+       ...your local font implementation
+    },
+    onRequestFallbackFont: (String fontFamily) async {
+       ...your local font implementation
+    },
+    onRequestItalicFont: (String fontFamily) async {
+       ...your local font implementation
+    },
+    onRequestFont: (String fontFamily) async {
+       ...your local font implementation
+    },
+    params: pageFormat,
+);
+```
+
+## To create the PDF document from PDFConverter, we have two options :
+
+#### `createDocument` function _returns the PDF document associated_
+
+```dart
+final pw.Document? document = await pdfConverter.createDocument();
+```
+
+#### `createDocumentFile` _makes the same of the befor one, but instead return the document, write in the selected file path_
+
+```dart
+await pdfConverter.createDocumentFile(path: filepath, ...other optional params);
+```
+
+## More information about other features 
+
+### If you want to get just the html from delta, you can use `convertDeltaToHtml` function
+
+```dart
+//it looks like
+String convertDeltaToHtml(Delta delta, [ConverterOptions? options]) {
+  return QuillDeltaToHtmlConverter(
+    delta.toJson(),
+    options ?? HTMLConverterOptions.options(), //default html converter options implementation
+  ).convert();
+}
+```
+
+### If you want to get the markdown, you need to make some steps
+
+1. Use `convertDeltaToMarkdown` function to get html from delta
+
+2. Use html string, and pass as param in `convertHtmlToMarkdown`
+
+3. Pass custom rules, or pass custom rules from this library using `MarkdownRules` class (Optional) 
+
+```dart
+//it looks like
+//If you don't pass any new rule, the converter will use the default ones from html2md
+String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String> ignoreRules,
+    {bool removeLeadingWhitespaces = false, bool escape = true}) {
+  if (!ignoreRules.contains('underline')) ignoreRules.add('underline');
+  return hm2.convert(
+    styleOptions: <String, String>{'emDelimiter': '*'},
+    htmlText,
+    escape: escape,
+    rules: rules,
+    removeLeadingWhitespaces: removeLeadingWhitespaces,
+    ignore: ignoreRules,
+  );
+}
+```
+
+## Supported
+
+* Font family
+* Size
+* Bold
+* Italic
+* Underline
+* Link
+* line-height (custom attribute used from this package)
+* Align
+* Embed image (File path yet)
+* Header
+* List (check, bullet, ordered)
+
+## Not support yet
+
+* Images links (working on it)
+* Code block (working on it)
+* Blockquote (working on it)
+* Text Color (working on it)
+* Background color (working on it)
+* Indented text,
+* Indented list (bullet, unordered, check) (working on it)
+* Embed formula 
+* Embed video
+
+## Custom rendering (HTML, Markdown)
+
 ### Configure delta to html options (optional)
 
-We can configure a custom `ConverterOptions` using the param `convertOptions` from `PDFConverter()`
-
 _This is a fragment from: [vsc_quill_delta_to_html](https://github.com/VisualSystemsCorp/vsc_quill_delta_to_html) description (If you want to know more about these configs, and custom attributes rendering, visit his github)_
+
+We can configure a custom `ConverterOptions` using the param `convertOptions` from `PDFConverter()`
 
 `QuillDeltaToHtmlConverter` accepts a few configuration (`ConverterOptions`, `OpConverterOptions`, 
 and `OpAttributeSanitizerOptions`) options as shown below:
@@ -91,6 +203,7 @@ and `OpAttributeSanitizerOptions`) options as shown below:
 | `converterOptions.customTagAttributes`  | `Map<String, String>? Function(DeltaInsertOp op)` | null           | Allows custom html tag attributes for the given op                                                                                                                                                                                                                                                                                                                                                                              | 
 | `converterOptions.customCssClasses`     | `List<String>? Function(DeltaInsertOp op)`           | null           | Allows custom CSS classes for the given op                                                                                                                                                                                                                                                                                                                                                                                      | 
 | `converterOptions.customCssStyles`      | `List<String>? Function(DeltaInsertOp op)`              | null           | Allows custom CSS styles attributes for the given op                                                                                                                                                                                                                                                                                                                                                                            | 
+
 
 
 ### Configuring custom markdown rules (optional)
@@ -154,67 +267,5 @@ Rule(
 )
 ~~~
 
-### Using pdf converter and required params
-
-```dart
-PDFConverter pdfConverter = PDFConverter(
-    backMatterDelta: null,
-    frontMatterDelta: null,
-    customConverters: [],
-    document: _quillController.document.toDelta(),
-    fallbacks: [...your global fonts],
-    onRequestBoldFont: (String fontFamily) async {
-       ...your local font implementation
-    },
-    onRequestBoldItalicFont: (String fontFamily) async {
-       ...your local font implementation
-    },
-    onRequestFallbackFont: (String fontFamily) async {
-       ...your local font implementation
-    },
-    onRequestItalicFont: (String fontFamily) async {
-       ...your local font implementation
-    },
-    onRequestFont: (String fontFamily) async {
-       ...your local font implementation
-    },
-    params: pageFormat,
-);
-```
-
-#### We can use a document create method
-
-```dart
-final pw.Document? document = await pdfConverter.createDocument();
-```
-
-#### Or just use this. It creates the PDF document and write in the selected file path
-```dart
-await pdfConverter.createDocumentFile(path: filepath, ...other optional params);
-```
-### Suppoted
-
-* font family
-* size
-* bold
-* italic
-* underline
-* Link
-* line-height (custom attribute used from this package)
-* Align
-* Embed image (File path yet)
-* Header
-* List (check, bullet, ordered)
-
-## Not support yet
-
-* Images links
-* Code block
-* Blockquote
-* text Color 
-* background color
-* indented text,
-* indented list (bullet, unordered, check)
-* formula 
-
 You can contribute reporting issues or requesting to add new features in: https://github.com/CatHood0/quill_to_pdf 
+
