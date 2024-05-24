@@ -8,7 +8,9 @@ extension StringNullableExt on String? {
   }
 
   String? replaceAllNewLinesWith(Object object) => this?.replaceAll('\n', '$object');
-
+  
+  ///Equals is a similar function that use Java or Kotlin 
+  ///classes to see the equality from two objects
   bool equals(String other, {bool caseSensitive = true, Pattern? pattern}) {
     if (this == null) return false;
     if (!caseSensitive) return this?.toLowerCase() == other.toLowerCase();
@@ -25,25 +27,6 @@ extension StringExtension on String {
     return '[$this]';
   }
 
-  String capitalize() => isEmpty || length < 2 ? this : "${this[0].toUpperCase()}${substring(1)}";
-
-  (String, int) capitalizeByIndex({int? startIndex, required int endIndex}) {
-    _buffer.clear();
-    int lastIndex = 0;
-    int end = endIndex;
-    for (int i = 0; i < endIndex; i++) {
-      if (startIndex != null && i < startIndex) {
-        _buffer.write(this[i]);
-      }
-      if (i < length || i >= endIndex) {
-        _buffer.write(this[i].toUpperCase());
-        lastIndex = i + 1;
-        end--;
-      }
-    }
-    return ('${_buffer..write(substring(lastIndex))}', end);
-  }
-
   bool get isTotallyEmpty => replaceAll(RegExp(r'\s+'), '').replaceAll(RegExp('\\n|\n'), '').isEmpty;
 
   List<String> get splitBasedNewLine => split('\n');
@@ -53,11 +36,7 @@ extension StringExtension on String {
 
   String replaceAllNewLinesWith(Object object) => replaceAll('\n', '$object');
 
-  String get replaceAllSpaces => replaceAll(RegExp(r'\s*'), '');
-
   String get replaceHtmlBrToManyNewLines => replaceAll('<br>', '\n');
-
-  String get replaceWhitespacesWithHyphen => replaceAll(r'\s+', '-');
 
   bool equals(String other, {bool caseSensitive = true, Pattern? pattern, bool useThisInstead = false}) {
     if (!caseSensitive) return toLowerCase() == other.toLowerCase();
@@ -67,7 +46,10 @@ extension StringExtension on String {
             : pattern.allMatches(useThisInstead ? this : other).isNotEmpty
         : this == other;
   }
-
+  ///Since our default delta to html can create inline styles like
+  /// <strong style="line-height:1.0;font-size:8px">bold</strong
+  ///Instead <span style="..."><strong>bold</strong></span>
+  ///We decide create a converter that fix this minimal bug
   String get convertWrongInlineStylesToSpans {
     return replaceAllMapped(RegExp(r'(<em\s*(style=".*?")>(.+?)<\/em>)'), (Match match) {
       final String? styles = match.group(2);
@@ -85,7 +67,9 @@ extension StringExtension on String {
   }
 
   ///Encode the markdown inline styles (**,*,_) to another tags types, to avoid detection by the compiler
-  //(is need, because if the user put _ in a word, it will be detected as underline instead of just a symbol)
+  //it's exist, because if the user put "_" in a 
+  ///word, it will be detected as underline 
+  ///instead a symbol, a put the underline style (the user couldn't want this)
   String get encodeSymbols {
     return replaceAll('#', Constant.ENCODED_MD_HEADER_SYMBOL)
         .replaceAll('"', Constant.ENCODED_QUOTE_SYMBOL)
@@ -123,7 +107,10 @@ extension StringExtension on String {
         .replaceAll(Constant.ENCODED_MD_BOLD_SYMBOL, '**')
         .replaceAll(Constant.ENCODED_MD_ITALIC_SYMBOL, '*');
   }
+  
 
+  ///A simple inline style html to markdown converter
+  //TODO: implement link conversion
   String get convertHTMLToMarkdown =>
       replaceAllMapped(RegExp(r'<strong>(?<bold>(?:(?!(<strong>|<\/strong>)).)+)<\/strong>'), (Match match) {
         return '**${match.group(1)!}**';
@@ -146,10 +133,12 @@ extension StringExtension on String {
         final String src = match.group(12)!;
         return '![$styles]($src)';
       });
-
+  ///Since [vsc_quill_delta_to_html] encode the text with UTF8, 
+  ///don't decode at the output, this function solve this
   String get convertUTF8QuotesToValidString => replaceAll('&lt;', '<').replaceAll('&gt;', '>');
   String get recovertUTF8QuotesToHumanStringChars => replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
+  ///Used to solved common errors in raw delta strings, since we don't used delta literals
   String get fixCommonErrorInsertsInRawDelta => replaceAll('"}]{"', '"},{"')
       .replaceAll(RegExp(r'\}(,+)\{'), '},{')
       .replaceAll('}{', '},{')
