@@ -98,7 +98,7 @@ PDFConverter pdfConverter = PDFConverter(
 final pw.Document? document = await pdfConverter.createDocument();
 ```
 
-#### `createDocumentFile` _makes the same of the befor one, but instead return the document, write in the selected file path_
+#### `createDocumentFile` _makes the same of the before one, but instead return the document, write in the selected file path_
 
 ```dart
 await pdfConverter.createDocumentFile(path: filepath, ...other optional params);
@@ -120,7 +120,7 @@ String convertDeltaToHtml(Delta delta, [ConverterOptions? options]) {
 
 ### If you want to get the markdown, you need to make some steps
 
-1. Use `convertDeltaToMarkdown` function to get html from delta
+1. Use `convertDeltaToHtml` function to get html from delta
 
 2. Use html string, and pass as param in `convertHtmlToMarkdown`
 
