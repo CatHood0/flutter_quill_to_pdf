@@ -3,8 +3,10 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 
-//calculate spacing for 0.6,0.8,1.0,1.1,1.2,1.3,1.4,1.5
+
 extension PdfDoubleExtension on double {
+  ///Calculate based on the the current value to return the more similar line height 
+  ///as should see on a PDF (and like Docx, libreoffice formatting too)
   double resolveLineHeight() {
     if (this <= 0) return 0;
     if (this == 2.0) return 23.5;
@@ -13,6 +15,10 @@ extension PdfDoubleExtension on double {
     return this;
   }
 
+  ///Calculate based on the current value to return the padding 
+  ///at the last of the line since pdf package 
+  ///rich text, on param of lineSpacing 
+  ///doesn't have effect at the top or botton of the line
   double resolvePaddingByLineHeight() {
     if (this <= 0) return 0;
     if (this == 12.5) return 6.5;
@@ -75,6 +81,7 @@ int rgbaToHex(int red, int green, int blue, {double opacity = 1}) {
   );
 }
 
+///A extesion to resolve more easily to decide the style of the spans
 extension TextStyleInlineExtension on pw.TextStyle {
   pw.TextStyle resolveInline(bool bold, bool italic, bool under, bool isAllInOne) {
     return !isAllInOne
@@ -91,6 +98,7 @@ extension TextStyleInlineExtension on pw.TextStyle {
   }
 }
 
+///A simple resolver to make more readable decide the align to a paragraph
 extension BlockAlignmentExtension on String {
   Alignment get resolveBlockAlign {
     if (equals('')) return Alignment.centerLeft;
@@ -102,6 +110,9 @@ extension BlockAlignmentExtension on String {
   }
 }
 
+///Pdf image resolve to boxfit images at a type
+///Some conditions return different boxfit from the compare
+///since that boxfit cam generate conflicts or crash the app
 extension PdfBlockBoxFitExtension on String {
   pw.BoxFit get resolvePdfFit {
     if (equals('contain')) return pw.BoxFit.contain;
@@ -126,6 +137,7 @@ extension PdfBlockAlignmentExtension on String {
   }
 }
 
+//TODO: remove resolveTextAlign since this doesn't be need it in this extension
 extension TextAlignmentExtension on String? {
   pw.TextAlign get resolvePdfTextAlign {
     return this == 'center'
