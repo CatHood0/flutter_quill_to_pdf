@@ -7,15 +7,15 @@ import 'package:flutter_quill_to_pdf/core/extensions/list_extension.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
-import '../attribute_functions.dart';
-import '../book_functions.dart';
+import 'attribute_functions.dart';
+import 'document_functions.dart';
 import '../abstract_converter.dart';
 
 abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     implements
         AttrInlineFunctions<List<pw.InlineSpan>, pw.TextStyle?>,
         AttrBlockFunctions<pw.Widget, pw.TextStyle?>,
-        BookFunctions<Delta, List<String>, List<pw.Widget>> {
+        DocumentFunctions<Delta, List<String>, List<pw.Widget>> {
   late final PdfColor default_link_color;
   late final pw.TextStyle default_style;
   final Delta? frontM;
@@ -63,7 +63,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
 
   //Network image is not supported yet
   @override
-  Future<pw.Widget?> imageBlock(String line, [pw.Alignment? alignment]) async {
+  Future<pw.Widget?> getImageBlock(String line, [pw.Alignment? alignment]) async {
     final RegExpMatch? match = Constant.IMAGE_PATTERN.firstMatch(line);
     double? width = null;
     double? height = null;
@@ -172,7 +172,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   @override
-  Future<List<pw.InlineSpan>> getDocLinksSpacingFontsStyle(String line,
+  Future<List<pw.InlineSpan>> getRichTextInlineStyles(String line,
       [pw.TextStyle? style, bool returnContentIfNeedIt = false, bool addFontSize = true]) async {
     final List<pw.InlineSpan> spans = <pw.InlineSpan>[];
     final Iterable<RegExpMatch> matches = Constant.INLINES_RICH_TEXT_PATTERN.allMatches(line);
@@ -184,7 +184,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       if (plainText.isNotEmpty) {
         if (Constant.INLINE_MATCHER.hasMatch(plainText)) {
           spans.add(pw.TextSpan(
-              children: await getAllStyles(plainText, style, addFontSize), style: style ?? default_style)); // Apply currentinheritedStyle
+              children: await applyInlineStyles(plainText, style, addFontSize), style: style ?? default_style)); // Apply currentinheritedStyle
         } else {
           spans.add(pw.TextSpan(text: plainText.decodeSymbols, style: style ?? default_style)); // Apply currentinheritedStyle
         }
@@ -217,7 +217,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
             lineSpacing: lineSpacing,
           );
       spans.add(
-        pw.TextSpan(children: await getAllStyles(content, decided_style, addFontSize), style: decided_style),
+        pw.TextSpan(children: await applyInlineStyles(content, decided_style, addFontSize), style: decided_style),
       );
       currentIndex = match.end;
       i++;
@@ -226,7 +226,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     if (remainingText.isNotEmpty) {
       if (Constant.INLINE_MATCHER.hasMatch(remainingText)) {
         spans.add(pw.TextSpan(
-            children: await getAllStyles(remainingText, style, addFontSize), style: style ?? default_style)); // Apply currentinheritedStyle
+            children: await applyInlineStyles(remainingText, style, addFontSize), style: style ?? default_style)); // Apply currentinheritedStyle
       } else {
         spans.add(pw.TextSpan(text: remainingText.decodeSymbols, style: style ?? default_style)); // Apply currentinheritedStyle
       }
@@ -235,7 +235,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     return spans;
   }
 
-  Future<List<pw.TextSpan>> getAllStyles(String line, [pw.TextStyle? style, bool addFontSize = true]) async {
+  Future<List<pw.TextSpan>> applyInlineStyles(String line, [pw.TextStyle? style, bool addFontSize = true]) async {
     final List<pw.TextSpan> spans = <pw.TextSpan>[];
     final pw.TextStyle? inheritedStyle = style;
     final Iterable<RegExpMatch> matches = Constant.INLINE_MATCHER.allMatches(line);
@@ -247,7 +247,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       if (plainText.isNotEmpty) {
         if (Constant.INLINE_MATCHER.hasMatch(plainText)) {
           spans.add(pw.TextSpan(
-              children: await getAllStyles(plainText.convertUTF8QuotesToValidString, inheritedStyle, addFontSize),
+              children: await applyInlineStyles(plainText.convertUTF8QuotesToValidString, inheritedStyle, addFontSize),
               style: inheritedStyle ?? default_style)); // Apply currentinheritedStyle
         } else {
           spans.add(pw.TextSpan(
@@ -269,7 +269,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     if (remainingText.isNotEmpty) {
       if (Constant.INLINE_MATCHER.hasMatch(remainingText)) {
         spans.add(pw.TextSpan(
-            children: await getAllStyles(remainingText.convertUTF8QuotesToValidString, inheritedStyle, addFontSize),
+            children: await applyInlineStyles(remainingText.convertUTF8QuotesToValidString, inheritedStyle, addFontSize),
             style: inheritedStyle ?? default_style)); // Apply currentinheritedStyle
       } else {
         spans.add(pw.TextSpan(
@@ -292,7 +292,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       if (plainText.isNotEmpty) {
         if (Constant.INLINE_MATCHER.hasMatch(plainText)) {
           spans.add(pw.TextSpan(
-              children: await getAllStyles(plainText.convertUTF8QuotesToValidString, style, addFontSize),
+              children: await applyInlineStyles(plainText.convertUTF8QuotesToValidString, style, addFontSize),
               style: style ?? default_style)); // Apply currentinheritedStyle
         } else {
           spans.add(pw.TextSpan(
@@ -334,7 +334,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     if (remainingText.isNotEmpty) {
       if (Constant.INLINE_MATCHER.hasMatch(remainingText)) {
         spans.add(pw.TextSpan(
-            children: await getAllStyles(remainingText, style, addFontSize), style: style ?? default_style)); // Apply currentinheritedStyle
+            children: await applyInlineStyles(remainingText, style, addFontSize), style: style ?? default_style)); // Apply currentinheritedStyle
       } else {
         spans.add(pw.TextSpan(
             text: remainingText.convertUTF8QuotesToValidString.decodeSymbols, style: style ?? default_style)); // Apply current style
@@ -369,7 +369,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       if (plainText.isNotEmpty) {
         if (Constant.INLINE_MATCHER.hasMatch(plainText)) {
           spans.add(
-              pw.TextSpan(children: await getAllStyles(plainText, style), style: style ?? default_style)); // Apply currentinheritedStyle
+              pw.TextSpan(children: await applyInlineStyles(plainText, style), style: style ?? default_style)); // Apply currentinheritedStyle
         } else {
           spans.add(pw.TextSpan(
               text: plainText.convertUTF8QuotesToValidString.decodeSymbols, style: style ?? default_style)); // Apply currentinheritedStyle
@@ -396,7 +396,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     if (remainingText.isNotEmpty) {
       if (Constant.INLINE_MATCHER.hasMatch(remainingText)) {
         spans.add(
-            pw.TextSpan(children: await getAllStyles(remainingText, style), style: style ?? default_style)); // Apply currentinheritedStyle
+            pw.TextSpan(children: await applyInlineStyles(remainingText, style), style: style ?? default_style)); // Apply currentinheritedStyle
       } else {
         spans.add(pw.TextSpan(
             text: remainingText.convertUTF8QuotesToValidString.decodeSymbols,
@@ -407,14 +407,14 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   @override
-  Future<pw.Widget> getBlockHeaderStyle(String line, [pw.TextStyle? style]) async {
+  Future<pw.Widget> getHeaderBlock(String line, [pw.TextStyle? style]) async {
     final RegExpMatch match = Constant.HEADER_PATTERN.firstMatch(line)!;
 
     final String headerLevel = match.group(1)!;
     final String headerText = match.group(2)!;
     final double defaultFontSize = headerLevel.resolveHeaderLevel();
     final pw.TextStyle textStyle = style ?? default_style.copyWith(fontSize: defaultFontSize);
-    final List<pw.InlineSpan> spans = await getDocLinksSpacingFontsStyle(
+    final List<pw.InlineSpan> spans = await getRichTextInlineStyles(
       headerText.replaceAllMapped(Constant.INLINES_RICH_TEXT_PATTERN_STRICT, (Match match) {
         final String content = match.group(10)!;
         final String? fontFamily = match.group(7);
@@ -437,7 +437,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   @override
-  Future<List<pw.Widget>> getAlignedBlockHeaderStyle(String line, [pw.TextStyle? style]) async {
+  Future<List<pw.Widget>> getAlignedHeaderBlock(String line, [pw.TextStyle? style]) async {
     final RegExpMatch match = Constant.ALIGNED_HEADER_PATTERN.firstMatch(line)!;
     final List<pw.Widget> widgets = <pw.Widget>[];
     final String hLevel = match.group(1)!;
@@ -468,14 +468,14 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   @override
-  Future<List<pw.Widget>> getAlignedBlockParagraphStyle(String line, [pw.TextStyle? style]) async {
+  Future<List<pw.Widget>> getAlignedParagraphBlock(String line, [pw.TextStyle? style]) async {
     if (Constant.HTML_IMAGE_PATTERN.hasMatch(line)) {
       final RegExp matcher = Constant.HTML_IMAGE_PATTERN;
       final RegExpMatch match = matcher.firstMatch(line)!;
       final pw.Alignment alignment = match.group(1)!.resolvePdfBlockAlign;
       final String sourceImage = match.group(2)!;
       String mdImage = convertHtmlToMarkdown(sourceImage, rules, <String>[]);
-      return <pw.Widget>[(await imageBlock.call(mdImage, alignment)) ?? pw.SizedBox()];
+      return <pw.Widget>[(await getImageBlock.call(mdImage, alignment)) ?? pw.SizedBox()];
     }
     final Iterable<RegExpMatch> matches = Constant.ALIGNED_P_PATTERN.allMatches(line);
     final List<pw.Widget> widgets = <pw.Widget>[];
@@ -510,7 +510,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   @override
-  Future<pw.Widget> getListBlockStyle(String line, bool isCheckList, [pw.TextStyle? style]) async {
+  Future<pw.Widget> getListBlock(String line, bool isCheckList, [pw.TextStyle? style]) async {
     final List<pw.WidgetSpan> widgets = <pw.WidgetSpan>[];
     final RegExpMatch? checkMatch = Constant.LIST_CHECK_MD_PATTERN.firstMatch(line);
     final RegExpMatch? listMatch = Constant.LIST_PATTERN.firstMatch(line);
@@ -605,9 +605,9 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   Future<List<pw.InlineSpan>> _getStylesSpans(String content,
       [pw.TextStyle? style, bool returnContentIfNeedIt = false, bool addFontSize = true]) async {
     if (Constant.INLINES_RICH_TEXT_PATTERN.hasMatch(content)) {
-      return await getDocLinksSpacingFontsStyle(content, style, returnContentIfNeedIt, addFontSize);
+      return await getRichTextInlineStyles(content, style, returnContentIfNeedIt, addFontSize);
     } else {
-      return await getAllStyles(content, style, addFontSize);
+      return await applyInlineStyles(content, style, addFontSize);
     }
   }
 }

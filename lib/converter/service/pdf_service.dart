@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_quill_to_pdf/utils/utils.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -11,7 +12,7 @@ import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 import 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/src/quill_delta_to_html_converter.dart';
 
 import '../../core/constant/constants.dart';
-import '../../domain/entities/custom_converter.dart';
+import '../configurator/converter_option/custom_converter.dart';
 import '../../utils/converters_utils.dart';
 import '../configurator/pdf/pdf_configurator.dart';
 
@@ -155,13 +156,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     return List<Map<String, dynamic>>.from(docMap);
   }
 
+  //TODO: we must to add support for default html tags, and markdown styles 
+  // (without the custom styles from the library) 
   @override
   Future<List<pw.Widget>> blockGenerators(List<String> lines, [Map<String, dynamic>? extraInfo]) async {
     final bool isDefaulBlockConvertion = customHTMLToMarkdownConverter == null;
     final List<pw.Widget> contentPerPage = <pw.Widget>[];
     for (int i = 0; i < lines.length; i++) {
       late String line;
-      if (isDefaulBlockConvertion) {
+      if (!isDefaulBlockConvertion) {
         line = lines.elementAt(i);
       } else {
         line = lines.elementAt(i).replaceAll(r'\"', '"').convertHTMLToMarkdown; //delete the encode that avoid conflicts with delta map
@@ -187,7 +190,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           contentPerPage.add(await onDetectImageBlock!.call(Constant.IMAGE_PATTERN_IN_SPAN, line));
           continue;
         }
-        final pw.Widget? image = await imageBlock.call(Constant.IMAGE_PATTERN_IN_SPAN.firstMatch(line.decodeSymbols)!.group(1)!);
+        final pw.Widget? image = await getImageBlock.call(Constant.IMAGE_PATTERN_IN_SPAN.firstMatch(line.decodeSymbols)!.group(1)!);
         if (image != null) contentPerPage.add(image);
         continue;
       }
@@ -203,7 +206,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
 
         /// founds lines like <span style="wiki-doc: id">(.*?)<\/span>) or <span style="line-height: 2.0")">(.*?)<\/span> or <span\s?style="font-size: 12">(.*?)<\/span>)
         /// and those three ones together are matched
-        final List<pw.InlineSpan> spans = await getDocLinksSpacingFontsStyle.call(line, default_style);
+        final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(line, default_style);
         final double spacing = (spans.first.style?.lineSpacing ?? 1.0);
         contentPerPage.add(
           pw.Padding(
@@ -226,14 +229,14 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           }
 
           /// founds lines like # header 1 or ## header 2
-          contentPerPage.add(await getBlockHeaderStyle.call(line));
+          contentPerPage.add(await getHeaderBlock.call(line));
           continue;
         }
         if (onDetectHeaderBlock != null) {
           contentPerPage.add(await onDetectHeaderBlock!.call(Constant.ALIGNED_HEADER_PATTERN, line));
           continue;
         }
-        contentPerPage.addAll(await getAlignedBlockHeaderStyle.call(line));
+        contentPerPage.addAll(await getAlignedHeaderBlock.call(line));
       } else if (Constant.IMAGE_PATTERN.hasMatch(line)) {
         /// founds lines like ![max-width: 100%;object-fit: fill](image_bytes)
         /// also ![styles](url|file-path)
@@ -241,7 +244,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           contentPerPage.add(await onDetectImageBlock!.call(Constant.IMAGE_PATTERN, line));
           continue;
         }
-        final pw.Widget? image = await imageBlock.call(line);
+        final pw.Widget? image = await getImageBlock.call(line);
         if (image != null) contentPerPage.add(image);
       } else if (Constant.ALIGNED_P_PATTERN.hasMatch(line)) {
         /// founds lines like <p style="text-align:center">paragraph</p>
@@ -249,7 +252,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           contentPerPage.add(await onDetectAlignedParagraph!.call(Constant.ALIGNED_P_PATTERN, line));
           continue;
         }
-        contentPerPage.addAll(await getAlignedBlockParagraphStyle.call(line));
+        contentPerPage.addAll(await getAlignedParagraphBlock.call(line));
       } else if (line.isTotallyEmpty || Constant.EMPTY_ALIGNED_H.hasMatch(line) || Constant.EMPTY_ALIGNED_P.hasMatch(line)) {
         /// founds lines like [] or <p style="text-align:center">\n</p> or <h1 style="text-align:center">\n</h1>
         // this could be returning/printing br word in document instead \n
@@ -274,17 +277,16 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               .call(Constant.LIST_PATTERN.hasMatch(line) ? Constant.LIST_PATTERN : Constant.LIST_CHECK_MD_PATTERN, line));
           continue;
         }
-
+        //TODO: now add support for indented lists ->
+        //TODO: now add support for list with different prefixes 
         /// founds lines like:
-        // TODO: fix issue where the with line height show wrong text position (checkbox isn't working with the line height )
         /// "[x] checked" or
         /// "[ ] uncheck" or
         /// "1. ordered list" or
-        //TODO: now add support for indented lists ->
         /// "i. ordered list" or
         /// "a. ordered list" or
         /// "* unordered list"
-        contentPerPage.add(await getListBlockStyle.call(line, Constant.LIST_CHECK_MD_PATTERN.hasMatch(line)));
+        contentPerPage.add(await getListBlock.call(line, Constant.LIST_CHECK_MD_PATTERN.hasMatch(line)));
       } else if (Constant.HTML_LINK_TAGS_PATTERN.hasMatch(line)) {
         if (onDetectLink != null) {
           contentPerPage.add(await onDetectLink!.call(Constant.HTML_LINK_TAGS_PATTERN, line));
@@ -329,7 +331,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
 
           /// founds lines like <span style="wiki-doc: id">(.*?)<\/span>) or <span style="line-height: 2.0")">(.*?)<\/span> or <span\s?style="font-size: 12">(.*?)<\/span>)
           /// and those three ones together are matched
-          final List<pw.InlineSpan> spans = await getDocLinksSpacingFontsStyle.call(line, default_style);
+          final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(line, default_style);
           final double spacing = (spans.first.style?.lineSpacing ?? 1.0);
           contentPerPage.add(
             pw.Padding(
@@ -349,14 +351,28 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           contentPerPage.add(await onDetectCommonText!.call(null, line));
           continue;
         }
-        final List<pw.TextSpan> spans = await getAllStyles(line);
+        if (isHTML(line)) {
+          final List<pw.TextSpan> spans = await applyInlineStyles.call(line);
+          contentPerPage.add(
+            pw.Padding(
+              padding: pw.EdgeInsets.symmetric(vertical: ((spans.firstOrNull?.style?.lineSpacing ?? 0.40) - 0.40).resolveLineHeight()),
+              child: pw.RichText(
+                softWrap: true,
+                overflow: pw.TextOverflow.span,
+                text: pw.TextSpan(children: spans),
+              ),
+            ),
+          );
+          continue;
+        }
+        //Wether found a plain text, then set default styles since we cannot detect any style to plain content
         contentPerPage.add(
           pw.Padding(
-            padding: pw.EdgeInsets.symmetric(vertical: ((spans.firstOrNull?.style?.lineSpacing ?? 0.40) - 0.40).resolveLineHeight()),
+            padding: const pw.EdgeInsets.symmetric(vertical: 1.0),
             child: pw.RichText(
               softWrap: true,
               overflow: pw.TextOverflow.span,
-              text: pw.TextSpan(children: spans),
+              text: pw.TextSpan(text: line, style: default_style),
             ),
           ),
         );

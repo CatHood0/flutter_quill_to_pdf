@@ -31,9 +31,6 @@ extension StringExtension on String {
 
   List<String> get splitBasedNewLine => split('\n');
 
-  String get replaceAllNewLines => replaceAll('\n', '');
-  String get rawnewLines => replaceAll('\n', r'\n');
-
   String replaceAllNewLinesWith(Object object) => replaceAll('\n', '$object');
 
   String get replaceHtmlBrToManyNewLines => replaceAll('<br>', '\n');

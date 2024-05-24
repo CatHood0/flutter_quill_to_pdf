@@ -29,9 +29,9 @@ String? searchNextAttr({
     }
     if (limitTo == DeltaDetectionLimit.newline) {
       if (operation.data is String && Constant.newLinesInsertions.hasMatch((operation.data as String)) && operation.attributes != null) {
-        final String? lineHeight = operation.attributes?[attr];
-        if (lineHeight != null) {
-          return lineHeight;
+        final String? attribute = operation.attributes?[attr];
+        if (attribute != null) {
+          return attribute;
         }
       }
       // just continue if the insert doesnt contains any new line
@@ -43,11 +43,12 @@ String? searchNextAttr({
         return null;
       }
     }
+    //Search the attribute until the end of the delta
     if (limitTo == DeltaDetectionLimit.end) {
       if (operation.data is String && Constant.newLinesInsertions.hasMatch((operation.data as String)) && operation.attributes != null) {
-        final String? lineHeight = operation.attributes?[attr];
-        if (lineHeight != null) {
-          return lineHeight;
+        final String? attribute = operation.attributes?[attr];
+        if (attribute != null) {
+          return attribute;
         }
       }
       if (operation.data is String && !operation.data.toString().contains(_newLinesRegexp)) {
@@ -55,12 +56,13 @@ String? searchNextAttr({
         continue;
       }
     }
+    //Search until the next insert
     if (limitTo == DeltaDetectionLimit.nextInsert) {
       breakLoop = true;
       if (operation.data is String && Constant.newLinesInsertions.hasMatch((operation.data as String)) && operation.attributes != null) {
-        final String? lineHeight = operation.attributes?[attr];
-        if (lineHeight != null) {
-          return lineHeight;
+        final String? attribute = operation.attributes?[attr];
+        if (attribute != null) {
+          return attribute;
         }
       }
       if (operation.data is String && !operation.data.toString().contains(_newLinesRegexp)) {
@@ -72,9 +74,9 @@ String? searchNextAttr({
       final int mid = (delta.length / 2).floor();
       if (index <= mid) {
         if (operation.data is String && Constant.newLinesInsertions.hasMatch((operation.data as String)) && operation.attributes != null) {
-          final String? lineHeight = operation.attributes?[attr];
-          if (lineHeight != null) {
-            return lineHeight;
+          final String? attribute = operation.attributes?[attr];
+          if (attribute != null) {
+            return attribute;
           }
         }
       } else {

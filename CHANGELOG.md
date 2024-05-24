@@ -1,3 +1,10 @@
+# 1.1.1
+
+* [Feat] improved README 
+* [Fix] bad unnecessary args remove 
+* [Fix] bad names in some classes and functions
+* [Fix] bad test (by now cannot be created a test)
+
 ## 1.1.0
 
 * [Feat] added support to custom delta to html converter
