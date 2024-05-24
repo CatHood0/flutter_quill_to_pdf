@@ -27,7 +27,7 @@ You can configure:
 
 ```yaml
 dependencies: 
-    quill_to_pdf: ^1.1.1
+    flutter_quill_to_pdf: ^1.1.1
 ```
 
 ### Import package
@@ -165,7 +165,7 @@ String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String
 * Text Color (working on it)
 * Background color (working on it)
 * Indented text,
-* Indented list (bullet, unordered, check) (working on it)
+* Indented list (bullet, unordered, check) - (working on it)
 * Embed formula 
 * Embed video
 
