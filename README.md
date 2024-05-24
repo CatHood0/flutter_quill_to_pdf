@@ -101,7 +101,7 @@ You can set custom rules using
 PDFConverter(..., customRules: [...your custom rules]);
 ```
 
-_This is a fragment from [html2md](https://github.com/jarontai/html2md) package documentation.
+_This is a fragment from [html2md](https://github.com/jarontai/html2md) package documentation_
 
 #### Custom Rules
 
