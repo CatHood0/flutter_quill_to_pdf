@@ -13,7 +13,6 @@ class HTMLConverterOptions {
     bool multiLineCodeblock = true,
     bool multiLineParagraph = false,
     bool multiLineCustomBlock = true,
-    String docLinksTag = 'wiki-doc',
     String docLineSpacingTag = 'line-height',
     CustomCssStylesFn? customCssStyles,
     OpAttributeSanitizerOptions? satitizerOptions,
@@ -40,9 +39,6 @@ class HTMLConverterOptions {
                       // cover makes the page document height and width
                       (attrs ?? '')
                     ];
-                  }
-                  if (op.attributes['wiki'] != null) {
-                    return <String>['$docLinksTag: ${op.attributes['wiki']}'];
                   }
                   return null;
                 },
