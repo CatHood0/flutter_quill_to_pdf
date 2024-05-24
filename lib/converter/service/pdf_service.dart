@@ -161,7 +161,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     final List<pw.Widget> contentPerPage = <pw.Widget>[];
     for (int i = 0; i < lines.length; i++) {
       late String line;
-      if (isDefaulBlockConvertion) {
+      if (!isDefaulBlockConvertion) {
         line = lines.elementAt(i);
       } else {
         line = lines.elementAt(i).replaceAll(r'\"', '"').convertHTMLToMarkdown; //delete the encode that avoid conflicts with delta map
