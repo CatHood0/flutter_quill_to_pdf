@@ -1,3 +1,15 @@
+## 1.1.0
+
+* [Feat] added support to custom delta to html converter
+* [Feat] added support to custom html to markdown converter
+* [Feat] added new factory to create document and write file
+* [Feat] improved params descriptions
+* [Feat] added support to customize markdown rules
+* [Feat] now we can add a custom theme to pdf document
+* [Feat] now we can pass functions to when the create doc ends sucessfully or when throws and exception
+* [Fix] removed lineHeight attribute since flutt_quill and html2md has Rule class and creates conflicts on imports
+* README now has better documentation, to be more accurate on how  use this library
+
 ## 1.0.2
 
 * [Fix] inconfortable name. PDFConvertersParam was changed to PDFPageFormat

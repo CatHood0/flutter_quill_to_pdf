@@ -13,7 +13,6 @@ export 'package:flutter_quill_to_pdf/packages/html2md/lib/html2md.dart';
 export 'package:flutter_quill_to_pdf/packages/vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 export 'package:flutter_quill_to_pdf/domain/entities/custom_converter.dart';
 export 'package:flutter_quill_to_pdf/utils/converters_utils.dart';
-export 'package:flutter_quill_to_pdf/utils/line_height_attr/line_height_attribute.dart';
 export 'package:flutter_quill_to_pdf/utils/makdown_rules_custom.dart';
 export 'package:flutter_quill_to_pdf/utils/typedefs.dart';
 export 'package:flutter_quill_to_pdf/converter/pdf_converter.dart';

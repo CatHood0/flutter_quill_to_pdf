@@ -21,6 +21,7 @@ dependencies:
   flutter_quill: ^9.3.20
   file_picker: ^8.0.3
   animated_text_kit: 
+  html2md: 
 
 
 

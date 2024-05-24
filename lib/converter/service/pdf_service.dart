@@ -27,6 +27,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   late final double _marginRight;
   late final double _width;
   late final double _height;
+  final String Function(Delta)? customDeltaToHTMLConverter;
+  final String Function(String html)? customHTMLToMarkdownConverter;
   final ConverterOptions? converterOptions;
 
   PdfService({
@@ -39,6 +41,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     required super.onRequestItalicFont,
     required super.customConverters,
     required super.document,
+    pw.ThemeData? customTheme,
+    this.customDeltaToHTMLConverter,
+    this.customHTMLToMarkdownConverter,
     super.onDetectAlignedParagraph,
     super.onDetectCommonText,
     super.onDetectHeaderAlignedBlock,
@@ -65,27 +70,28 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     _height = params.height;
     pageWidth = params.width;
     pageHeight = params.height;
-    defaultTheme = pw.ThemeData(
-      softWrap: true,
-      textAlign: pw.TextAlign.left,
-      iconTheme: pw.IconThemeData.fallback(pw.Font.symbol()),
-      overflow: pw.TextOverflow.span,
-      defaultTextStyle: pw.TextStyle(
-        color: PdfColors.black,
-        fontWeight: pw.FontWeight.normal,
-        fontStyle: pw.FontStyle.normal,
-        letterSpacing: 0,
-        wordSpacing: 1.0,
-        lineSpacing: 1.0,
-        height: 1,
-        decoration: pw.TextDecoration.none,
-        decorationColor: null,
-        decorationStyle: pw.TextDecorationStyle.solid,
-        decorationThickness: 1,
-        renderingMode: PdfTextRenderingMode.fill,
-        fontFallback: <pw.Font>[..._fonts],
-      ),
-    );
+    defaultTheme = customTheme ??
+        pw.ThemeData(
+          softWrap: true,
+          textAlign: pw.TextAlign.left,
+          iconTheme: pw.IconThemeData.fallback(pw.Font.symbol()),
+          overflow: pw.TextOverflow.span,
+          defaultTextStyle: pw.TextStyle(
+            color: PdfColors.black,
+            fontWeight: pw.FontWeight.normal,
+            fontStyle: pw.FontStyle.normal,
+            letterSpacing: 0,
+            wordSpacing: 1.0,
+            lineSpacing: 1.0,
+            height: 1,
+            decoration: pw.TextDecoration.none,
+            decorationColor: null,
+            decorationStyle: pw.TextDecorationStyle.solid,
+            decorationThickness: 1,
+            renderingMode: PdfTextRenderingMode.fill,
+            fontFallback: <pw.Font>[..._fonts],
+          ),
+        );
   }
 
   @override
@@ -127,9 +133,12 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       final Delta doc = documents.elementAt(i);
       if (doc.isNotEmpty) {
         try {
-          final String html =
-              convertDeltaToHtml(doc, converterOptions).convertWrongInlineStylesToSpans.replaceAll('<p><br/><p>', '<p><br></p>');
-          markdownText = convertHtmlToMarkdown(html, rules, <String>[], removeLeadingWhitespaces: false, escape: false);
+          final String html = customDeltaToHTMLConverter != null
+              ? customDeltaToHTMLConverter!.call(doc)
+              : convertDeltaToHtml(doc, converterOptions).convertWrongInlineStylesToSpans.replaceAll('<p><br/><p>', '<p><br></p>');
+          markdownText = customHTMLToMarkdownConverter != null
+              ? customHTMLToMarkdownConverter!.call(html)
+              : convertHtmlToMarkdown(html, rules, <String>[], removeLeadingWhitespaces: false, escape: false);
         } on ArgumentError catch (e) {
           debugPrint(e.toString());
           rethrow;
@@ -148,9 +157,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
 
   @override
   Future<List<pw.Widget>> blockGenerators(List<String> lines, [Map<String, dynamic>? extraInfo]) async {
+    final bool isDefaulBlockConvertion = customHTMLToMarkdownConverter == null;
     final List<pw.Widget> contentPerPage = <pw.Widget>[];
     for (int i = 0; i < lines.length; i++) {
-      String line = lines.elementAt(i).replaceAll(r'\"', '"').convertHTMLToMarkdown; //delete the encode that avoid conflicts with delta map
+      late String line;
+      if (isDefaulBlockConvertion) {
+        line = lines.elementAt(i);
+      } else {
+        line = lines.elementAt(i).replaceAll(r'\"', '"').convertHTMLToMarkdown; //delete the encode that avoid conflicts with delta map
+      }
       if (customConverters.isNotEmpty) {
         for (final CustomConverter detector in customConverters) {
           if (detector.predicate.hasMatch(line)) {

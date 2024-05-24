@@ -5,6 +5,8 @@ import 'package:flutter_quill/translations.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 
+import 'line_height_attr/line_height_attribute.dart';
+
 class QuillLineHeightButton extends QuillToolbarBaseValueButton<QuillLineHeightButtonOptions, QuillLineHeightButtonExtraOptions> {
   QuillLineHeightButton({
     required super.controller,

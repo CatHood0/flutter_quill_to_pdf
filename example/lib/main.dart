@@ -6,7 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
+import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' hide Rule;
 
 import 'example_editor/toolbar/custom_quill_toolbar.dart';
 

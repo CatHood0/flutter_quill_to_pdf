@@ -26,30 +26,13 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final Future<pw.Font> Function(String fontFamily) onRequestItalicFont;
   final Future<pw.Font> Function(String fontFamily) onRequestBothFont;
   final CustomPDFWidget? onDetectImageBlock;
-
-  ///Detect Rich text styles like: size, spacing, font family
   final CustomPDFWidget? onDetectInlineRichTextStyles;
-
-  ///Detect simple: # header
   final CustomPDFWidget? onDetectHeaderBlock;
-
-  ///Detect html headers: <h1 style="text-align:center">header</h1>
   final CustomPDFWidget? onDetectHeaderAlignedBlock;
-
-  ///Detect html headers: <p style="text-align:center">header</p>
   final CustomPDFWidget? onDetectAlignedParagraph;
-
-  ///Detect simple text like: <p>paragraph</p> or <span>paragrap</span> or even plain text
   final CustomPDFWidget? onDetectCommonText;
-
-  ///Detect classic inline markdown styles: **bold** *italic* _underline_ [strikethrogh is not supported yet]
   final CustomPDFWidget? onDetectInlinesMarkdown;
-
-  ///Detect custom and common html links implementation like:
-  ///<a style="line-height:1.0;font-family:Times new roman;font-size:12px" href="https://google.com" target="_blank">link to google</a>
-  ///<a href="https://google.com" target="_blank">link to google</a>
   final CustomPDFWidget? onDetectLink;
-  //Detect markdown list: * bullet, 1. ordered, [x] check list (still has errors in render or in detect indent)
   final CustomPDFWidget? onDetectList;
   final Future<List<pw.Font>?> Function(String fontFamily)? onRequestFallbacks;
   final int defaultFontSize = Constant.DEFAULT_FONT_SIZE; //avoid spans without font sizes not appears in the document

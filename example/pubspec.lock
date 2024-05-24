@@ -401,7 +401,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.1"
+    version: "1.0.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -437,7 +437,7 @@ packages:
     source: hosted
     version: "0.15.4"
   html2md:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: html2md
       sha256: "6f50cec926b0a09816aadb66a59e4cda45c91fd00551e5a8298870069729b508"
