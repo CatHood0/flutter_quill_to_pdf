@@ -43,8 +43,20 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     required super.customConverters,
     required super.document,
     pw.ThemeData? customTheme,
+    super.codeBlockFont,
+    super.blockQuoteBackgroundColor,
+    super.codeBlockBackgroundColor,
+    super.codeBlockNumLinesTextStyle,
+    super.codeBlockTextStyle,
+    super.blockQuoteDividerColor,
+    super.blockQuoteTextStyle,
     this.customDeltaToHTMLConverter,
     this.customHTMLToMarkdownConverter,
+    super.blockQuotePaddingLeft,
+    super.blockQuotePaddingRight,
+    super.blockQuotethicknessDividerColor,
+    super.onDetectBlockquote,
+    super.onDetectCodeBlock,
     super.onDetectAlignedParagraph,
     super.onDetectCommonText,
     super.onDetectHeaderAlignedBlock,
@@ -59,7 +71,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.frontM,
   }) {
     _fonts = fonts;
-    default_style = pw.TextStyle(
+    defaultTextStyle = pw.TextStyle(
       fontSize: defaultFontSize.toDouble(),
       fontFallback: <pw.Font>[..._fonts],
     );
@@ -156,8 +168,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     return List<Map<String, dynamic>>.from(docMap);
   }
 
-  //TODO: we must to add support for default html tags, and markdown styles 
-  // (without the custom styles from the library) 
   @override
   Future<List<pw.Widget>> blockGenerators(List<String> lines, [Map<String, dynamic>? extraInfo]) async {
     final bool isDefaulBlockConvertion = customHTMLToMarkdownConverter == null;
@@ -193,20 +203,35 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         final pw.Widget? image = await getImageBlock.call(Constant.IMAGE_PATTERN_IN_SPAN.firstMatch(line.decodeSymbols)!.group(1)!);
         if (image != null) contentPerPage.add(image);
         continue;
-      }
-      if (Constant.NEWLINE_WITH_SPACING_PATTERN.hasMatch(line)) {
+      } else if (Constant.BLOCKQUOTE_PATTERN.hasMatch(line.decodeSymbols)) {
+        if (onDetectBlockquote != null) {
+          contentPerPage.add(await onDetectBlockquote!.call(Constant.BLOCKQUOTE_PATTERN, line.decodeSymbols));
+          continue;
+        }
+
+        /// founds multiline where starts with <pre> and ends with </pre>
+        contentPerPage.addAll(await getBlockQuote.call(line.decodeSymbols));
+      } else if (Constant.CODE_PATTERN.hasMatch(line.replaceAll('\n', r'\n').decodeSymbols)) {
+        if (onDetectCodeBlock != null) {
+          contentPerPage.add(await onDetectCodeBlock!.call(Constant.CODE_PATTERN, line.decodeSymbols));
+          continue;
+        }
+
+        /// founds multiline where starts with <pre> and ends with </pre>
+        contentPerPage.addAll(await getCodeBlock.call(line.decodeSymbols));
+      } else if (Constant.NEWLINE_WITH_SPACING_PATTERN.hasMatch(line)) {
         /// founds lines like <span style="line-spacing: 1.0">\n</span>
         contentPerPage.add(
             pw.RichText(softWrap: true, overflow: pw.TextOverflow.span, text: pw.TextSpan(children: await getNewLinesWithSpacing(line))));
-      } else if (Constant.INLINES_RICH_TEXT_PATTERN_STRICT.hasMatch(line)) {
+      } else if (Constant.STARTS_WITH_RICH_TEXT_INLINE_STYLES_PATTERN.hasMatch(line)) {
         if (onDetectInlineRichTextStyles != null) {
-          contentPerPage.add(await onDetectInlineRichTextStyles!.call(Constant.INLINES_RICH_TEXT_PATTERN_STRICT, line));
+          contentPerPage.add(await onDetectInlineRichTextStyles!.call(Constant.STARTS_WITH_RICH_TEXT_INLINE_STYLES_PATTERN, line));
           continue;
         }
 
         /// founds lines like <span style="wiki-doc: id">(.*?)<\/span>) or <span style="line-height: 2.0")">(.*?)<\/span> or <span\s?style="font-size: 12">(.*?)<\/span>)
         /// and those three ones together are matched
-        final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(line, default_style);
+        final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(line, defaultTextStyle);
         final double spacing = (spans.first.style?.lineSpacing ?? 1.0);
         contentPerPage.add(
           pw.Padding(
@@ -266,7 +291,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         contentPerPage.add(
           pw.Paragraph(
             text: newLineDecided,
-            style: default_style,
+            style: defaultTextStyle,
             padding: const pw.EdgeInsets.symmetric(vertical: 1.5),
             margin: pw.EdgeInsets.zero,
           ),
@@ -278,7 +303,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           continue;
         }
         //TODO: now add support for indented lists ->
-        //TODO: now add support for list with different prefixes 
+        //TODO: now add support for list with different prefixes
         /// founds lines like:
         /// "[x] checked" or
         /// "[ ] uncheck" or
@@ -323,15 +348,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           ),
         );
       } else {
-        if (Constant.INLINES_RICH_TEXT_PATTERN.hasMatch(line)) {
+        if (Constant.RICH_TEXT_INLINE_STYLES_PATTERN.hasMatch(line)) {
           if (onDetectInlineRichTextStyles != null) {
-            contentPerPage.add(await onDetectInlineRichTextStyles!.call(Constant.INLINES_RICH_TEXT_PATTERN, line));
+            contentPerPage.add(await onDetectInlineRichTextStyles!.call(Constant.RICH_TEXT_INLINE_STYLES_PATTERN, line));
             continue;
           }
 
           /// founds lines like <span style="wiki-doc: id">(.*?)<\/span>) or <span style="line-height: 2.0")">(.*?)<\/span> or <span\s?style="font-size: 12">(.*?)<\/span>)
           /// and those three ones together are matched
-          final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(line, default_style);
+          final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(line, defaultTextStyle);
           final double spacing = (spans.first.style?.lineSpacing ?? 1.0);
           contentPerPage.add(
             pw.Padding(
@@ -372,7 +397,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
             child: pw.RichText(
               softWrap: true,
               overflow: pw.TextOverflow.span,
-              text: pw.TextSpan(text: line, style: default_style),
+              text: pw.TextSpan(text: line, style: defaultTextStyle),
             ),
           ),
         );

@@ -25,12 +25,15 @@ String applyAttributesIfNeeded({
   json = json.closeWithBracketsIfNeeded;
   fq.Delta delta = fq.Delta.fromJson(jsonDecode(json)).fullDenormalizer();
   while (_index < delta.length) {
+    final nextIndex = _index + 1;
     final ops.Operation operation = delta.elementAt(_index);
     if (operation.data is! String) {
       _buffer.write(',${jsonEncode(operation.toJson())},');
       _index++;
       continue;
     }
+    ops.Operation? nextOp = null;
+    if (nextIndex < delta.length) nextOp = delta.elementAt(nextIndex);
     if (operation.data is String && !Constant.newLinesInsertions.hasMatch((operation.data as String).replaceAll(RegExp('\n|\\n'), '¶'))) {
       //inlines
       final bool overridedBoldAttr = overrideAttributes ? attr.bold : false;
@@ -65,16 +68,16 @@ String applyAttributesIfNeeded({
           ) ??
           lineSpacingHelper;
       final Map<String, dynamic> mapAttrs = <String, dynamic>{
-        "line-height": "$spacing",
-        "size": fontSizeAttr,
-        "font": fontFamilyAttr,
+        "line-height": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : "$spacing",
+        "size": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : fontSizeAttr,
+        "font": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : fontFamilyAttr,
         "bold": boldAttr,
         "italic": italicAttr,
         "underline": underlineAttr,
         "strike": strikeAttr,
         "link": linkAttr,
-        "color": color,
-        "background": background,
+        "color": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : color,
+        "background": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : background,
       };
       final Map<String, dynamic>? attributesJson = mapAttrs.ignoreIf(predicate: (String key, dynamic value) {
         if (value is bool && !value) {
@@ -96,7 +99,7 @@ String applyAttributesIfNeeded({
       final String? indentHelper = attr.indent > 0 ? '${attr.indent}' : null;
       String? indentAttr = operation.attributes?['indent'] as String? ?? indentHelper;
       final bool quote = operation.attributes?['blockquote'] as bool? ?? false;
-      final bool codeBlock = operation.attributes?[' code-block'] ?? false;
+      final bool codeBlock = operation.attributes?['code-block'] ?? false;
       final int? headerHelper = overrideAttributes
           ? attr.levelHeader == null || attr.levelHeader! > 0 && attr.levelHeader! < 6
               ? null
@@ -107,7 +110,8 @@ String applyAttributesIfNeeded({
         "align": quote || listAttr != null || codeBlock ? null : alignAttr,
         "list": headerAttr != null || quote || codeBlock ? null : listAttr,
         "header": quote || codeBlock || listAttr != null ? null : headerAttr,
-        "blockquote": quote || codeBlock || listAttr != null || alignAttr != null ? null : quote,
+        "blockquote": codeBlock || listAttr != null || alignAttr != null ? null : quote,
+        "code-block": !quote || headerAttr != null || listAttr != null || alignAttr != null ? codeBlock : null,
         "indent": quote || codeBlock ? null : indentAttr,
       };
       final Map<String, dynamic>? attributesJson = mapAttrs.ignoreIf(predicate: (String key, value) {
@@ -125,7 +129,7 @@ String applyAttributesIfNeeded({
     } else {
       final double lineSpacingHelper = overrideAttributes ? attr.lineSpacing : Constant.DEFAULT_LINE_HEIGHT;
       double spacing = operation.attributes?['line-height'] ?? lineSpacingHelper;
-      final Map<String, dynamic> map = <String, dynamic>{"line-height": "$spacing"};
+      final Map<String, dynamic> map = <String, dynamic>{"line-height": "$spacing", ...(operation.attributes ?? {})};
       final String attributes = jsonEncode(map);
       _buffer.write(',{"insert":"${(operation.data as String).encodeSymbols.replaceAll('\n', r'\n')}","attributes":$attributes},');
     }

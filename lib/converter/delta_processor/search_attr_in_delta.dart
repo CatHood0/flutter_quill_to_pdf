@@ -6,6 +6,7 @@ final RegExp _newLinesRegexp = RegExp('\n|\\n');
 
 enum DeltaDetectionLimit { newline, end, mid, nextInsert }
 
+///Search any attribute using DeltaDetectionLimit as breaker if you needed
 String? searchNextAttr({
   required fq.Delta delta,
   required int currentIndex,

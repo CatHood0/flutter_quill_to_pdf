@@ -1,10 +1,14 @@
 import 'package:flutter_quill_to_pdf/packages/html2md/lib/html2md.dart' as hm2;
-import 'package:flutter_quill_to_pdf/utils/makdown_rules_custom.dart';
+import 'package:flutter_quill_to_pdf/utils/markdown_rules_custom.dart';
 
 ///Converter is a parent that's [provides the essential rules]
 ///for generate and create a document pdf file for that project
 sealed class Converter<Doc, Type> {
+
+  ///Determine the markdown rules to transform html
   late final List<hm2.Rule> _rules;
+
+  ///Main body to the converter
   late final Doc _document;
 
   Converter({
@@ -27,6 +31,7 @@ sealed class Converter<Doc, Type> {
   Future<Type> generateDoc();
 }
 
+///Use this class if you want to create your own PDF configurator implementation instead Converter
 abstract class ConverterConfigurator<D, T> extends Converter<D, T> {
   ConverterConfigurator({required super.document});
 }

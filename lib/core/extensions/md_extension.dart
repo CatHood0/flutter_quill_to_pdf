@@ -1,5 +1,3 @@
-import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
-
 import '../constant/constants.dart';
 
 final RegExp STRONG_PATTERN = RegExp(r'\*\*(?<bold>(?:(?!\*\*).)+)\*\*'); // more precise bold detecting pattern
@@ -52,7 +50,6 @@ extension MdInlineStringExtension on String {
   }
 }
 
-//TODO: remove resolveSize since this doesn't be need it into this extension
 extension MdHeaderLevelExtension on String {
   double resolveHeaderLevel({List<double> headingSizes = Constant.default_heading_size}) {
     return this == '#' || this == '1'
@@ -64,19 +61,5 @@ extension MdHeaderLevelExtension on String {
                 : this == '####' || this == '4'
                     ? headingSizes[3]
                     : headingSizes[4];
-  }
-
-  double? resolveSize() {
-    return equals('small')
-        ? 12
-        : equals('large')
-            ? 19.5
-            : equals('huge')
-                ? 22.5
-                : equals('subtitle')
-                    ? 24.5
-                    : equals('title')
-                        ? 26
-                        : double.tryParse(this);
   }
 }

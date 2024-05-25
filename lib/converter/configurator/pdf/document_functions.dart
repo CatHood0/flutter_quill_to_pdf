@@ -1,5 +1,6 @@
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 
+///Basic functions to create documents and generates widgets
 mixin DocumentFunctions<D extends Delta, T, RW extends Object> {
   ///This function create a (valid) file [transforming]
   ///[delta format to markdown] and detecting all [markdown syntax] for

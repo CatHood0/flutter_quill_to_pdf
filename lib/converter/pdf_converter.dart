@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pdf/pdf.dart' show PdfColor;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/converter/configurator/abstract_converter.dart';
 import 'package:flutter_quill_to_pdf/converter/service/pdf_service.dart';
@@ -47,6 +48,34 @@ class PDFConverter {
   ///If you need to [customize] the [theme] of the [pdf document], override this param
   final pw.ThemeData? themeData;
 
+  ///If you need [customize] exactly how the [code block looks], then you use this [theme]
+  final pw.TextStyle? codeBlockTextStyle;
+
+  ///If you need just a different [font] to show your code blocks, use this font [(by default is pw.Font.courier())]
+  final pw.Font? codeBlockFont;
+
+  ///Customize the background color of the code block
+  final PdfColor? codeBlockBackgroundColor;
+
+  ///Customize the style of the num lines in code block
+  final pw.TextStyle? codeBlockNumLinesTextStyle;
+
+  ///Define the text style of the general blockquote. [This overrides any style detected like: line-height, size, font families, color]
+  final pw.TextStyle? blockQuoteTextStyle;
+
+  ///Define the left space between divider and text
+  final double? blockQuotePaddingLeft;
+  final double? blockQuotePaddingRight;
+
+  ///Define the width of the divider
+  final double? blockQuotethicknessDividerColor;
+
+  ///Customize the background of the blockquote
+  final PdfColor? blockQuoteBackgroundColor;
+
+  ///Customize the left/right divider color to blockquotes
+  final PdfColor? blockQuoteDividerColor;
+
   final CustomPDFWidget? onDetectImageBlock;
 
   ///Detect Rich text styles like: size, spacing, font family
@@ -64,7 +93,7 @@ class PDFConverter {
   ///Detect simple text like: <p>paragraph</p> or <span>paragrap</span> or even plain text
   final CustomPDFWidget? onDetectCommonText;
 
-  ///Detect classic inline markdown styles: **bold** *italic* _underline_ [strikethrogh is not supported yet]
+  ///Detect classic inline markdown styles: **bold** *italic* _underline_ [strikethrough is not supported yet]
   final CustomPDFWidget? onDetectInlinesMarkdown;
 
   final List<qpdf.Rule>? customRules;
@@ -75,6 +104,12 @@ class PDFConverter {
   final CustomPDFWidget? onDetectLink;
   //Detect markdown list: * bullet, 1. ordered, [x] check list (still has errors in render or in detect indent)
   final CustomPDFWidget? onDetectList;
+
+  /// Detect html code tag <pre>some code</pre> and it could be multiline
+  final CustomPDFWidget? onDetectCodeBlock;
+
+  /// Detect html blockquote tag <blockquote>text in blockquote</blockquote> and it could be multiline
+  final CustomPDFWidget? onDetectBlockquote;
 
   ///If this [request] is null, list is [empty] or is list [null], will be used another by default
   final Future<List<pw.Font>?> Function(String)? onRequestFallbackFont;
@@ -95,10 +130,22 @@ class PDFConverter {
     required this.onRequestFont,
     required this.onRequestItalicFont,
     required List<pw.Font> fallbacks,
+    this.blockQuotePaddingLeft,
+    this.blockQuotePaddingRight,
+    this.blockQuotethicknessDividerColor,
+    this.blockQuoteBackgroundColor,
+    this.blockQuoteDividerColor,
+    this.blockQuoteTextStyle,
+    this.codeBlockBackgroundColor,
+    this.codeBlockNumLinesTextStyle,
     this.customRules,
+    this.codeBlockFont,
+    this.codeBlockTextStyle,
     this.themeData,
     this.customDeltaToHTMLConverter,
     this.customHTMLToMarkdownConverter,
+    this.onDetectBlockquote,
+    this.onDetectCodeBlock,
     this.onDetectAlignedParagraph,
     this.onDetectCommonText,
     this.onDetectHeaderAlignedBlock,
@@ -148,9 +195,21 @@ class PDFConverter {
       customDeltaToHTMLConverter: customDeltaToHTMLConverter,
       customHTMLToMarkdownConverter: customHTMLToMarkdownConverter,
       customTheme: themeData,
+      blockQuoteBackgroundColor: blockQuoteBackgroundColor,
+      blockQuoteDividerColor: blockQuoteDividerColor,
+      codeBlockBackgroundColor: codeBlockBackgroundColor,
+      codeBlockFont: codeBlockFont,
+      codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
+      codeBlockTextStyle: codeBlockTextStyle,
+      blockQuoteTextStyle: blockQuoteTextStyle,
       onRequestFallbacks: onRequestFallbackFont,
       onDetectAlignedParagraph: onDetectAlignedParagraph,
       onDetectCommonText: onDetectCommonText,
+      onDetectBlockquote: onDetectBlockquote,
+      onDetectCodeBlock: onDetectCodeBlock,
+      blockQuotePaddingLeft: blockQuotePaddingLeft,
+      blockQuotePaddingRight: blockQuotePaddingRight,
+      blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
       onDetectHeaderAlignedBlock: onDetectHeaderAlignedBlock,
       onDetectHeaderBlock: onDetectHeaderBlock,
       onDetectImageBlock: onDetectImageBlock,
@@ -175,6 +234,7 @@ class PDFConverter {
       return await converter.generateDoc();
     } catch (e) {
       onException?.call(e);
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -202,9 +262,21 @@ class PDFConverter {
       onDetectAlignedParagraph: onDetectAlignedParagraph,
       onDetectCommonText: onDetectCommonText,
       customTheme: themeData,
+      blockQuoteBackgroundColor: blockQuoteBackgroundColor,
+      blockQuoteDividerColor: blockQuoteDividerColor,
+      codeBlockBackgroundColor: codeBlockBackgroundColor,
+      codeBlockFont: codeBlockFont,
+      codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
+      codeBlockTextStyle: codeBlockTextStyle,
+      blockQuoteTextStyle: blockQuoteTextStyle,
+      onDetectBlockquote: onDetectBlockquote,
+      onDetectCodeBlock: onDetectCodeBlock,
       onDetectHeaderAlignedBlock: onDetectHeaderAlignedBlock,
       onDetectHeaderBlock: onDetectHeaderBlock,
       onDetectImageBlock: onDetectImageBlock,
+      blockQuotePaddingLeft: blockQuotePaddingLeft,
+      blockQuotePaddingRight: blockQuotePaddingRight,
+      blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
       onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
       onDetectInlinesMarkdown: onDetectInlinesMarkdown,
       onDetectLink: onDetectLink,
@@ -227,6 +299,7 @@ class PDFConverter {
       onSucessWrite?.call(path);
     } catch (e) {
       onException?.call(e);
+      debugPrint(e.toString());
       if (onException == null) debugPrint(e.toString());
     }
   }

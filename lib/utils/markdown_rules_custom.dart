@@ -1,3 +1,5 @@
+// ignore_for_file: use_string_buffers
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 import 'package:flutter_quill_to_pdf/packages/html2md/lib/src/options.dart';
@@ -15,8 +17,9 @@ abstract interface class MarkdownRules {
   static hm2.Rule get image => _IMAGE_RULE;
   static hm2.Rule get underline => _UNDERLINE_RULE;
   static hm2.Rule get code => _CODE_RULE;
+  static hm2.Rule get blockquote => _BLOCKQUOTE_RULE;
   static List<hm2.Rule> get list => <hm2.Rule>[_LIST_ITEM_RULE, _LIST_RULE];
-  static List<hm2.Rule> get allRules => <hm2.Rule>[paragraph, headers, common, image, underline, code, ...list];
+  static List<hm2.Rule> get allRules => <hm2.Rule>[blockquote, paragraph, headers, common, image, underline, code, ...list];
 
   static final hm2.Rule _UNDERLINE_RULE =
       hm2.Rule('underline', filters: <String>['u', 'ins'], replacement: (String content, hm2.Node node) {
@@ -39,6 +42,18 @@ abstract interface class MarkdownRules {
       }
       return "\n$content\n";
     }
+  });
+
+  static final hm2.Rule _BLOCKQUOTE_RULE =
+      hm2.Rule('blockquote', filters: <String>['blockquote'], replacement: (String content, hm2.Node node) {
+    return node.outerHTML;
+  });
+
+  static final hm2.Rule _CODE_RULE = hm2.Rule('code', filterFn: (hm2.Node node) {
+    bool isCodeBlock = node.nodeName == 'pre';
+    return isCodeBlock;
+  }, replacement: (String content, hm2.Node node) {
+    return node.outerHTML;
   });
 
   static final hm2.Rule _IMAGE_RULE = hm2.Rule('image', filters: <String>['img'], replacement: (String content, hm2.Node node) {
@@ -92,19 +107,8 @@ abstract interface class MarkdownRules {
     }
   });
 
-  static final hm2.Rule _CODE_RULE = hm2.Rule('code', filterFn: (hm2.Node node) {
-    bool isCodeBlock = node.nodeName == 'pre';
-    return isCodeBlock;
-  }, replacement: (String content, hm2.Node node) {
-    return "\n${node.outerHTML.replaceAll('\n', '<br>')}";
-  });
-
   static final hm2.Rule _LIST_RULE = hm2.Rule('list', filters: <String>['ul', 'ol'], replacement: (String content, hm2.Node node) {
-    if (node.parentElName == 'li' && node.isParentLastChild) {
-      return '$content\n';
-    } else {
-      return '$content\n';
-    }
+    return '$content\n';
   });
 
   static final hm2.Rule _LIST_ITEM_RULE = hm2.Rule('listItem', filters: <String>['li'], replacement: (String content, hm2.Node node) {
@@ -119,8 +123,11 @@ abstract interface class MarkdownRules {
       final String suffix = ' ${content.convertHTMLToMarkdown}';
       return '\n$prefix$suffix';
     } else {
-      String convertContent =
-          content.replaceAll(RegExp(r'^\n+'), '\n').replaceAll(RegExp(r'\n+$'), '').replaceAll(RegExp('\n', multiLine: true), '\n    ');
+      String convertContent = node.outerHTML
+          .replaceAll(RegExp(r'^<li>|<\/li>$'), '')
+          .replaceAll(RegExp(r'^\n+'), '\n')
+          .replaceAll(RegExp(r'\n+$'), '')
+          .replaceAll(RegExp('\n', multiLine: true), '\n    ');
       String prefix = '${getStyleOption('bulletListMarker')}   ';
       if (node.parentElName == 'ol') {
         //Is numered list
