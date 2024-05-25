@@ -1,18 +1,21 @@
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 
+///Contains all custom properties that we want in our delta
+///Use this with together delta processor to add properties more easily without format all delta
 class DeltaAttributesOptions {
   //inline
   double fontSize;
   bool bold;
   bool italic;
   bool underline;
-  bool strikethrough;
   double lineSpacing;
   String fontFamily;
-  String? rgbColor;
-  String? link; //url
   //block
   String? align;
+  ///[Not supported yet]
+  bool strikethrough;
+  String? link; //url
+  String? rgbColor;
   int indent;
   String? image; //bytes or url
   int? levelHeader;

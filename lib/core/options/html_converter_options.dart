@@ -8,9 +8,9 @@ class HTMLConverterOptions {
   HTMLConverterOptions._();
 
   static ConverterOptions options({
-    bool multiLineBlockquote = true,
+    bool multiLineBlockquote = false,
     bool multiLineHeader = false,
-    bool multiLineCodeblock = true,
+    bool multiLineCodeblock = false,
     bool multiLineParagraph = false,
     bool multiLineCustomBlock = true,
     String docLinksTag = 'wiki-doc',
@@ -41,7 +41,6 @@ class HTMLConverterOptions {
                       (attrs ?? '')
                     ];
                   }
-
                   return null;
                 },
             inlineStyles: InlineStyles(<String, InlineStyleType>{

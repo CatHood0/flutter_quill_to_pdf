@@ -1,3 +1,60 @@
+# 1.2.0
+
+* Removed unnecessary code
+* Writed more documentation about classes and functions
+* [Fix] rename at MarkdownRules by bad name of file
+* [Fix] bad list formatting. The list block function generator didn't detect the span styles into itself
+* [Feat] added support for image links
+* [Feat] added support for colors 
+* [Feat] added support for blockquote
+* [Feat] added support for codeblock
+* [Feat] added support to render custom html using `renderCustomCallback` param from `convertDeltaToHtml` 
+
+```dart
+//it looks like
+String convertDeltaToHtml(Delta delta, [ConverterOptions? options,String Function(DeltaInsertOp customOp, DeltaInsertOp? contextOp)? customRenderCallback]) {
+  final QuillDeltaToHtmlConverter converterDeltaToHTML = QuillDeltaToHtmlConverter(
+    delta.toJson(),
+    options ?? HTMLConverterOptions.options(),
+  );
+  converterDeltaToHTML.renderCustomWith = customRenderCallback;
+  return converterDeltaToHTML.convert();
+}
+```
+
+* [Feat] added support for customize properties in blockquote and codeblock without create a custom widget
+
+```dart
+  ///If you need [customize] exactly how the [code block looks], then you use this [theme]
+  final pw.TextStyle? codeBlockTextStyle;
+
+  ///If you need just a different [font] to show your code blocks, use this font [(by default is pw.Font.courier())]
+  final pw.Font? codeBlockFont;
+
+  ///Customize the background color of the code block
+  final PdfColor? codeBlockBackgroundColor;
+
+  ///Customize the style of the num lines in code block
+  final pw.TextStyle? codeBlockNumLinesTextStyle;
+
+  ///Define the text style of the general blockquote. [This overrides any style detected like: line-height, size, font families, color]
+  final pw.TextStyle? blockQuoteTextStyle;
+
+  ///Define the left space between divider and text
+  final double? blockQuotePaddingLeft;
+  final double? blockQuotePaddingRight;
+
+  ///Define the width of the divider
+  final double? blockQuotethicknessDividerColor;
+
+  ///Customize the background of the blockquote
+  final PdfColor? blockQuoteBackgroundColor;
+
+  ///Customize the left/right divider color to blockquotes
+  final PdfColor? blockQuoteDividerColor;
+```
+
+
 # 1.1.4
 
 * [Fix] README bad dependecy name

@@ -2,7 +2,7 @@ import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 import 'package:flutter_quill_to_pdf/core/options/html_converter_options.dart';
 import 'package:flutter_quill_to_pdf/packages/html2md/lib/html2md.dart' as hm2;
-import '../packages/vsc_quill_delta_to_html/src/quill_delta_to_html_converter.dart';
+import '../packages/vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 bool? stringToSafeBool(String? str) {
   if (str == null) return null;
@@ -12,11 +12,14 @@ bool? stringToSafeBool(String? str) {
   return null;
 }
 
-String convertDeltaToHtml(Delta delta, [ConverterOptions? options]) {
-  return QuillDeltaToHtmlConverter(
+String convertDeltaToHtml(Delta delta,
+    [ConverterOptions? options, String Function(DeltaInsertOp customOp, DeltaInsertOp? contextOp)? customRenderCallback]) {
+  final QuillDeltaToHtmlConverter converterDeltaToHTML = QuillDeltaToHtmlConverter(
     delta.toJson(),
     options ?? HTMLConverterOptions.options(),
-  ).convert();
+  );
+  converterDeltaToHTML.renderCustomWith = customRenderCallback;
+  return converterDeltaToHTML.convert();
 }
 
 String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String> ignoreRules,

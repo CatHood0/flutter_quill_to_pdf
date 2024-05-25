@@ -57,15 +57,26 @@ class Constant {
       r'^(?:(?<scheme>[^:\/?#]+):)?(?:\/\/(?<authority>[^\/?#]*))?(?<path>[^?#]*\/)?(?<file>[^?#]*\.(?<extension>[Jj][Pp][Ee]?[Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]))(?:\?(?<query>[^#]*))?(?:#(?<fragment>.*))?$');
   //HTML PATTERNS
   static final RegExp NEWLINE_WITH_SPACING_PATTERN = RegExp(r'^(<span\s*style="line-height:\s*(\d+.\d+|\d+)">(\n)+<\/span>)$');
-  static final RegExp INLINES_RICH_TEXT_PATTERN_STRICT =
-      RegExp(r'^(<span\s*style="((line-height:\s*(.+?);?)?)((font-family:\s*(.*?);?)?)(font-size:\s*(\d+.\d+|\d+)px)?">(.*?)<\/span>)');
-  //Wiki, Line spacing, and Size:
-  //group 4 (take whether exist the spacing),
-  //group 7 (takes the font family),
-  //group 8 (takes the font size)
-  //group 10 (takes the content)
-  static final RegExp INLINES_RICH_TEXT_PATTERN =
-      RegExp(r'(<span\s*style="((line-height:\s*(.+?);?)?)((font-family:\s*(.+?);?)?)(font-size:\s*(\d+.\d+|\d+)px)?">(.*?)<\/span>)');
+  static final RegExp STARTS_WITH_RICH_TEXT_INLINE_STYLES_PATTERN = RegExp(
+      r'^(<span\s*style="((color:(#.+?|(rgb\((\d+),\s*(\d+),\s*(\d+)\)));?)?)((background-color:(#.+?|(rgb\((\d+),\s*(\d+),\s*(\d+)\)));?)?)((wiki-doc:\s*(.+?);?)?)((line-height:\s*(.+?);?)?)(font-family:\s*(.+?);?)?((font-size:\s*(\d+.\d+|\d+)(px|em|rem))?)">(.*?)<\/span>)');
+  /*
+    TEXT COLOR
+      4 hex color
+      5 rgb (full string) -> 6 (red) | 7 (green) | 8 (blue)
+    BACKGROUND COLOR
+      11 hex color
+      12 rgb (full string) -> 13 (red) | 14 (green) | 15 (blue)
+    WIKI
+      18 link to document
+    ATTRIBUTES
+      21 Line-height
+      23 Font family
+      26 text size
+    CONTENT
+      28 content span
+  */
+  static final RegExp RICH_TEXT_INLINE_STYLES_PATTERN = RegExp(
+      r'(<span\s*style="((color:(#.+?|(rgb\((\d+),\s*(\d+),\s*(\d+)\)));?)?)((background-color:(#.+?|(rgb\((\d+),\s*(\d+),\s*(\d+)\)));?)?)((wiki-doc:\s*(.+?);?)?)((line-height:\s*(.+?);?)?)(font-family:\s*(.+?);?)?((font-size:\s*(\d+.\d+|\d+)(px|em|rem))?)">(.*?)<\/span>)');
   static final RegExp EMPTY_ALIGNED_H =
       RegExp(r'^<h([1-6])\s+style="text-align:(center|right|left|justify)">(([<br>]+)|(<span.*?>[<br>]+<\/span>))+<\/h\1>$');
   static final RegExp EMPTY_ALIGNED_P =
@@ -90,8 +101,8 @@ class Constant {
       r'(<a(\s*style="((line-height:\s*(.*?);?)?)((font-family:\s*(.*?);?)?)(font-size:\s*(\d+.\d+|\d+)px)?")?\s*href="(.+?)"\s*?target="(.+?)">(.+?)<\/a>)');
   //Matches with <p style="text-align:center"><img style="max-width: 100%;object-fit: contain;;" src="/data/user/0/com.example.x/cache/93c1785c-c0d5-4416-b622-94f8163c8fce/1000172526.jpg"></p>
   static final RegExp HTML_IMAGE_PATTERN = RegExp(r'<p\s+style="text-align:(center|right|left|justify)">(<img .*?>)<\/p>$');
-  static final RegExp BLOCKQUOTE_PATTERN = RegExp(r"<blockquote>(.+?)<\/blockquote>", dotAll: true, multiLine: true);
-  static final RegExp CODE_PATTERN = RegExp(r"<pre>(.*?)<\/pre>");
+  static final RegExp BLOCKQUOTE_PATTERN = RegExp(r"<blockquote>(.+?)<\/blockquote>", multiLine: true);
+  static final RegExp CODE_PATTERN = RegExp(r"<pre>(.*?)<\/pre>|<code>(.*?)<\/code>", multiLine: true);
 
   //MARKDOWN PATTERNS
   static final RegExp LIST_CHECK_MD_PATTERN = RegExp(r'^(-\s?\[(x|\s{1})\](\[(center|right|left|justify)\])?\s)(.+)$');
@@ -123,11 +134,4 @@ class Constant {
   static final RegExp STRONG_WITH_WRONG_STYLES_PATTER = RegExp(r'(.*?)(<strong\s*(style=".*?")>(.+?)<\/strong>)|(.*)');
   static final RegExp EMPHASIS_WITH_WRONG_STYLES_PATTER = RegExp(r'(.*?)(<em\s*(style=".*?")>(.+?)<\/em>)|(.*)');
   static final RegExp UNDERLINE_WITH_WRONG_STYLES_PATTER = RegExp(r'(.*?)(<u\s*(style=".*?")>(.+?)<\/u>)|(.*)');
-
-  //No used
-  //TODO: we should implemented widgets and update the regex for new styles on deltas
-  // static final RegExp COLOR_PATTERN = RegExp(r'<span\s*style="color:(rgb\((\d+),\s*(\d+),\s*(\d+)\))">(.+?)<\/span>');
-  // //COLOR: group 1 (just the text of the rgb and info), group 2 (red), group 3 (green), group 4 (blue), group 5 (text)
-  // static final RegExp COLOR_PATTERN_COMPILER_CONFIG =
-  //     RegExp(r'(.*?)(<span\s*style="color:(rgb\((\d+),\s*(\d+),\s*(\d+)\))">(.+?)<\/span>)|(.+)');
 }

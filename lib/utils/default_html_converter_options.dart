@@ -4,6 +4,7 @@ import 'package:flutter_quill_to_pdf/utils/typedefs.dart';
 
 import '../packages/vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
+///Default Delta to HTML converter used by this library
 class HTMLConverterOptions {
   HTMLConverterOptions._();
 
@@ -29,6 +30,7 @@ class HTMLConverterOptions {
           converterOptions: OpConverterOptions(
             customCssStyles: customCssStyles ??
                 (DeltaInsertOp op) {
+                  ///Add custom attributes if are available to the image block (height, margin, width, alignment)
                   if (op.isImage()) {
                     final OpAttributes attributes = op.attributes;
                     final String? attrs = attributes['style'];
@@ -36,7 +38,6 @@ class HTMLConverterOptions {
                     return <String>[
                       'max-width: 100%',
                       'object-fit: ${Constant.DEFAULT_OBJECT_FIT}',
-                      // cover makes the page document height and width
                       (attrs ?? '')
                     ];
                   }

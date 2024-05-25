@@ -66,7 +66,7 @@ class CustomQuillEditor extends HookWidget {
           }
           if (attribute.key.equals('size')) {
             return TextStyle(
-              fontSize: attribute.value.toString().resolveSize(),
+              fontSize: resolveSize(attribute.value.toString()),
             );
           }
           if (attribute.key.equals('header')) {
@@ -102,7 +102,7 @@ class CustomQuillEditor extends HookWidget {
             null,
           ),
           code: DefaultTextBlockStyle(
-              const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Color.fromARGB(255, 255, 184, 78)),
+              const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Color.fromARGB(255, 117, 117, 117)),
               const VerticalSpacing(5, 5),
               const VerticalSpacing(5, 5),
               BoxDecoration(borderRadius: BorderRadius.circular(2), color: const Color.fromARGB(255, 234, 234, 234))),
@@ -111,7 +111,7 @@ class CustomQuillEditor extends HookWidget {
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(
-              border: BorderDirectional(start: BorderSide(width: 5, color: Color.fromARGB(202, 255, 255, 255))),
+              border: BorderDirectional(start: BorderSide(width: 5, color: Color.fromARGB(201, 84, 224, 255))),
               borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15)),
               color: Color.fromARGB(15, 255, 255, 255),
             ),
@@ -136,5 +136,15 @@ class CustomQuillEditor extends HookWidget {
         ),
       ),
     );
+  }
+
+  double? resolveSize(String size) {
+    return size.equals('small')
+        ? 12
+        : size.equals('large')
+            ? 19.5
+            : size.equals('huge')
+                ? 22.5
+                : double.tryParse(size);
   }
 }

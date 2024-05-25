@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 
+//create just an instance and void duplicate instance 
+final FontsLoader _instance = FontsLoader._();
+
+///A simple class that charge all fonts available in this example
 class FontsLoader {
   late final List<pw.Font> _pdffonts; // save valid pdf type fonts
   late final EmojisFonts emojiFont;
@@ -10,10 +14,14 @@ class FontsLoader {
 
   bool _configured = false;
 
-  FontsLoader() {
+  FontsLoader._() {
     unicodeFont = SpecialUnicodeFonts();
     emojiFont = EmojisFonts();
     _pdffonts = <pw.Font>[];
+  }
+
+  factory FontsLoader() {
+    return _instance;
   }
 
   List<pw.Font> allFonts() {

@@ -27,7 +27,7 @@ You can configure:
 
 ```yaml
 dependencies: 
-    flutter_quill_to_pdf: ^1.1.4
+    flutter_quill_to_pdf: ^1.2.0
 ```
 
 ### Import package
@@ -110,11 +110,14 @@ await pdfConverter.createDocumentFile(path: filepath, ...other optional params);
 
 ```dart
 //it looks like
-String convertDeltaToHtml(Delta delta, [ConverterOptions? options]) {
-  return QuillDeltaToHtmlConverter(
+String convertDeltaToHtml(Delta delta,
+    [ConverterOptions? options, String Function(DeltaInsertOp customOp, DeltaInsertOp? contextOp)? customRenderCallback]) {
+  final QuillDeltaToHtmlConverter converterDeltaToHTML = QuillDeltaToHtmlConverter(
     delta.toJson(),
-    options ?? HTMLConverterOptions.options(), //default html converter options implementation
-  ).convert();
+    options ?? HTMLConverterOptions.options(),
+  );
+  converterDeltaToHTML.renderCustomWith = customRenderCallback; // use this callback if you want or need render a custom attribute or block
+  return converterDeltaToHTML.convert();
 }
 ```
 
@@ -151,21 +154,20 @@ String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String
 * Italic
 * Underline
 * Link
-* line-height (custom attribute used from this package)
+* Color
+* Background
+* Line-height (custom attribute used from this package)
+* Code block 
+* Blockquote 
 * Align
-* Embed image (File path yet)
+* Embed image 
 * Header
-* List (check, bullet, ordered)
+* List
 
 ## Not support yet
 
-* Images links (working on it)
-* Code block (working on it)
-* Blockquote (working on it)
-* Text Color (working on it)
-* Background color (working on it)
-* Indented text,
-* Indented list (bullet, unordered, check) - (working on it)
+* Indented text (working on it)
+* Indented list (working on it)
 * Embed formula 
 * Embed video
 

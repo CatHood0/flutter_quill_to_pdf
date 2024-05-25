@@ -1,11 +1,10 @@
-import 'package:flutter/widgets.dart' show Alignment, TextAlign;
-import 'package:pdf/widgets.dart' as pw;
+import 'package:flutter/widgets.dart' show Alignment;
 import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 
-
 extension PdfDoubleExtension on double {
-  ///Calculate based on the the current value to return the more similar line height 
+  ///Calculate based on the the current value to return the more similar line height
   ///as should see on a PDF (and like Docx, libreoffice formatting too)
   double resolveLineHeight() {
     if (this <= 0) return 0;
@@ -15,9 +14,9 @@ extension PdfDoubleExtension on double {
     return this;
   }
 
-  ///Calculate based on the current value to return the padding 
-  ///at the last of the line since pdf package 
-  ///rich text, on param of lineSpacing 
+  ///Calculate based on the current value to return the padding
+  ///at the last of the line since pdf package
+  ///rich text, on param of lineSpacing
   ///doesn't have effect at the top or botton of the line
   double resolvePaddingByLineHeight() {
     if (this <= 0) return 0;
@@ -29,40 +28,40 @@ extension PdfDoubleExtension on double {
   }
 }
 
-extension ColorExt on PdfColor {
-  static PdfColor? fromRgbaString(String colorString) {
-    final RegExp regex = RegExp(r'rgba\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)');
-    final RegExpMatch? match = regex.firstMatch(colorString);
-
-    if (match == null) {
-      return null;
-    }
-    if (match.groupCount < 4) {
-      return null;
-    }
-
-    final String? redColor = match.group(1);
-    final String? greenColor = match.group(2);
-    final String? blueColor = match.group(3);
-    final String? alphaColor = match.group(4);
-
-    final int? red = redColor != null ? int.tryParse(redColor) : null;
-    final int? green = greenColor != null ? int.tryParse(greenColor) : null;
-    final int? blue = blueColor != null ? int.tryParse(blueColor) : null;
-    final int? alpha = alphaColor != null ? int.tryParse(alphaColor) : null;
-
-    if (red == null || green == null || blue == null || alpha == null) {
-      return null;
-    }
-
-    return PdfColor.fromInt(
-      rgbaToHex(red, green, blue, opacity: alpha.toDouble()),
-    );
+PdfColor? pdfColorString(String? colorString) {
+  if (colorString == null || colorString.isTotallyEmpty) return null;
+  if (colorString.startsWith('#')) {
+    return PdfColor.fromHex(colorString);
+  }
+  if (colorString.startsWith('0x')) {
+    return PdfColor.fromInt(int.parse(colorString));
+  }
+  final RegExp regex = RegExp(r'rgb\((\d+)\s*?,\s*?(\d+)\s*?,\s*?(\d+)\s*?(,?\s*?(\d+)\s*?)\)');
+  final RegExpMatch? match = regex.firstMatch(colorString);
+  if (match == null) {
+    return null;
+  }
+  if (match.groupCount < 3) {
+    return null;
   }
 
-  String toRgbaString() {
-    return 'rgba($red, $green, $blue, $alpha)';
+  final String? redColor = match.group(1);
+  final String? greenColor = match.group(2);
+  final String? blueColor = match.group(3);
+  final String? alphaColor = match.group(5);
+
+  final int? red = redColor != null ? int.tryParse(redColor) : null;
+  final int? green = greenColor != null ? int.tryParse(greenColor) : null;
+  final int? blue = blueColor != null ? int.tryParse(blueColor) : null;
+  final int alpha = int.tryParse(alphaColor ?? 'null') ?? 1;
+
+  if (red == null || green == null || blue == null) {
+    return null;
   }
+
+  return PdfColor.fromInt(
+    rgbaToHex(red, green, blue, opacity: alpha.toDouble()),
+  );
 }
 
 int rgbaToHex(int red, int green, int blue, {double opacity = 1}) {
@@ -70,15 +69,13 @@ int rgbaToHex(int red, int green, int blue, {double opacity = 1}) {
   green = (green < 0) ? -green : green;
   blue = (blue < 0) ? -blue : blue;
   opacity = (opacity < 0) ? -opacity : opacity;
-  opacity = (opacity > 0) ? -255 : opacity * 255;
+  opacity = (opacity > 0) ? 255 : opacity * 255;
   red = (red > 255) ? 255 : red;
   green = (green > 255) ? 255 : green;
   blue = (blue > 255) ? 255 : blue;
   int alpha = opacity.toInt();
-
-  return int.parse(
-    '0x${alpha.toRadixString(16)}${red.toRadixString(16)}${green.toRadixString(16)}${blue.toRadixString(16)}',
-  );
+  final hex = '0x${alpha.toRadixString(16)}${red.toRadixString(16)}${green.toRadixString(16)}${blue.toRadixString(16)}';
+  return int.parse(hex.replaceFirst('-', ''));
 }
 
 ///A extesion to resolve more easily to decide the style of the spans
@@ -137,7 +134,6 @@ extension PdfBlockAlignmentExtension on String {
   }
 }
 
-//TODO: remove resolveTextAlign since this doesn't be need it in this extension
 extension TextAlignmentExtension on String? {
   pw.TextAlign get resolvePdfTextAlign {
     return this == 'center'
@@ -147,15 +143,5 @@ extension TextAlignmentExtension on String? {
             : this == 'justify'
                 ? pw.TextAlign.justify
                 : pw.TextAlign.left;
-  }
-
-  TextAlign get resolveTextAlign {
-    return this == 'center'
-        ? TextAlign.center
-        : this == 'right'
-            ? TextAlign.right
-            : this == 'justify'
-                ? TextAlign.justify
-                : TextAlign.left;
   }
 }

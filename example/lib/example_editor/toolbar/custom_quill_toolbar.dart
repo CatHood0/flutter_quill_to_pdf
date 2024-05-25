@@ -85,6 +85,8 @@ class CustomQuillToolbar extends StatelessWidget {
           options: toolbarConfigurations.buttonOptions.listBullets,
           controller: controller,
         ),
+        QuillToolbarToggleStyleButton(attribute: Attribute.blockQuote, controller: controller),
+        QuillToolbarToggleStyleButton(controller: controller, attribute: Attribute.codeBlock),
         QuillToolbarToggleCheckListButton(
           options: toolbarConfigurations.buttonOptions.toggleCheckList,
           controller: controller,
@@ -175,6 +177,7 @@ class CustomQuillToolbar extends StatelessWidget {
       fontFamilyValues: Constant.fontFamilies,
       multiRowsDisplay: false,
       buttonOptions: const QuillSimpleToolbarButtonOptions(
+        codeBlock: QuillToolbarToggleStyleButtonOptions(),
         fontFamily: QuillToolbarFontFamilyButtonOptions(
           renderFontFamilies: true,
         ),

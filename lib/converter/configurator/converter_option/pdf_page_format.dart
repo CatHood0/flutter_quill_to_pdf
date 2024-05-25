@@ -1,3 +1,6 @@
+
+///PDFPageFormat is a default implementation to decide all the properties for the pdf document
+///[width, height and margins]
 class PDFPageFormat {
   final double marginTop;
   final double marginBottom;

@@ -1,6 +1,7 @@
 import '../../utils/typedefs.dart';
 
 extension ListExtension<T> on List<T> {
+  ///Merge to many list as we wants in a same list
   void merge(List<List<T>> listToAdd) {
     int i = 0;
     while (i < listToAdd.length) {
@@ -9,6 +10,8 @@ extension ListExtension<T> on List<T> {
     }
   }
 
+
+  ///Update the data where predicate match
   List<T> updateWhere({required T data, required Predicate<T> predicate}) {
     final List<T> temp = <T>[...this];
     for (int i = 0; i < temp.length; i++) {
@@ -20,6 +23,7 @@ extension ListExtension<T> on List<T> {
     return <T>[...temp];
   }
 
+  ///Ignore the item if predicate match
   List<T> ignoreWhile({required bool Function(T predicate) ignoreIf}) {
     List<T> cache = <T>[];
     for (int i = 0; i < length; i++) {
@@ -30,6 +34,7 @@ extension ListExtension<T> on List<T> {
     return cache;
   }
 
+  ///Count the items that matches with yout object data, or use predicate to match
   int count(T obj, {bool Function(T)? predicate}) {
     int count = 0, i = 0;
     while (i < length) {
@@ -44,6 +49,7 @@ extension ListExtension<T> on List<T> {
     return count;
   }
 
+  ///Verify if a element exist using a predicate that match
   bool exist({required bool Function(T reference) predicate}) {
     for (T value in this) {
       if (predicate(value)) {

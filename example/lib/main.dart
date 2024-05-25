@@ -43,9 +43,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool firstEntry = false;
   final PDFPageFormat params = PDFPageFormat.a4;
-  final QuillController _quillController = QuillController(
-      document: Document(),
-      selection: const TextSelection.collapsed(offset: 0));
+  final QuillController _quillController = QuillController(document: Document(), selection: const TextSelection.collapsed(offset: 0));
   final FocusNode _editorNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<bool> _shouldShowToolbar = ValueNotifier<bool>(false);
