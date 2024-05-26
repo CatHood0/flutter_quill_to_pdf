@@ -1,8 +1,8 @@
 # Flutter quill to PDF
 
-This package allows you to create PDFs using deltas from Quill.
+This package allow create PDF's using deltas from Quill.
 
-You can configure:
+Features that can be configured:
 
 * `DeltaAttributesOptions` (this are attributes that will appear in the delta if certain attributes are not found in the delta)
 * We can use custom fonts. Using `onRequest` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package _Just works with the default library implementation_
@@ -36,7 +36,7 @@ dependencies:
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
 ```
 
-### Personalize the settings of the page that will be printed (height,width,margins)
+### Personalize the settings of the page (height, width and margins)
 
 We can use two types differents constructors of the same `PDFPageFormat` class
 
@@ -52,7 +52,7 @@ final PDFPageFormat pageFormat = PDFPageFormat(
 );
 ```
 
-##### The marginize all `PDFPageFormat` implementation
+##### The factory to marginize all `PDFPageFormat` 
 
 ```dart
 final PDFPageFormat pageFormat = PDFPageFormat.all(
@@ -62,7 +62,7 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 );
 ```
 
-### Use PDF converter to start creating your document
+### Using PDFConverter to create finally our document
 
 ```dart
 PDFConverter pdfConverter = PDFConverter(
@@ -90,15 +90,15 @@ PDFConverter pdfConverter = PDFConverter(
 );
 ```
 
-## To create the PDF document from PDFConverter, we have two options :
+## To create it, we have two options :
 
-#### `createDocument` function _returns the PDF document associated_
+#### `createDocument` function (_returns the PDF document associated_)
 
 ```dart
 final pw.Document? document = await pdfConverter.createDocument();
 ```
 
-#### `createDocumentFile` _makes the same of the before one, but instead return the document, write in the selected file path_
+#### `createDocumentFile` (_makes the same of the before one, but instead return the document, write in the selected file path_)
 
 ```dart
 await pdfConverter.createDocumentFile(path: filepath, ...other optional params);
@@ -106,7 +106,7 @@ await pdfConverter.createDocumentFile(path: filepath, ...other optional params);
 
 ## More information about other features 
 
-### If you want to get just the html from delta, you can use `convertDeltaToHtml` function
+### If you want to get the html from delta, you can use `convertDeltaToHtml` function
 
 ```dart
 //it looks like
@@ -127,7 +127,7 @@ String convertDeltaToHtml(Delta delta,
 
 2. Use html string, and pass as param in `convertHtmlToMarkdown`
 
-3. Pass custom rules, or pass custom rules from this library using `MarkdownRules` class (Optional) 
+3. Pass your custom rules implementation, or just pass the default ones from library, using `MarkdownRules` class (Optional) 
 
 ```dart
 //it looks like
@@ -146,7 +146,7 @@ String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String
 }
 ```
 
-## Supported
+## Delta attributes supported
 
 * Font family
 * Size
@@ -164,16 +164,17 @@ String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String
 * Header
 * List
 
-## Not support yet
+## Delta attributes no support yet
 
+* Horizontal divider
 * Indented text (working on it)
 * Indented list (working on it)
 * Embed formula 
 * Embed video
 
-## Custom rendering (HTML, Markdown)
+## Custom rendering (HTML and Markdown)
 
-### Configure delta to html options (optional)
+### You could configure the delta to html options to create your own implementation (optional)
 
 _This is a fragment from: [vsc_quill_delta_to_html](https://github.com/VisualSystemsCorp/vsc_quill_delta_to_html) description (If you want to know more about these configs, and custom attributes rendering, visit his github)_
 
@@ -208,9 +209,9 @@ and `OpAttributeSanitizerOptions`) options as shown below:
 
 
 
-### Configuring custom markdown rules (optional)
+### You also could configure custom markdown rules to accept and format correctly your custom HTML implementation (optional)
 
-You can set custom rules using 
+You can set custom rules to PDFConverter using 
 ```dart
 //By default is null, and it will throws error if rules are empty
 PDFConverter(..., customRules: [...your custom rules]);
@@ -269,5 +270,5 @@ Rule(
 )
 ~~~
 
-You can contribute reporting issues or requesting to add new features in: https://github.com/CatHood0/quill_to_pdf 
+You can contribute reporting issues or requesting to add new features in: https://github.com/CatHood0/flutter_quill_to_pdf 
 
