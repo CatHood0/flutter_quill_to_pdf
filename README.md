@@ -164,7 +164,7 @@ String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String
 * Header
 * List
 
-## Delta attributes no support yet
+## Delta attributes not supported yet
 
 * Horizontal divider
 * Indented text (working on it)
