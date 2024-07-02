@@ -1,14 +1,25 @@
+# 1.2.1
+
+- [Fix] renamed WidgetGenerator to PdfWidgetGenerator
+- [Fix] renamed file markdown_rules_custom to markdown_rules
+- [Chore] changed ConverterOptions from converter delta to html from `HTMLConverterOptions` to `ConverterOptions.forEmail()`
+- [Feat] exposed PdfService
+- [Feat] added support for strikethrough in PdfService
+- [Feat] All params on DeltaAttributesOptions are supported
+- [BREAKING CHANGES] rgbColor was renamed as hexColor and now is an int at DeltaAttributesOptions
+- [BREAKING CHANGES] levelHeader was removed on DeltaAttributesOptions
+
 # 1.2.0
 
-* Removed unnecessary code
-* Writed more documentation about classes and functions
-* [Fix] rename at MarkdownRules by bad name of file
-* [Fix] bad list formatting. The list block function generator didn't detect the span styles into itself
-* [Feat] added support for image links
-* [Feat] added support for colors 
-* [Feat] added support for blockquote
-* [Feat] added support for codeblock
-* [Feat] added support to render custom html using `renderCustomCallback` param from `convertDeltaToHtml` 
+- Removed unnecessary code
+- Writed more documentation about classes and functions
+- [Fix] rename at MarkdownRules by bad name of file
+- [Fix] bad list formatting. The list block function generator didn't detect the span styles into itself
+- [Feat] added support for image links
+- [Feat] added support for colors
+- [Feat] added support for blockquote
+- [Feat] added support for codeblock
+- [Feat] added support to render custom html using `renderCustomCallback` param from `convertDeltaToHtml`
 
 ```dart
 //it looks like
@@ -22,7 +33,7 @@ String convertDeltaToHtml(Delta delta, [ConverterOptions? options,String Functio
 }
 ```
 
-* [Feat] added support for customize properties in blockquote and codeblock without create a custom widget
+- [Feat] added support for customize properties in blockquote and codeblock without create a custom widget
 
 ```dart
   ///If you need [customize] exactly how the [code block looks], then you use this [theme]
@@ -54,40 +65,39 @@ String convertDeltaToHtml(Delta delta, [ConverterOptions? options,String Functio
   final PdfColor? blockQuoteDividerColor;
 ```
 
-
 # 1.1.4
 
-* [Fix] README bad dependecy name
+- [Fix] README bad dependecy name
 
 # 1.1.1
 
-* [Feat] improved README 
-* [Fix] bad unnecessary args remove 
-* [Fix] bad names in some classes and functions
-* [Fix] bad test (by now cannot be created a test)
+- [Feat] improved README
+- [Fix] bad unnecessary args remove
+- [Fix] bad names in some classes and functions
+- [Fix] bad test (by now cannot be created a test)
 
 ## 1.1.0
 
-* [Feat] added support to custom delta to html converter
-* [Feat] added support to custom html to markdown converter
-* [Feat] added new factory to create document and write file
-* [Feat] improved params descriptions
-* [Feat] added support to customize markdown rules
-* [Feat] now we can add a custom theme to pdf document
-* [Feat] now we can pass functions to when the create doc ends sucessfully or when throws and exception
-* [Fix] removed lineHeight attribute since flutt_quill and html2md has Rule class and creates conflicts on imports
-* README now has better documentation, to be more accurate on how  use this library
+- [Feat] added support to custom delta to html converter
+- [Feat] added support to custom html to markdown converter
+- [Feat] added new factory to create document and write file
+- [Feat] improved params descriptions
+- [Feat] added support to customize markdown rules
+- [Feat] now we can add a custom theme to pdf document
+- [Feat] now we can pass functions to when the create doc ends sucessfully or when throws and exception
+- [Fix] removed lineHeight attribute since flutt_quill and html2md has Rule class and creates conflicts on imports
+- README now has better documentation, to be more accurate on how use this library
 
 ## 1.0.2
 
-* [Fix] inconfortable name. PDFConvertersParam was changed to PDFPageFormat
-* [Feat] improved README to make more easy read how works the package
+- [Fix] inconfortable name. PDFConvertersParam was changed to PDFPageFormat
+- [Feat] improved README to make more easy read how works the package
 
 ## 1.0.1
 
-* [Fix] minimal errors
-* [Fix] issue where list (bullet, check, and ordered) takes a more space that it needs on top  
+- [Fix] minimal errors
+- [Fix] issue where list (bullet, check, and ordered) takes a more space that it needs on top
 
 ## 1.0.0
 
-* First commit 
+- First commit

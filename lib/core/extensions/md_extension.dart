@@ -3,8 +3,11 @@ import '../constant/constants.dart';
 final RegExp STRONG_PATTERN = RegExp(r'\*\*(?<bold>(?:(?!\*\*).)+)\*\*'); // more precise bold detecting pattern
 final RegExp ITALIC_PATTERN = RegExp(r'^(\*(?<italic>[^*]+)\*)$');
 final RegExp ITALIC_AND_STRONG_PATTERN = RegExp(r'^(\*\*\*(?<boldItalic>(?:(?!\*\*\*).)+)\*\*\*)$');
+final RegExp ITALIC_AND_STRONG_AND_UNDERLINE_AND_STRIKE_PATTERN =
+    RegExp(r'^(\*\*\*~~\_(?<boldItalicStrikeUnderline>(?:(?!\_~~\*\*\*).)+)\_~~\*\*\*)$');
 final RegExp ITALIC_AND_STRONG_AND_UNDERLINE_PATTERN = RegExp(r'^(\*\*\*\_(?<boldItalicUnderline>(?:(?!\_\*\*\*).)+)\_\*\*\*)$');
-final RegExp UNDERLINE_WITH_OPTIONAL_STYLES_PATTERN = RegExp(r'^(\*\*)?(\*)?\_((?:(?!\_\*\*\*).)+)\_(\2)?(\1)?$');
+final RegExp UNDERLINE_WITH_OPTIONAL_STYLES_PATTERN = RegExp(r'^(\*\*)?(\*)?(\_)((?:(?!\_\*\*\*).)+)(\3)(\2)?(\1)?$');
+final RegExp SRIKE_WITH_OPTIONAL_STYLES_PATTERN = RegExp(r'^(\*\*)?(\*)?(~~)(\_)?(.+)(\4)(~~)(\2)?(\1)?$');
 
 ///an extension used to detect inline markdown styles in plain text
 extension MdInlineStringExtension on String {
@@ -20,7 +23,7 @@ extension MdInlineStringExtension on String {
     return ITALIC_PATTERN.hasMatch(this) || ITALIC_AND_STRONG_PATTERN.hasMatch(this);
   }
 
-  bool get isBothInlineStylesCombined {
+  bool get isItalicAndBoldInlineStylesCombined {
     return ITALIC_AND_STRONG_PATTERN.hasMatch(this);
   }
 
@@ -28,13 +31,18 @@ extension MdInlineStringExtension on String {
     return UNDERLINE_WITH_OPTIONAL_STYLES_PATTERN.hasMatch(this);
   }
 
+  bool get isStrike {
+    return  SRIKE_WITH_OPTIONAL_STYLES_PATTERN.hasMatch(this);
+  }
+
   bool get isUnderlineWithOtherStyles {
     return UNDERLINE_WITH_OPTIONAL_STYLES_PATTERN.hasMatch(this);
   }
 
   bool get isAllStylesCombined {
-    return ITALIC_AND_STRONG_AND_UNDERLINE_PATTERN.hasMatch(this);
+    return ITALIC_AND_STRONG_AND_UNDERLINE_PATTERN.hasMatch(this) || ITALIC_AND_STRONG_AND_UNDERLINE_AND_STRIKE_PATTERN.hasMatch(this);
   }
+
   ///Remove markdown inlines styles. Like: **bold** -> bold
   String get replaceMd {
     return replaceAllMapped(STRONG_PATTERN, (Match match) {
@@ -44,8 +52,11 @@ extension MdInlineStringExtension on String {
       final String contentWithoutItalic = match.group(1)!;
       return contentWithoutItalic;
     }).replaceAllMapped(UNDERLINE_WITH_OPTIONAL_STYLES_PATTERN, (Match match) {
-      final String contentWithoutUnderline = match.group(3)!;
+      final String contentWithoutUnderline = match.group(4)!;
       return contentWithoutUnderline;
+    }).replaceAllMapped(SRIKE_WITH_OPTIONAL_STYLES_PATTERN, (Match match) {
+      final String contentWithoutStrike = match.group(5)!;
+      return contentWithoutStrike;
     });
   }
 }

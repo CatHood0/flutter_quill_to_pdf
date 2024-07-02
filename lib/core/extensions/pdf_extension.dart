@@ -36,7 +36,8 @@ PdfColor? pdfColorString(String? colorString) {
   if (colorString.startsWith('0x')) {
     return PdfColor.fromInt(int.parse(colorString));
   }
-  final RegExp regex = RegExp(r'rgb\((\d+)\s*?,\s*?(\d+)\s*?,\s*?(\d+)\s*?(,?\s*?(\d+)\s*?)\)');
+  final RegExp regex =
+      RegExp(r'rgb\((\d+)\s*?,\s*?(\d+)\s*?,\s*?(\d+)\s*?(,?\s*?(\d+)\s*?)\)');
   final RegExpMatch? match = regex.firstMatch(colorString);
   if (match == null) {
     return null;
@@ -74,23 +75,36 @@ int rgbaToHex(int red, int green, int blue, {double opacity = 1}) {
   green = (green > 255) ? 255 : green;
   blue = (blue > 255) ? 255 : blue;
   int alpha = opacity.toInt();
-  final hex = '0x${alpha.toRadixString(16)}${red.toRadixString(16)}${green.toRadixString(16)}${blue.toRadixString(16)}';
+  final String hex =
+      '0x${alpha.toRadixString(16)}${red.toRadixString(16)}${green.toRadixString(16)}${blue.toRadixString(16)}';
   return int.parse(hex.replaceFirst('-', ''));
 }
 
 ///A extesion to resolve more easily to decide the style of the spans
 extension TextStyleInlineExtension on pw.TextStyle {
-  pw.TextStyle resolveInline(bool bold, bool italic, bool under, bool isAllInOne) {
+  pw.TextStyle resolveInline(
+      bool bold, bool italic, bool under, bool strike, bool isAllInOne) {
+    pw.TextDecoration? decoration = null;
+    if (under && strike ) {
+      decoration = pw.TextDecoration.combine(
+        [pw.TextDecoration.lineThrough, pw.TextDecoration.underline],
+      );
+    } else if (strike) {
+      decoration = pw.TextDecoration.lineThrough;
+    } else if (under) {
+      decoration = pw.TextDecoration.underline;
+    }
+
     return !isAllInOne
         ? copyWith(
             fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
             fontStyle: italic ? pw.FontStyle.italic : pw.FontStyle.normal,
-            decoration: under ? pw.TextDecoration.underline : pw.TextDecoration.none,
+            decoration: decoration,
           )
         : copyWith(
             fontWeight: pw.FontWeight.bold,
             fontStyle: pw.FontStyle.italic,
-            decoration: pw.TextDecoration.underline,
+            decoration: decoration,
           );
   }
 }

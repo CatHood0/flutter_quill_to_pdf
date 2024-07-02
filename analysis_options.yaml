@@ -5,9 +5,9 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
   language:
-    strict-casts: false 
-    strict-inference: false 
-    strict-raw-types: false 
+    strict-casts: false
+    strict-inference: false
+    strict-raw-types: false
   errors:
     avoid_init_to_null: ignore
     constant_identifier_names: ignore
@@ -16,7 +16,6 @@ analyzer:
 
 linter:
   rules:
-
     # Personal preference. I don't find it more readable
     cascade_invocations: false
 
@@ -37,9 +36,6 @@ linter:
     # and `@required Widget child` last.
     always_put_required_named_parameters_first: false
 
-    # This project doesn't use Flutter-style todos
-    flutter_style_todos: false
-
     # There are situations where we voluntarily want to catch everything,
     # especially as a library.
     avoid_catches_without_on_clauses: false
@@ -55,9 +51,6 @@ linter:
     # conflicts with `prefer_relative_imports`
     always_use_package_imports: false
 
-    # Disabled for now until we have NNBD as it otherwise conflicts with `missing_return`
-    no_default_cases: false
-
     # False positive, null checks don't need a message
     prefer_asserts_with_message: false
 
@@ -72,7 +65,7 @@ linter:
 
     # Does not apply to providers
     prefer_const_constructors_in_immutables: false
-    
+
     hash_and_equals: true
     implicit_reopen: true
     cancel_subscriptions: true
@@ -91,4 +84,3 @@ linter:
     control_flow_in_finally: true
     always_specify_types: true
     # avoid_bool_literals_in_conditional_expressions: true
-

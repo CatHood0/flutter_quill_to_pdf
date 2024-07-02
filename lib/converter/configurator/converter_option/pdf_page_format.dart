@@ -1,4 +1,3 @@
-
 ///PDFPageFormat is a default implementation to decide all the properties for the pdf document
 ///[width, height and margins]
 class PDFPageFormat {
@@ -17,7 +16,8 @@ class PDFPageFormat {
     required this.width,
   });
 
-  factory PDFPageFormat.all({required double width, required double height, double margin = 0}) {
+  factory PDFPageFormat.all(
+      {required double width, required double height, double margin = 0}) {
     return PDFPageFormat(
       marginTop: margin,
       marginBottom: margin,

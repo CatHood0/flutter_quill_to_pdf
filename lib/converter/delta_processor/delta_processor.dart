@@ -1,3 +1,5 @@
+// ignore_for_file: always_specify_types
+
 import 'dart:convert';
 import 'package:dart_quill_delta/dart_quill_delta.dart' as fq;
 import 'package:dart_quill_delta/dart_quill_delta.dart' as ops;
@@ -25,7 +27,7 @@ String applyAttributesIfNeeded({
   json = json.closeWithBracketsIfNeeded;
   fq.Delta delta = fq.Delta.fromJson(jsonDecode(json)).fullDenormalizer();
   while (_index < delta.length) {
-    final nextIndex = _index + 1;
+    final int nextIndex = _index + 1;
     final ops.Operation operation = delta.elementAt(_index);
     if (operation.data is! String) {
       _buffer.write(',${jsonEncode(operation.toJson())},');
@@ -34,25 +36,49 @@ String applyAttributesIfNeeded({
     }
     ops.Operation? nextOp = null;
     if (nextIndex < delta.length) nextOp = delta.elementAt(nextIndex);
-    if (operation.data is String && !Constant.newLinesInsertions.hasMatch((operation.data as String).replaceAll(RegExp('\n|\\n'), '¶'))) {
+    if (operation.data is String &&
+        !Constant.newLinesInsertions.hasMatch(
+            (operation.data as String).replaceAll(RegExp('\n|\\n'), '¶'))) {
       //inlines
+      final String? overridedHexColor = overrideAttributes
+          ? attr.hexColor == null
+              ? null
+              : '${attr.hexColor}'
+          : null;
+      final String? overridedBackgroundHexColor = overrideAttributes
+          ? attr.hexBackgroundColor == null
+              ? null
+              : '${attr.hexBackgroundColor}'
+          : null;
       final bool overridedBoldAttr = overrideAttributes ? attr.bold : false;
       final bool overridedItalicAttr = overrideAttributes ? attr.italic : false;
-      final bool overridedUnderlineAttr = overrideAttributes ? attr.underline : false;
+      final bool overridedStrikeAttr =
+          overrideAttributes ? attr.strikethrough : false;
+      final String? overridedLinkAttr = overrideAttributes ? attr.link : null;
+      final bool overridedUnderlineAttr =
+          overrideAttributes ? attr.underline : false;
       final bool boldAttr = operation.attributes?['bold'] ?? overridedBoldAttr;
-      final bool? italicHelperAttr =
-          operation.attributes?['italic'] is String ? stringToSafeBool(operation.attributes?['italic']) : operation.attributes?['italic'];
+      final bool? italicHelperAttr = operation.attributes?['italic'] is String
+          ? stringToSafeBool(operation.attributes?['italic'])
+          : operation.attributes?['italic'];
       final bool italicAttr = italicHelperAttr ?? overridedItalicAttr;
-      final bool? underlineHelperAttr = operation.attributes?['underline'] is String
-          ? stringToSafeBool(operation.attributes?['underline'])
-          : operation.attributes?['underline'];
+      final bool? underlineHelperAttr =
+          operation.attributes?['underline'] is String
+              ? stringToSafeBool(operation.attributes?['underline'])
+              : operation.attributes?['underline'];
       final bool underlineAttr = underlineHelperAttr ?? overridedUnderlineAttr;
-      final bool strikeAttr = operation.attributes?['strike'] ?? false;
-      final String? color = operation.attributes?['color'];
-      final String? background = operation.attributes?['background'];
-      final String decidedFontFamily = overrideAttributes ? attr.fontFamily : 'Arial';
-      final String fontFamilyAttr = operation.attributes?['font'] as String? ?? decidedFontFamily;
-      final String? linkAttr = operation.attributes?['link'] ?? operation.attributes?['href'];
+      final bool strikeAttr =
+          operation.attributes?['strike'] ?? overridedStrikeAttr;
+      final String? color = operation.attributes?['color'] ?? overridedHexColor;
+      final String? background =
+          operation.attributes?['background'] ?? overridedBackgroundHexColor;
+      final String decidedFontFamily =
+          overrideAttributes ? attr.fontFamily : 'Arial';
+      final String fontFamilyAttr =
+          operation.attributes?['font'] as String? ?? decidedFontFamily;
+      final String? linkAttrHelper =
+          operation.attributes?['link'] ?? operation.attributes?['href'];
+      final String? linkAttr = linkAttrHelper ?? overridedLinkAttr;
       final fontSizeHelper = operation.attributes?['size'];
       final String fontSizeAttr = fontSizeHelper != null
           ? fontSizeHelper is String
@@ -61,60 +87,97 @@ String applyAttributesIfNeeded({
           : overrideAttributes
               ? '${attr.fontSize.toInt()}'
               : Constant.DEFAULT_FONT_SIZE.toString();
-      final String insertionData = '{"insert":${jsonEncode(operation.data.toString().encodeSymbols)}';
-      final double lineSpacingHelper = overrideAttributes ? attr.lineSpacing : Constant.DEFAULT_LINE_HEIGHT;
+      final String insertionData =
+          '{"insert":${jsonEncode(operation.data.toString().encodeSymbols)}';
+      final double lineSpacingHelper =
+          overrideAttributes ? attr.lineSpacing : Constant.DEFAULT_LINE_HEIGHT;
       final double spacing = double.tryParse(
-            searchNextAttr(delta: delta, currentIndex: _index, limitTo: DeltaDetectionLimit.newline, attr: 'line-height') ?? 'null',
+            searchNextAttr(
+                    delta: delta,
+                    currentIndex: _index,
+                    limitTo: DeltaDetectionLimit.newline,
+                    attr: 'line-height') ??
+                'null',
           ) ??
           lineSpacingHelper;
       final Map<String, dynamic> mapAttrs = <String, dynamic>{
-        "line-height": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : "$spacing",
-        "size": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : fontSizeAttr,
-        "font": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : fontFamilyAttr,
+        "line-height": nextOp?.attributes != null &&
+                nextOp!.attributes!.containsKey('code-block')
+            ? null
+            : "$spacing",
+        "size": nextOp?.attributes != null &&
+                nextOp!.attributes!.containsKey('code-block')
+            ? null
+            : fontSizeAttr,
+        "font": nextOp?.attributes != null &&
+                nextOp!.attributes!.containsKey('code-block')
+            ? null
+            : fontFamilyAttr,
         "bold": boldAttr,
         "italic": italicAttr,
         "underline": underlineAttr,
         "strike": strikeAttr,
         "link": linkAttr,
-        "color": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : color,
-        "background": nextOp?.attributes != null && nextOp!.attributes!.containsKey('code-block') ? null : background,
+        "color": nextOp?.attributes != null &&
+                nextOp!.attributes!.containsKey('code-block')
+            ? null
+            : color,
+        "background": nextOp?.attributes != null &&
+                nextOp!.attributes!.containsKey('code-block')
+            ? null
+            : background,
       };
-      final Map<String, dynamic>? attributesJson = mapAttrs.ignoreIf(predicate: (String key, dynamic value) {
+      final Map<String, dynamic>? attributesJson =
+          mapAttrs.ignoreIf(predicate: (String key, dynamic value) {
         if (value is bool && !value) {
           return false;
         }
         if (value == null) return false;
         return true;
       });
-      _buffer.write(insertionData); //Avoid error if the content has '"' into itself
-      _buffer.write(attributesJson == null ? '},' : ',"attributes":${jsonEncode(attributesJson)}},');
+      _buffer.write(
+          insertionData); //Avoid error if the content has '"' into itself
+      _buffer.write(attributesJson == null
+          ? '},'
+          : ',"attributes":${jsonEncode(attributesJson)}},');
       _index++;
       continue;
     } else if (operation.data is String &&
-        Constant.newLinesInsertions.hasMatch((operation.data as String).replaceAll(RegExp('\n|\\n'), '¶')) &&
+        Constant.newLinesInsertions.hasMatch(
+            (operation.data as String).replaceAll(RegExp('\n|\\n'), '¶')) &&
         operation.attributes != null) {
       final String? listAttr = operation.attributes?['list'];
-      final String? decidedAlign = overrideAttributes ? attr.align : null;
-      final String? alignAttr = operation.attributes?['align'] ?? decidedAlign;
-      final String? indentHelper = attr.indent > 0 ? '${attr.indent}' : null;
-      String? indentAttr = operation.attributes?['indent'] as String? ?? indentHelper;
-      final bool quote = operation.attributes?['blockquote'] as bool? ?? false;
-      final bool codeBlock = operation.attributes?['code-block'] ?? false;
-      final int? headerHelper = overrideAttributes
-          ? attr.levelHeader == null || attr.levelHeader! > 0 && attr.levelHeader! < 6
-              ? null
-              : attr.levelHeader
+      final String? decidedAlign = overrideAttributes
+          ? validateAlign(attr.align)
+              ? attr.align
+              : null
           : null;
-      final int? headerAttr = operation.attributes?['header'] ?? headerHelper;
+      final String? alignAttr = operation.attributes?['align'] ?? decidedAlign;
+      final String? indentHelper = overrideAttributes
+          ? attr.indent > 0
+              ? '${attr.indent}'
+              : null
+          : null;
+      String? indentAttr = operation.attributes?['indent'] ?? indentHelper;
+      final bool quote = operation.attributes?['blockquote'] ?? false;
+      final bool codeBlock = operation.attributes?['code-block'] ?? false;
+      final int? headerAttr = operation.attributes?['header'];
       final Map<String, dynamic> mapAttrs = <String, dynamic>{
         "align": quote || listAttr != null || codeBlock ? null : alignAttr,
         "list": headerAttr != null || quote || codeBlock ? null : listAttr,
         "header": quote || codeBlock || listAttr != null ? null : headerAttr,
-        "blockquote": codeBlock || listAttr != null || alignAttr != null ? null : quote,
-        "code-block": !quote || headerAttr != null || listAttr != null || alignAttr != null ? codeBlock : null,
+        "blockquote":
+            codeBlock || listAttr != null || alignAttr != null ? null : quote,
+        "code-block": !quote ||
+                headerAttr != null ||
+                listAttr != null ||
+                alignAttr != null
+            ? codeBlock
+            : null,
         "indent": quote || codeBlock ? null : indentAttr,
       };
-      final Map<String, dynamic>? attributesJson = mapAttrs.ignoreIf(predicate: (String key, value) {
+      final Map<String, dynamic>? attributesJson =
+          mapAttrs.ignoreIf(predicate: (String key, value) {
         if (value is bool && !value) {
           return false;
         }
@@ -127,13 +190,27 @@ String applyAttributesIfNeeded({
       _buffer.write(
           ',{"insert":"${(operation.data as String).replaceAll('\n', r'\n')}"${attributesJson == null ? '},' : ',"attributes":${jsonEncode(attributesJson)}}'}');
     } else {
-      final double lineSpacingHelper = overrideAttributes ? attr.lineSpacing : Constant.DEFAULT_LINE_HEIGHT;
-      double spacing = operation.attributes?['line-height'] ?? lineSpacingHelper;
-      final Map<String, dynamic> map = <String, dynamic>{"line-height": "$spacing", ...(operation.attributes ?? {})};
+      final double lineSpacingHelper =
+          overrideAttributes ? attr.lineSpacing : Constant.DEFAULT_LINE_HEIGHT;
+      double spacing =
+          operation.attributes?['line-height'] ?? lineSpacingHelper;
+      final Map<String, dynamic> map = <String, dynamic>{
+        "line-height": "$spacing",
+        ...(operation.attributes ?? <String, dynamic>{})
+      };
       final String attributes = jsonEncode(map);
-      _buffer.write(',{"insert":"${(operation.data as String).encodeSymbols.replaceAll('\n', r'\n')}","attributes":$attributes},');
+      _buffer.write(
+          ',{"insert":"${(operation.data as String).encodeSymbols.replaceAll('\n', r'\n')}","attributes":$attributes},');
     }
     _index++;
   }
   return '$_buffer'.fixCommonErrorInsertsInRawDelta;
+}
+
+bool validateAlign(String? align) {
+  if (align.equals('left')) return true;
+  if (align.equals('justify')) return true;
+  if (align.equals('center')) return true;
+  if (align.equals('right')) return true;
+  return false;
 }

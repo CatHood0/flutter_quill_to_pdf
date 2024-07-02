@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/list_extension.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,13 +14,13 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import 'attribute_functions.dart';
 import 'document_functions.dart';
-import '../abstract_converter.dart';
 
 abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     implements
         AttrInlineFunctions<List<pw.InlineSpan>, pw.TextStyle?>,
         AttrBlockFunctions<pw.Widget, pw.TextStyle?>,
         DocumentFunctions<Delta, List<String>, List<pw.Widget>> {
+  late final pw.ThemeData defaultTheme;
   late final PdfColor defaultLinkColor;
   late final pw.TextStyle defaultTextStyle;
   final Delta? frontM;
@@ -273,9 +274,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
             background: pw.BoxDecoration(color: backgroundTextColor),
             decorationColor: textColor ?? backgroundTextColor,
           );
-      spans.add(
-        pw.TextSpan(children: await applyInlineStyles(content, decided_style, addFontSize), style: decided_style),
-      );
+      spans.add(pw.TextSpan(children: await applyInlineStyles(content, decided_style, addFontSize), style: decided_style));
       currentIndex = match.end;
       i++;
     }
@@ -289,7 +288,9 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         spans.add(pw.TextSpan(text: remainingText.decodeSymbols, style: style ?? defaultTextStyle)); // Apply currentinheritedStyle
       }
     }
-    if (returnContentIfNeedIt && spans.isEmpty) return <pw.TextSpan>[pw.TextSpan(text: line, style: style)];
+    if (returnContentIfNeedIt && spans.isEmpty) {
+      return <pw.TextSpan>[pw.TextSpan(text: line, style: style)];
+    }
     return spans;
   }
 
@@ -418,7 +419,9 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
               style: inheritedStyle ?? defaultTextStyle)); // Apply currentinheritedStyle
         }
       }
-      final String? contentInlineStyles = match.group(2) ?? match.group(4) ?? match.group(6) ?? match.group(8); //inline
+
+      ///2 bold italic, 4 bold, 6 italic, 8 underline, 12 is strike
+      final String? contentInlineStyles = match.group(2) ?? match.group(4) ?? match.group(6) ?? match.group(8) ?? match.group(12); //inline
       final String? contentLink = match.group(15); //link
       final List<pw.TextSpan> spansLineStyle =
           await getInlineStyles(contentInlineStyles?.convertUTF8QuotesToValidString ?? '', inheritedStyle);
@@ -515,7 +518,9 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       final RegExpMatch match = matches.elementAt(i);
       final double? spacing = double.tryParse(match.group(2)!);
       final String content = match.group(3)!;
-      final pw.TextStyle decided_style = style?.copyWith(lineSpacing: spacing?.resolveLineHeight()) ??
+      final pw.TextStyle decided_style = style?.copyWith(
+            lineSpacing: spacing?.resolveLineHeight(),
+          ) ??
           defaultTextStyle.copyWith(lineSpacing: spacing?.resolveLineHeight());
       spans.add(pw.TextSpan(text: content.convertUTF8QuotesToValidString.decodeSymbols, style: decided_style));
     }
@@ -546,12 +551,25 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       final bool isBold = contentWithMd.isBold;
       final bool isItalic = contentWithMd.isItalic;
       final bool isUnder = contentWithMd.isUnderline;
-      final bool isBoldItalicUnderline = contentWithMd.isAllStylesCombined;
+      final bool isStrike = contentWithMd.isStrike;
+      final bool isAllInOne = contentWithMd.isAllStylesCombined;
       late pw.TextStyle textStyle;
       if (style == null) {
-        textStyle = defaultTextStyle.resolveInline(isBold, isItalic, isUnder, isBoldItalicUnderline);
+        textStyle = defaultTextStyle.resolveInline(
+          isBold,
+          isItalic,
+          isUnder,
+          isStrike,
+          isAllInOne,
+        );
       } else {
-        textStyle = style.resolveInline(isBold, isItalic, isUnder, isBoldItalicUnderline);
+        textStyle = style.resolveInline(
+          isBold,
+          isItalic,
+          isUnder,
+          isStrike,
+          isAllInOne,
+        );
       }
       spans.add(pw.TextSpan(text: content.convertUTF8QuotesToValidString.replaceMd.decodeSymbols, style: textStyle));
       currentIndex = match.end;

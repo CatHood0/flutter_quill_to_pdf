@@ -17,13 +17,18 @@ abstract interface class MarkdownRules {
   static hm2.Rule get image => _IMAGE_RULE;
   static hm2.Rule get underline => _UNDERLINE_RULE;
   static hm2.Rule get code => _CODE_RULE;
+  static hm2.Rule get strike => _STRIKE_RULE;
   static hm2.Rule get blockquote => _BLOCKQUOTE_RULE;
   static List<hm2.Rule> get list => <hm2.Rule>[_LIST_ITEM_RULE, _LIST_RULE];
-  static List<hm2.Rule> get allRules => <hm2.Rule>[blockquote, paragraph, headers, common, image, underline, code, ...list];
+  static List<hm2.Rule> get allRules => <hm2.Rule>[blockquote, paragraph, headers, common, image, underline, code, ...list, strike];
 
   static final hm2.Rule _UNDERLINE_RULE =
       hm2.Rule('underline', filters: <String>['u', 'ins'], replacement: (String content, hm2.Node node) {
     return '_${content}_';
+  });
+
+  static final hm2.Rule _STRIKE_RULE = hm2.Rule('strike', filters: <String>['s'], replacement: (String content, hm2.Node node) {
+    return '~~$content~~';
   });
 
   static final hm2.Rule _PARAGRAPH_RULE = hm2.Rule('paragraph', filters: <String>['p'], replacement: (String content, hm2.Node node) {

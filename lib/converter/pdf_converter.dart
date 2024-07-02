@@ -4,8 +4,6 @@ import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pdf/pdf.dart' show PdfColor;
 import 'package:pdf/widgets.dart' as pw;
-import 'package:flutter_quill_to_pdf/converter/configurator/abstract_converter.dart';
-import 'package:flutter_quill_to_pdf/converter/service/pdf_service.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' as qpdf;
 
 import '../flutter_quill_to_pdf.dart';
@@ -38,7 +36,7 @@ class PDFConverter {
   final Future<pw.Font> Function(String) onRequestBoldItalicFont;
 
   ///Used by PDF converter to transform [delta to html].
-  ///if you use custom [formatted delta], use this to avoid [conflicts]
+  ///if you use your own delta implementation, use this to avoid [conflicts]
   final String Function(Delta)? customDeltaToHTMLConverter;
 
   ///Used by PDF converter to transform [formatted html to markdown]
@@ -156,12 +154,16 @@ class PDFConverter {
     this.onDetectLink,
     this.onDetectList,
     this.convertOptions,
-  })  : assert(params.height > 50, 'Page size height isn\'t valid'),
-        assert(params.width > 50, 'Page size width isn\'t valid'),
-        assert(params.marginBottom >= 0.0, 'Margin to bottom with value ${params.marginBottom}'),
-        assert(params.marginLeft >= 0.0, 'Margin to left with value ${params.marginLeft}'),
-        assert(params.marginRight >= 0.0, 'Margin to right with value ${params.marginRight}'),
-        assert(params.marginTop >= 0.0, 'Margin to tp with value ${params.marginTop}') {
+  })  : assert(params.height > 30, 'Page size height isn\'t valid'),
+        assert(params.width > 30, 'Page size width isn\'t valid'),
+        assert(params.marginBottom >= 0.0,
+            'Margin to bottom with value ${params.marginBottom}'),
+        assert(params.marginLeft >= 0.0,
+            'Margin to left with value ${params.marginLeft}'),
+        assert(params.marginRight >= 0.0,
+            'Margin to right with value ${params.marginRight}'),
+        assert(params.marginTop >= 0.0,
+            'Margin to tp with value ${params.marginTop}') {
     globalFontsFallbacks = <pw.Font>[
       ...fallbacks,
       pw.Font.helvetica(),
@@ -218,15 +220,25 @@ class PDFConverter {
       onDetectLink: onDetectLink,
       onDetectList: onDetectList,
       onRequestFont: onRequestFont,
-      backM: !shouldProcessDeltas ? backMatterDelta : processDelta(backMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
+      backM: !shouldProcessDeltas
+          ? backMatterDelta
+          : processDelta(backMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
       converterOptions: convertOptions,
-      frontM: !shouldProcessDeltas ? frontMatterDelta : processDelta(frontMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
+      frontM: !shouldProcessDeltas
+          ? frontMatterDelta
+          : processDelta(frontMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
       onRequestItalicFont: onRequestItalicFont,
       customConverters: customConverters,
-      document: !shouldProcessDeltas ? document : processDelta(document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
+      document: !shouldProcessDeltas
+          ? document
+          : processDelta(
+              document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
     );
     if (customRules != null) {
-      assert(customRules!.isNotEmpty, 'Cannot be passed a list of new rules empty');
+      assert(customRules!.isNotEmpty,
+          'Cannot be passed a list of new rules empty');
       final List<qpdf.Rule>? rules = customRules;
       converter.customRules(rules!, clearDefaultRules: true);
     }
@@ -281,15 +293,25 @@ class PDFConverter {
       onDetectInlinesMarkdown: onDetectInlinesMarkdown,
       onDetectLink: onDetectLink,
       onDetectList: onDetectList,
-      backM: !shouldProcessDeltas ? backMatterDelta : processDelta(backMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
+      backM: !shouldProcessDeltas
+          ? backMatterDelta
+          : processDelta(backMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
       converterOptions: convertOptions,
-      frontM: !shouldProcessDeltas ? frontMatterDelta : processDelta(frontMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
+      frontM: !shouldProcessDeltas
+          ? frontMatterDelta
+          : processDelta(frontMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
       onRequestItalicFont: onRequestItalicFont,
       customConverters: customConverters,
-      document: !shouldProcessDeltas ? document : processDelta(document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
+      document: !shouldProcessDeltas
+          ? document
+          : processDelta(
+              document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
     );
     if (customRules != null) {
-      assert(customRules!.isNotEmpty, 'Cannot be passed a list of new rules empty');
+      assert(customRules!.isNotEmpty,
+          'Cannot be passed a list of new rules empty');
       final List<qpdf.Rule>? rules = customRules;
       converter.customRules(rules!, clearDefaultRules: true);
     }
@@ -304,13 +326,16 @@ class PDFConverter {
     }
   }
 
-  static Delta? processDelta(Delta? delta, DeltaAttributesOptions options, bool overrideAttributesPassedByUser) {
+  static Delta? processDelta(Delta? delta, DeltaAttributesOptions options,
+      bool overrideAttributesPassedByUser) {
     if (delta == null) return null;
     if (delta.isEmpty) return delta;
-    final String json =
-        applyAttributesIfNeeded(json: jsonEncode(delta.toJson()), attr: options, overrideAttributes: overrideAttributesPassedByUser)
-            .fixCommonErrorInsertsInRawDelta
-            .withBrackets;
+    final String json = applyAttributesIfNeeded(
+            json: jsonEncode(delta.toJson()),
+            attr: options,
+            overrideAttributes: overrideAttributesPassedByUser)
+        .fixCommonErrorInsertsInRawDelta
+        .withBrackets;
     return Delta.fromJson(jsonDecode(json));
   }
 }

@@ -10,7 +10,6 @@ extension ListExtension<T> on List<T> {
     }
   }
 
-
   ///Update the data where predicate match
   List<T> updateWhere({required T data, required Predicate<T> predicate}) {
     final List<T> temp = <T>[...this];

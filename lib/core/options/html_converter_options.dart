@@ -13,7 +13,6 @@ class HTMLConverterOptions {
     bool multiLineCodeblock = false,
     bool multiLineParagraph = false,
     bool multiLineCustomBlock = true,
-    String docLinksTag = 'wiki-doc',
     String docLineSpacingTag = 'line-height',
     CustomCssStylesFn? customCssStyles,
     OpAttributeSanitizerOptions? satitizerOptions,
@@ -26,7 +25,8 @@ class HTMLConverterOptions {
           multiLineCodeblock: multiLineCodeblock,
           multiLineParagraph: multiLineParagraph,
           multiLineCustomBlock: multiLineCustomBlock,
-          sanitizerOptions: satitizerOptions ?? OpAttributeSanitizerOptions(allow8DigitHexColors: true),
+          sanitizerOptions: satitizerOptions ??
+              OpAttributeSanitizerOptions(allow8DigitHexColors: true),
           converterOptions: OpConverterOptions(
             customCssStyles: customCssStyles ??
                 (DeltaInsertOp op) {
@@ -44,7 +44,9 @@ class HTMLConverterOptions {
                   return null;
                 },
             inlineStyles: InlineStyles(<String, InlineStyleType>{
-              'font': InlineStyleType(fn: (String value, _) => defaultInlineFonts[value] ?? 'font-family: $value'),
+              'font': InlineStyleType(
+                  fn: (String value, _) =>
+                      defaultInlineFonts[value] ?? 'font-family: $value'),
               'size': InlineStyleType(fn: (String value, _) {
                 //default sizes
                 if (value.equals('small')) return 'font-size: 8px';
@@ -54,8 +56,10 @@ class HTMLConverterOptions {
                 return 'font-size: ${value}px';
               }),
               'indent': InlineStyleType(fn: (String value, DeltaInsertOp op) {
-                final double indentSize = (double.tryParse(value) ?? double.nan) * 3;
-                final String side = op.attributes['direction'] == 'rtl' ? 'right' : 'left';
+                final double indentSize =
+                    (double.tryParse(value) ?? double.nan) * 3;
+                final String side =
+                    op.attributes['direction'] == 'rtl' ? 'right' : 'left';
                 return 'padding-$side:${indentSize}px';
               }),
               'list': InlineStyleType(map: <String, String>{

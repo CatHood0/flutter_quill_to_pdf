@@ -12,13 +12,11 @@ class DeltaAttributesOptions {
   String fontFamily;
   //block
   String? align;
-  ///[Not supported yet]
   bool strikethrough;
   String? link; //url
-  String? rgbColor;
+  int? hexColor;
+  int? hexBackgroundColor;
   int indent;
-  String? image; //bytes or url
-  int? levelHeader;
 
   DeltaAttributesOptions({
     required this.fontSize,
@@ -28,27 +26,29 @@ class DeltaAttributesOptions {
     required this.lineSpacing,
     required this.strikethrough,
     required this.align,
-    required this.levelHeader,
     this.fontFamily = "Arial",
-    this.rgbColor,
+    this.hexColor,
+    this.hexBackgroundColor,
     this.link,
     this.indent = -1,
-    this.image,
   })  : assert(lineSpacing <= 2.0 && lineSpacing >= 1.0),
         assert(indent == -1 || (indent > 0 && indent <= 4)),
-        assert(align == null || (align.equals('left') || align.equals('right') || align.equals('center') || align.equals('justify')));
+        assert(align == null ||
+            (align.equals('left') ||
+                align.equals('right') ||
+                align.equals('center') ||
+                align.equals('justify')));
 
   factory DeltaAttributesOptions.common({
     bool? bold,
     bool? italic,
     bool? underline,
     bool? automaticIndent,
-    int? levelHeader,
-    String? rgbColor,
+    int? hexColor,
+    int? hexBackgroundColor,
     String? rgbBackground,
     String? fontFamily,
     String? align,
-    String? image,
     double? lineSpacing,
     double? fontSize,
   }) {
@@ -59,12 +59,11 @@ class DeltaAttributesOptions {
       strikethrough: false,
       indent: -1,
       link: null,
-      levelHeader: levelHeader ?? 0,
-      image: image,
       lineSpacing: lineSpacing ?? 1.0,
       fontFamily: fontFamily ?? 'Arial',
       fontSize: fontSize ?? 12,
-      rgbColor: rgbColor,
+      hexColor: hexColor,
+      hexBackgroundColor: hexBackgroundColor,
       underline: underline ?? false,
     );
   }
@@ -76,14 +75,13 @@ class DeltaAttributesOptions {
     bool? underline,
     bool? automaticIndent,
     String? fontFamily,
-    String? rgbColor,
-    String? image,
+    int? hexColor,
+    int? hexBackgroundColor,
     double? lineSpacing,
     bool? strikethrough,
     String? link,
     String? align,
     int? indent,
-    int? levelHeader,
   }) {
     return DeltaAttributesOptions(
       fontSize: fontSize ?? this.fontSize,
@@ -92,17 +90,11 @@ class DeltaAttributesOptions {
       bold: bold ?? this.bold,
       italic: italic ?? this.italic,
       lineSpacing: lineSpacing ?? this.lineSpacing,
+      hexBackgroundColor: hexBackgroundColor ?? this.hexBackgroundColor,
       underline: underline ?? this.underline,
       fontFamily: fontFamily ?? this.fontFamily,
-      rgbColor: rgbColor ?? this.rgbColor,
-      image: image ?? this.image,
+      hexColor: hexColor ?? this.hexColor,
       align: align ?? this.align,
-      levelHeader: levelHeader ?? this.levelHeader,
     );
-  }
-
-  @override
-  String toString() {
-    return 'DeltaAttributesOptions(line_spacing: $lineSpacing, fontSize: $fontSize, bold: $bold, italic: $italic, underline: $underline, fontFamily: $fontFamily, rgbColor: $rgbColor, image: $image, align: $align, levelHeader: $levelHeader)';
   }
 }
