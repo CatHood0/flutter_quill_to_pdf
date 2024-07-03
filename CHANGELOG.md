@@ -1,3 +1,7 @@
+# 1.2.2
+
+- [Fix] delta to html doesn't detect double values
+
 # 1.2.1
 
 - [Fix] renamed WidgetGenerator to PdfWidgetGenerator

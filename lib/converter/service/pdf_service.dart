@@ -191,6 +191,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
             .elementAt(i)
             .replaceAll(r'\"', '"')
             .convertHTMLToMarkdown; //delete the encode that avoid conflicts with delta map
+        //TODO: implement a param to add custom conversion from html inlines to markdown for devs
       }
       print(line);
       if (customConverters.isNotEmpty) {

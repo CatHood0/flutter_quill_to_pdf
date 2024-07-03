@@ -1,11 +1,11 @@
-# Flutter quill to PDF
+# Flutter Quill to PDF
 
-This package allow create PDF's using deltas from Quill.
+This package allow us create PDF's using deltas from Quill.
 
-Features that can be configured:
+Some options that can be configured:
 
-- `DeltaAttributesOptions` (this are attributes that will appear in the delta if certain attributes are not found in the delta)
-- We can use custom fonts. Using `onRequest` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package _Just works with the default library implementation_
+- `DeltaAttributesOptions` (this attributes will be applied to whole delta)
+- We can use custom fonts. Using `onRequest` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package _Just works automatically with the default library implementation_
 - `CustomConverter`, which helps you create custom PDF widgets using custom regular expressions.
 - Optional front matter and back matter
 - Page format using `PDFPageFormat` class
@@ -14,7 +14,7 @@ Features that can be configured:
 - Set custom rules from `html2md` to customize your own markdown style detection _(It could have conflicts if don't customize the `CustomPDFWidget` functions to detect your custom markdown style implementation)_
 - Set a custom `ConverterOption` to `PDFConverter` to customize your own html rendering implementation _(It could have conflicts if you don't also make your own `CustomPDFWidget` functions, to detect your new html style. And you should also have to change the default rules of the package to make correct detect of this custom implemenation)_
 
-> By default, the delta when creating the document is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes, making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
+> By default, the delta is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes (if it is not null), making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
 
 <details>
     <summary>Tap to show/hide screenshots</summary>
@@ -27,7 +27,7 @@ Features that can be configured:
 
 ```yaml
 dependencies:
-  flutter_quill_to_pdf: ^1.2.1
+  flutter_quill_to_pdf: ^1.2.2
 ```
 
 ### Import package
@@ -168,8 +168,7 @@ String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String
 
 ## No supported
 
-- Indented text (working on it)
-- Indented list (working on it)
+- Indent (working on it)
 - Superscript/Subscript (Working on it)
 - Embed formula (Not planned)
 - Embed video (Not planned)
