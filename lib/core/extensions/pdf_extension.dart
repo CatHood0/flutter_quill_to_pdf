@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart' show Alignment;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
@@ -106,18 +105,6 @@ extension TextStyleInlineExtension on pw.TextStyle {
             fontStyle: pw.FontStyle.italic,
             decoration: decoration,
           );
-  }
-}
-
-///A simple resolver to make more readable decide the align to a paragraph
-extension BlockAlignmentExtension on String {
-  Alignment get resolveBlockAlign {
-    if (equals('')) return Alignment.centerLeft;
-    return this == 'center'
-        ? Alignment.center
-        : this == 'right'
-            ? Alignment.centerRight
-            : Alignment.centerLeft;
   }
 }
 
