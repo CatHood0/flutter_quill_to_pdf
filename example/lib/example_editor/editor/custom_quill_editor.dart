@@ -26,7 +26,8 @@ class CustomQuillEditor extends HookWidget {
   Widget build(BuildContext context) {
     useEffect(() {
       controller.addListener(() => onChange(controller.document));
-      return () => controller.removeListener(() => onChange(controller.document));
+      return () =>
+          controller.removeListener(() => onChange(controller.document));
     }, <Object?>[controller.document]);
     return QuillEditor.basic(
       focusNode: node,
@@ -42,7 +43,9 @@ class CustomQuillEditor extends HookWidget {
         autoFocus: false,
         enableSelectionToolbar: true,
         enableInteractiveSelection: true,
-        textSelectionControls: Platform.isAndroid ? MaterialTextSelectionControls() : DesktopTextSelectionControls(),
+        textSelectionControls: Platform.isAndroid
+            ? MaterialTextSelectionControls()
+            : DesktopTextSelectionControls(),
         customStyleBuilder: (Attribute<dynamic> attribute) {
           if (attribute.key.equals('line-height')) {
             return TextStyle(
@@ -79,58 +82,96 @@ class CustomQuillEditor extends HookWidget {
           return TextStyle(fontFamily: defaultFontFamily, height: 1.0);
         },
         customStyles: DefaultStyles(
-          h1: const DefaultTextBlockStyle(TextStyle(), VerticalSpacing(10, 1), VerticalSpacing(5, 0), BoxDecoration()),
-          h2: const DefaultTextBlockStyle(TextStyle(), VerticalSpacing(7, 1), VerticalSpacing(5, 0), BoxDecoration()),
-          h3: const DefaultTextBlockStyle(TextStyle(), VerticalSpacing(4, 1), VerticalSpacing(5, 0), BoxDecoration()),
+          h1: const DefaultTextBlockStyle(TextStyle(), VerticalSpacing(10, 1),
+              VerticalSpacing(5, 0), BoxDecoration()),
+          h2: const DefaultTextBlockStyle(TextStyle(), VerticalSpacing(7, 1),
+              VerticalSpacing(5, 0), BoxDecoration()),
+          h3: const DefaultTextBlockStyle(TextStyle(), VerticalSpacing(4, 1),
+              VerticalSpacing(5, 0), BoxDecoration()),
           indent: DefaultTextBlockStyle(
-            TextStyle(color: Theme.of(context).textTheme.displayMedium!.color, fontSize: 16, fontFamily: defaultFontFamily, height: 1.15),
+            TextStyle(
+                color: Theme.of(context).textTheme.displayMedium!.color,
+                fontSize: 16,
+                fontFamily: defaultFontFamily,
+                height: 1.15),
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(),
           ),
           lists: DefaultListBlockStyle(
-            TextStyle(color: Theme.of(context).textTheme.displayMedium!.color, fontSize: 16, fontFamily: defaultFontFamily, height: 1.15),
+            TextStyle(
+                color: Theme.of(context).textTheme.displayMedium!.color,
+                fontSize: 16,
+                fontFamily: defaultFontFamily,
+                height: 1.15),
             const VerticalSpacing(5, 0),
             const VerticalSpacing(0, 0),
             null,
             null,
           ),
           leading: DefaultTextBlockStyle(
-            TextStyle(fontFamily: defaultFontFamily, fontSize: 16, height: 1.15, decoration: TextDecoration.none),
+            TextStyle(
+                fontFamily: defaultFontFamily,
+                fontSize: 16,
+                height: 1.15,
+                decoration: TextDecoration.none),
             const VerticalSpacing(0, 0),
             const VerticalSpacing(0, 0),
             null,
           ),
           code: DefaultTextBlockStyle(
-              const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Color.fromARGB(255, 117, 117, 117)),
+              const TextStyle(
+                  fontSize: 11,
+                  fontFamily: 'monospace',
+                  color: Color.fromARGB(255, 117, 117, 117)),
               const VerticalSpacing(5, 5),
               const VerticalSpacing(5, 5),
-              BoxDecoration(borderRadius: BorderRadius.circular(2), color: const Color.fromARGB(255, 234, 234, 234))),
+              BoxDecoration(
+                  borderRadius: BorderRadius.circular(2),
+                  color: const Color.fromARGB(255, 234, 234, 234))),
           quote: DefaultTextBlockStyle(
-            TextStyle(fontSize: 15, height: 1.15, fontFamily: defaultFontFamily, color: Colors.grey),
+            TextStyle(
+                fontSize: 15,
+                height: 1.15,
+                fontFamily: defaultFontFamily,
+                color: Colors.grey),
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(
-              border: BorderDirectional(start: BorderSide(width: 5, color: Color.fromARGB(201, 84, 224, 255))),
-              borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15)),
+              border: BorderDirectional(
+                  start: BorderSide(
+                      width: 5, color: Color.fromARGB(201, 84, 224, 255))),
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(15),
+                  bottomRight: Radius.circular(15)),
               color: Color.fromARGB(15, 255, 255, 255),
             ),
           ),
           align: DefaultTextBlockStyle(
-            TextStyle(color: Theme.of(context).textTheme.displayMedium!.color, height: 1.15, fontSize: 16, fontFamily: defaultFontFamily),
+            TextStyle(
+                color: Theme.of(context).textTheme.displayMedium!.color,
+                height: 1.15,
+                fontSize: 16,
+                fontFamily: defaultFontFamily),
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(),
           ),
           paragraph: DefaultTextBlockStyle(
-            TextStyle(color: Theme.of(context).textTheme.displayMedium!.color, height: 1.15, fontSize: 16, fontFamily: defaultFontFamily),
+            TextStyle(
+                color: Theme.of(context).textTheme.displayMedium!.color,
+                height: 1.15,
+                fontSize: 16,
+                fontFamily: defaultFontFamily),
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(),
           ),
           link: const TextStyle(color: Color.fromARGB(255, 115, 192, 255)),
         ),
-        elementOptions: const QuillEditorElementOptions(codeBlock: QuillEditorCodeBlockElementOptions(enableLineNumbers: true)),
+        elementOptions: const QuillEditorElementOptions(
+            codeBlock:
+                QuillEditorCodeBlockElementOptions(enableLineNumbers: true)),
         sharedConfigurations: const QuillSharedConfigurations(
           locale: Locale('en'),
         ),

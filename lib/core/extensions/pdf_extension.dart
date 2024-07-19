@@ -85,7 +85,7 @@ extension TextStyleInlineExtension on pw.TextStyle {
   pw.TextStyle resolveInline(
       bool bold, bool italic, bool under, bool strike, bool isAllInOne) {
     pw.TextDecoration? decoration = null;
-    if (under && strike ) {
+    if (under && strike) {
       decoration = pw.TextDecoration.combine(
         [pw.TextDecoration.lineThrough, pw.TextDecoration.underline],
       );

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 extension ColorExtension on String {
   Color? tryToColor() {
     final RegExp rgbRegex = RegExp(r'^rgb\((\d+),\s*?(\d+),\s*?(\d+)\)$');
-    final RegExp rgbaRegex = RegExp(r'^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$');
+    final RegExp rgbaRegex =
+        RegExp(r'^rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)$');
     final RegExp hexRegex = RegExp(r'^(0x|#)([0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$');
 
     if (rgbRegex.hasMatch(this)) {
@@ -57,7 +58,8 @@ extension ColorExtension2 on Color {
   /// Try to parse the `rgba(red, greed, blue, alpha)`
   /// from the string.
   static Color? tryFromRgbaString(String colorString) {
-    final RegExp reg = RegExp(r'rgba\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)');
+    final RegExp reg =
+        RegExp(r'rgba\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)');
     final RegExpMatch? match = reg.firstMatch(colorString);
     if (match == null) {
       return null;

@@ -17,10 +17,13 @@ class QuillToolbarArrowIndicatedButtonList extends StatefulWidget {
   final List<Widget> buttons;
 
   @override
-  QuillToolbarArrowIndicatedButtonListState createState() => QuillToolbarArrowIndicatedButtonListState();
+  QuillToolbarArrowIndicatedButtonListState createState() =>
+      QuillToolbarArrowIndicatedButtonListState();
 }
 
-class QuillToolbarArrowIndicatedButtonListState extends State<QuillToolbarArrowIndicatedButtonList> with WidgetsBindingObserver {
+class QuillToolbarArrowIndicatedButtonListState
+    extends State<QuillToolbarArrowIndicatedButtonList>
+    with WidgetsBindingObserver {
   final ScrollController _controller = ScrollController();
   bool _showBackwardArrow = false;
   bool _showForwardArrow = false;
@@ -71,8 +74,10 @@ class QuillToolbarArrowIndicatedButtonListState extends State<QuillToolbarArrowI
     if (!mounted) return;
 
     setState(() {
-      _showBackwardArrow = _controller.position.minScrollExtent != _controller.position.pixels;
-      _showForwardArrow = _controller.position.maxScrollExtent != _controller.position.pixels;
+      _showBackwardArrow =
+          _controller.position.minScrollExtent != _controller.position.pixels;
+      _showForwardArrow =
+          _controller.position.maxScrollExtent != _controller.position.pixels;
     });
   }
 

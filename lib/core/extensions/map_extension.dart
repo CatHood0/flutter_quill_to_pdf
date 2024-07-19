@@ -2,25 +2,38 @@ typedef MapEntryPredicate<K, V> = bool Function(K key, V value);
 
 extension MapExtension<K, V> on Map<K, V> {
   Map<K, V>? firstEntryWhere({required MapEntryPredicate<K, V> predicate}) {
-    final MapEntry<K, V>? entry = entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
+    final MapEntry<K, V>? entry = entries
+        .where(
+            (MapEntry<K, V> element) => predicate(element.key, element.value))
+        .firstOrNull;
     if (entry == null) return null;
     return <K, V>{entry.key: entry.value};
   }
 
   K? firstKeyWhere({required MapEntryPredicate<K, V> predicate}) {
-    final MapEntry<K, V>? entry = entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
+    final MapEntry<K, V>? entry = entries
+        .where(
+            (MapEntry<K, V> element) => predicate(element.key, element.value))
+        .firstOrNull;
     if (entry == null) return null;
     return entry.key;
   }
 
   V? firstValueWhere({required MapEntryPredicate<K, V> predicate}) {
-    final MapEntry<K, V>? entry = entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
+    final MapEntry<K, V>? entry = entries
+        .where(
+            (MapEntry<K, V> element) => predicate(element.key, element.value))
+        .firstOrNull;
     if (entry == null) return null;
     return entry.value;
   }
 
-  bool updateValueWhere({required MapEntryPredicate<K, V> predicate, required V value}) {
-    final MapEntry<K, V>? entry = entries.where((MapEntry<K, V> element) => predicate(element.key, element.value)).firstOrNull;
+  bool updateValueWhere(
+      {required MapEntryPredicate<K, V> predicate, required V value}) {
+    final MapEntry<K, V>? entry = entries
+        .where(
+            (MapEntry<K, V> element) => predicate(element.key, element.value))
+        .firstOrNull;
     if (entry == null) return false;
     this[entry.key] = value;
     return this[entry.key] == value;
@@ -29,16 +42,19 @@ extension MapExtension<K, V> on Map<K, V> {
   Iterable<V>? firstValuesWhere({required MapEntryPredicate<K, V> predicate}) {
     final Iterable<V> entries = this
         .entries
-        .where((MapEntry<K, V> element) => predicate(element.key, element.value))
+        .where(
+            (MapEntry<K, V> element) => predicate(element.key, element.value))
         .map((MapEntry<K, V> mapEntry) => mapEntry.value);
     if (entries.isEmpty) return null;
     return entries;
   }
 
-  Iterable<Map<K, V>>? firstEntriesWhere({required MapEntryPredicate<K, V> predicate}) {
+  Iterable<Map<K, V>>? firstEntriesWhere(
+      {required MapEntryPredicate<K, V> predicate}) {
     final Iterable<Map<K, V>> entries = this
         .entries
-        .where((MapEntry<K, V> element) => predicate(element.key, element.value))
+        .where(
+            (MapEntry<K, V> element) => predicate(element.key, element.value))
         .map((MapEntry<K, V> e) => <K, V>{e.key: e.value})
         .toList();
     if (entries.isEmpty) return null;
@@ -61,7 +77,8 @@ extension MapExtension<K, V> on Map<K, V> {
   Iterable<K>? firstKeysWhere({required MapEntryPredicate<K, V> predicate}) {
     final Iterable<K> entries = this
         .entries
-        .where((MapEntry<K, V> element) => predicate(element.key, element.value))
+        .where(
+            (MapEntry<K, V> element) => predicate(element.key, element.value))
         .map((MapEntry<K, V> mapEntry) => mapEntry.key);
     if (entries.isEmpty) return null;
     return entries;

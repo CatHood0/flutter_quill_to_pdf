@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:collection';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
-import 'package:flutter_quill_to_pdf/utils/utils.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-
-import '../../core/constant/constants.dart';
 
 ///A Manager that contains all operations for PDF services
 class PdfService extends PdfConfigurator<Delta, pw.Document> {
@@ -19,9 +16,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   late final double _marginRight;
   late final double _width;
   late final double _height;
-  final String Function(Delta)? customDeltaToHTMLConverter;
-  final String Function(String html)? customHTMLToMarkdownConverter;
-  final ConverterOptions? converterOptions;
 
   PdfService({
     required PDFPageFormat params,
@@ -41,8 +35,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.codeBlockTextStyle,
     super.blockQuoteDividerColor,
     super.blockQuoteTextStyle,
-    this.customDeltaToHTMLConverter,
-    this.customHTMLToMarkdownConverter,
     super.blockQuotePaddingLeft,
     super.blockQuotePaddingRight,
     super.blockQuotethicknessDividerColor,
@@ -57,13 +49,13 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.onDetectInlinesMarkdown,
     super.onDetectLink,
     super.onDetectList,
-    this.converterOptions,
     super.backM,
     super.frontM,
   }) {
     _fonts = fonts;
     defaultTextStyle = pw.TextStyle(
       fontSize: defaultFontSize.toDouble(),
+      lineSpacing: 1.0,
       fontFallback: <pw.Font>[..._fonts],
     );
     _marginLeft = params.marginLeft;
@@ -107,13 +99,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       version: PdfVersion.pdf_1_5,
     );
     final PdfPageFormat pageFormat = PdfPageFormat(_width, _height,
-        marginBottom: _marginBottom,
-        marginLeft: _marginLeft,
-        marginRight: _marginRight,
-        marginTop: _marginTop);
+        marginBottom: _marginBottom, marginLeft: _marginLeft, marginRight: _marginRight, marginTop: _marginTop);
     // front matter
-    final List<Map<String, dynamic>> docWidgets = await generatePages(
-        documents: <Delta>[frontM ?? Delta(), document, backM ?? Delta()]);
+    final List<Map<String, dynamic>> docWidgets =
+        await generatePages(documents: <Delta>[frontM ?? Delta(), document, backM ?? Delta()]);
     for (int i = 0; i < docWidgets.length; i++) {
       final Map<String, dynamic> map = docWidgets.elementAt(i);
       final List<pw.Widget> widgets = map['content'] as List<pw.Widget>;
@@ -132,42 +121,16 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> generatePages(
-      {required List<Delta> documents}) async {
-    String markdownText = "";
-    LinkedHashSet<Map<String, dynamic>> docMap =
-        LinkedHashSet<Map<String, dynamic>>();
+  Future<List<Map<String, dynamic>>> generatePages({required List<Delta> documents}) async {
+    LinkedHashSet<Map<String, dynamic>> docMap = LinkedHashSet<Map<String, dynamic>>();
     int i = 0;
     int totalDocuments = documents.length;
     while (i < totalDocuments) {
       final Delta doc = documents.elementAt(i);
       if (doc.isNotEmpty) {
-        try {
-          final String html = customDeltaToHTMLConverter != null
-              ? customDeltaToHTMLConverter!.call(doc)
-              : convertDeltaToHtml(
-                      doc, converterOptions ?? HTMLConverterOptions.options())
-                  .convertWrongInlineStylesToSpans
-                  .replaceAll('<p><br/><p>', '<p><br></p>');
-          markdownText = customHTMLToMarkdownConverter != null
-              ? customHTMLToMarkdownConverter!.call(html)
-              : convertHtmlToMarkdown(
-                  html,
-                  rules,
-                  <String>[],
-                  removeLeadingWhitespaces: false,
-                  escape: false,
-                );
-        } on ArgumentError catch (e) {
-          debugPrint(e.toString());
-          rethrow;
-        } on FormatException catch (e) {
-          debugPrint(e.toString());
-          rethrow;
-        }
+        final Document? document = RichTextParser().parseDelta(doc);
         docMap.add(<String, dynamic>{
-          'content': List<pw.Widget>.from(
-              await blockGenerators(markdownText.splitBasedNewLine)),
+          'content': List<pw.Widget>.from(await blockGenerators(document!)),
         });
       }
       i++;
@@ -176,288 +139,166 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }
 
   @override
-  Future<List<pw.Widget>> blockGenerators(List<String> lines,
-      [Map<String, dynamic>? extraInfo]) async {
-    final bool isDefaulBlockConvertion = customHTMLToMarkdownConverter == null;
+  Future<List<pw.Widget>> blockGenerators(Document document) async {
     final List<pw.Widget> contentPerPage = <pw.Widget>[];
-    for (int i = 0; i < lines.length; i++) {
-      late String line;
-      //if is custom HTML, then just get the default line.
-      //The local implementation use markdown with html
-      if (!isDefaulBlockConvertion) {
-        line = lines.elementAt(i);
-      } else {
-        line = lines
-            .elementAt(i)
-            .replaceAll(r'\"', '"')
-            .convertHTMLToMarkdown; //delete the encode that avoid conflicts with delta map
-        //TODO: implement a param to add custom conversion from html inlines to markdown for devs
-      }
-      print(line);
-      if (customConverters.isNotEmpty) {
-        for (final CustomConverter detector in customConverters) {
-          if (detector.predicate.hasMatch(line)) {
-            final List<RegExpMatch> matches =
-                List<RegExpMatch>.from(detector.predicate.allMatches(line));
-            if (matches.isNotEmpty) {
-              contentPerPage.add(detector.widgetCallback(
-                matches: matches,
-                input: line,
-                lineWithoutFormatting:
-                    line.decodeSymbols.convertUTF8QuotesToValidString,
-              ));
+    final List<Paragraph> paragraphs = <Paragraph>[...document.paragraphs];
+    for (int i = 0; i < paragraphs.length; i++) {
+      final Paragraph paragraph = paragraphs.elementAt(i);
+      final Map<String, dynamic>? blockAttributes = paragraph.blockAttributes;
+      final List<pw.InlineSpan> spansToWrap = <pw.InlineSpan>[];
+      for (int l = 0; l < paragraph.lines.length; l++) {
+        final Line line = paragraph.lines.elementAt(l);
+        //verify if the data line is a embed
+        if (paragraph.type == ParagraphType.embed || line.data is Map) {
+          final bool isImage = (line.data as Map<String, dynamic>)['image'] != null;
+          if (!isImage) {
+            continue;
+          }
+          contentPerPage.add(await getImageBlock.call(line));
+        } else if (paragraph.type == ParagraphType.block || blockAttributes != null) {
+          if ((line.data as Map<String, dynamic>)['image'] != null) {
+            if (spansToWrap.isNotEmpty && blockAttributes != null) {
+              // if found a paragraph with a embed between the lines, then must separate in two different lists
+              // and apply first the before content with the block attributes and after clean those before lines to avoid
+              // duplicate content
+              _applyBlockAttributes(spansToWrap, blockAttributes, contentPerPage);
+              spansToWrap.clear();
+            }
+            contentPerPage.add(await getImageBlock.call(line));
+            continue;
+          }
+          verifyBlock(blockAttributes);
+          pw.TextStyle? style = null;
+          final double? lineHeight = blockAttributes?['line-height'];
+          if (blockAttributes?['header'] != null) {
+            final int headerLevel = blockAttributes!['header'];
+            final double currentFontSize = headerLevel.resolveHeaderLevel();
+            style = defaultTextStyle.copyWith(fontSize: currentFontSize);
+            style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+          } else if (blockAttributes?['code-block']) {
+            final pw.TextStyle defaultCodeBlockStyle = pw.TextStyle(
+              fontSize: 12,
+              font: codeBlockFont ?? pw.Font.courier(),
+              fontFallback: <pw.Font>[
+                pw.Font.courierBold(),
+                pw.Font.courierBoldOblique(),
+                pw.Font.courierOblique(),
+                pw.Font.symbol()
+              ],
+              letterSpacing: 1.5,
+              lineSpacing: 1.1,
+              wordSpacing: 0.5,
+              color: PdfColor.fromHex("#808080"),
+            );
+            style = codeBlockTextStyle ?? defaultCodeBlockStyle;
+            style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+          } else if (blockAttributes?['blockquote'] != null) {
+            final pw.TextStyle defaultStyle = pw.TextStyle(color: PdfColor.fromHex("#808080"), lineSpacing: 6.5);
+            final pw.TextStyle blockquoteStyle = blockQuoteTextStyle ?? defaultStyle;
+            style = blockquoteStyle;
+            style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+          } else {
+            style = defaultTextStyle.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+          }
+          if (line.attributes?['link'] != null) {
+            spansToWrap.addAll(await getLinkStyle.call(line, style));
+            continue;
+          }
+          spansToWrap.addAll(await getRichTextInlineStyles.call(line, style));
+        } else if (paragraph.type == ParagraphType.inline || blockAttributes == null) {
+          if (line.attributes != null) {
+            if (onDetectInlineRichTextStyles != null) {
+              contentPerPage.add(await onDetectInlineRichTextStyles!.call(line));
               continue;
             }
-          }
-        }
-      }
-      //search any span that contains just ![]() images
-      if (Constant.IMAGE_PATTERN_IN_SPAN.hasMatch(line.decodeSymbols)) {
-        if (onDetectImageBlock != null) {
-          contentPerPage.add(await onDetectImageBlock!
-              .call(Constant.IMAGE_PATTERN_IN_SPAN, line));
-          continue;
-        }
-        final pw.Widget? image = await getImageBlock.call(Constant
-            .IMAGE_PATTERN_IN_SPAN
-            .firstMatch(line.decodeSymbols)!
-            .group(1)!);
-        if (image != null) contentPerPage.add(image);
-        continue;
-      } else if (Constant.BLOCKQUOTE_PATTERN.hasMatch(line.decodeSymbols)) {
-        if (onDetectBlockquote != null) {
-          contentPerPage.add(await onDetectBlockquote!
-              .call(Constant.BLOCKQUOTE_PATTERN, line.decodeSymbols));
-          continue;
-        }
 
-        /// founds multiline where starts with <pre> and ends with </pre>
-        contentPerPage.addAll(await getBlockQuote.call(line.decodeSymbols));
-      } else if (Constant.CODE_PATTERN
-          .hasMatch(line.replaceAll('\n', r'\n').decodeSymbols)) {
-        if (onDetectCodeBlock != null) {
-          contentPerPage.add(await onDetectCodeBlock!
-              .call(Constant.CODE_PATTERN, line.decodeSymbols));
-          continue;
-        }
-
-        /// founds multiline where starts with <pre> and ends with </pre>
-        contentPerPage.addAll(await getCodeBlock.call(line.decodeSymbols));
-      } else if (Constant.NEWLINE_WITH_SPACING_PATTERN.hasMatch(line)) {
-        /// founds lines like <span style="line-spacing: 1.0">\n</span>
-        contentPerPage.add(pw.RichText(
-            softWrap: true,
-            overflow: pw.TextOverflow.span,
-            text: pw.TextSpan(children: await getNewLinesWithSpacing(line))));
-      } else if (Constant.STARTS_WITH_RICH_TEXT_INLINE_STYLES_PATTERN
-          .hasMatch(line)) {
-        if (onDetectInlineRichTextStyles != null) {
-          contentPerPage.add(await onDetectInlineRichTextStyles!.call(
-              Constant.STARTS_WITH_RICH_TEXT_INLINE_STYLES_PATTERN, line));
-          continue;
-        }
-
-        /// founds lines like <span style="wiki-doc: id">(.*?)<\/span> or <span style="line-height: 2.0")">(.*?)<\/span> or <span\s?style="font-size: 12">(.*?)<\/span>)
-        /// and those three ones together are matched
-        final List<pw.InlineSpan> spans =
-            await getRichTextInlineStyles.call(line, defaultTextStyle);
-        final double spacing = (spans.first.style?.lineSpacing ?? 1.0);
-        contentPerPage.add(
-          pw.Padding(
-            padding: pw.EdgeInsets.only(
-                bottom: spacing.resolvePaddingByLineHeight()),
-            child: pw.RichText(
-              softWrap: true,
-              overflow: pw.TextOverflow.span,
-              text: pw.TextSpan(
-                children: spans,
-              ),
-            ),
-          ),
-        );
-      } else if (Constant.HEADER_PATTERN.hasMatch(line) ||
-          Constant.ALIGNED_HEADER_PATTERN.hasMatch(line)) {
-        /// founds lines like # header 1 or <h1 style="text-align:center">header 1</h1>
-        if (Constant.HEADER_PATTERN.hasMatch(line)) {
-          if (onDetectHeaderBlock != null) {
+            /// founds lines like <span style="wiki-doc: id">(.*?)<\/span> or <span style="line-height: 2.0")">(.*?)<\/span> or <span\s?style="font-size: 12">(.*?)<\/span>)
+            /// and those three ones together are matched
+            final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(line, defaultTextStyle);
+            final double spacing = (spans.firstOrNull?.style?.lineSpacing ?? 1.0);
             contentPerPage.add(
-                await onDetectHeaderBlock!.call(Constant.HEADER_PATTERN, line));
-            continue;
-          }
-
-          /// founds lines like # header 1 or ## header 2
-          contentPerPage.add(await getHeaderBlock.call(line));
-          continue;
-        }
-        if (onDetectHeaderBlock != null) {
-          contentPerPage.add(await onDetectHeaderBlock!
-              .call(Constant.ALIGNED_HEADER_PATTERN, line));
-          continue;
-        }
-        contentPerPage.addAll(await getAlignedHeaderBlock.call(line));
-      } else if (Constant.IMAGE_PATTERN.hasMatch(line)) {
-        /// founds lines like ![max-width: 100%;object-fit: fill](image_bytes)
-        /// also ![styles](url|file-path)
-        if (onDetectImageBlock != null) {
-          contentPerPage.add(
-              await onDetectImageBlock!.call(Constant.IMAGE_PATTERN, line));
-          continue;
-        }
-        final pw.Widget? image = await getImageBlock.call(line);
-        if (image != null) contentPerPage.add(image);
-      } else if (Constant.ALIGNED_P_PATTERN.hasMatch(line)) {
-        /// founds lines like <p style="text-align:center">paragraph</p>
-        if (onDetectAlignedParagraph != null) {
-          contentPerPage.add(await onDetectAlignedParagraph!
-              .call(Constant.ALIGNED_P_PATTERN, line));
-          continue;
-        }
-        contentPerPage.addAll(await getAlignedParagraphBlock.call(line));
-      } else if (line.isTotallyEmpty ||
-          Constant.EMPTY_ALIGNED_H.hasMatch(line) ||
-          Constant.EMPTY_ALIGNED_P.hasMatch(line)) {
-        /// founds lines like [] or <p style="text-align:center">\n</p> or <h1 style="text-align:center">\n</h1>
-        // this could be returning/printing br word in document instead \n
-        //TODO: make a function to get the last or the first and get the spacing
-        bool isHeaderEmpty = Constant.EMPTY_ALIGNED_H.hasMatch(line);
-        final String newLineDecided = line.isNotEmpty
-            ? isHeaderEmpty
-                ? line
-                    .replaceAll(RegExp(r'<h([1-6])(.+?)?>|<\/h(\1)>'), '')
-                    .replaceHtmlBrToManyNewLines
-                : line
-                    .replaceAll(RegExp(r'<p>|<p.*?>|<\/p>'), '')
-                    .replaceHtmlBrToManyNewLines
-            : '\n';
-        contentPerPage.add(
-          pw.Paragraph(
-            text: newLineDecided,
-            style: defaultTextStyle,
-            padding: const pw.EdgeInsets.symmetric(vertical: 1.5),
-            margin: pw.EdgeInsets.zero,
-          ),
-        );
-      } else if (Constant.LIST_PATTERN.hasMatch(line) ||
-          Constant.LIST_CHECK_MD_PATTERN.hasMatch(line)) {
-        if (onDetectList != null) {
-          contentPerPage.add(await onDetectList!.call(
-              Constant.LIST_PATTERN.hasMatch(line)
-                  ? Constant.LIST_PATTERN
-                  : Constant.LIST_CHECK_MD_PATTERN,
-              line));
-          continue;
-        }
-        //TODO: now add support for indented lists ->
-        //TODO: now add support for list with different prefixes
-        /// founds lines like:
-        /// "[x] checked" or
-        /// "[ ] uncheck" or
-        /// "1. ordered list" or
-        /// "i. ordered list" or
-        /// "a. ordered list" or
-        /// "* unordered list"
-        contentPerPage.add(await getListBlock.call(
-            line, Constant.LIST_CHECK_MD_PATTERN.hasMatch(line)));
-      } else if (Constant.HTML_LINK_TAGS_PATTERN.hasMatch(line)) {
-        if (onDetectLink != null) {
-          contentPerPage.add(
-              await onDetectLink!.call(Constant.HTML_LINK_TAGS_PATTERN, line));
-          continue;
-        }
-
-        /// founds lines like (title)[href]
-        contentPerPage.add(
-          pw.RichText(
-            softWrap: true,
-            overflow: pw.TextOverflow.span,
-            text: pw.TextSpan(
-              children: await getLinkStyle.call(line),
-            ),
-          ),
-        );
-      } else if (Constant.INLINE_STYLES_PATTERN.hasMatch(line)) {
-        if (onDetectInlinesMarkdown != null) {
-          contentPerPage.add(await onDetectInlinesMarkdown!
-              .call(Constant.INLINE_STYLES_PATTERN, line));
-          continue;
-        }
-
-        /// founds lines like *italic* _underline_ **bold** or those three ones together
-        final List<pw.TextSpan> spans = await getInlineStyles.call(line);
-        final double spacing = (spans.firstOrNull?.style?.lineSpacing ?? 1.0);
-        contentPerPage.add(
-          pw.Padding(
-            padding: pw.EdgeInsets.symmetric(
-                vertical: spacing.resolvePaddingByLineHeight()),
-            child: pw.RichText(
-              softWrap: true,
-              overflow: pw.TextOverflow.span,
-              text: pw.TextSpan(children: spans),
-            ),
-          ),
-        );
-      } else {
-        if (Constant.RICH_TEXT_INLINE_STYLES_PATTERN.hasMatch(line)) {
-          if (onDetectInlineRichTextStyles != null) {
-            contentPerPage.add(await onDetectInlineRichTextStyles!
-                .call(Constant.RICH_TEXT_INLINE_STYLES_PATTERN, line));
-            continue;
-          }
-
-          /// founds lines like <span style="wiki-doc: id">(.*?)<\/span>) or <span style="line-height: 2.0")">(.*?)<\/span> or <span\s?style="font-size: 12">(.*?)<\/span>)
-          /// and those three ones together are matched
-          final List<pw.InlineSpan> spans =
-              await getRichTextInlineStyles.call(line, defaultTextStyle);
-          final double spacing = (spans.first.style?.lineSpacing ?? 1.0);
-          contentPerPage.add(
-            pw.Padding(
-              padding: pw.EdgeInsets.symmetric(
-                  vertical: spacing.resolvePaddingByLineHeight()),
-              child: pw.RichText(
-                softWrap: true,
-                overflow: pw.TextOverflow.span,
-                text: pw.TextSpan(
-                  children: spans,
+              pw.Padding(
+                padding: pw.EdgeInsets.symmetric(vertical: spacing.resolvePaddingByLineHeight()),
+                child: pw.RichText(
+                  softWrap: true,
+                  overflow: pw.TextOverflow.span,
+                  text: pw.TextSpan(
+                    children: spans,
+                  ),
                 ),
               ),
-            ),
-          );
-          continue;
-        }
-        if (onDetectCommonText != null) {
-          contentPerPage.add(await onDetectCommonText!.call(null, line));
-          continue;
-        }
-        if (isHTML(line)) {
-          final List<pw.TextSpan> spans = await applyInlineStyles.call(line);
+            );
+            continue;
+          }
+          if (onDetectCommonText != null) {
+            contentPerPage.add(await onDetectCommonText!.call(line, blockAttributes));
+            continue;
+          }
           contentPerPage.add(
             pw.Padding(
-              padding: pw.EdgeInsets.symmetric(
-                  vertical:
-                      ((spans.firstOrNull?.style?.lineSpacing ?? 0.40) - 0.40)
-                          .resolveLineHeight()),
+              padding: const pw.EdgeInsets.symmetric(vertical: 1.0),
               child: pw.RichText(
                 softWrap: true,
                 overflow: pw.TextOverflow.span,
-                text: pw.TextSpan(children: spans),
+                text: pw.TextSpan(text: line.data as String, style: defaultTextStyle),
               ),
             ),
           );
-          continue;
         }
-        //Wether found a plain text, then set default styles since we cannot detect any style to plain content
-        contentPerPage.add(
-          pw.Padding(
-            padding: const pw.EdgeInsets.symmetric(vertical: 1.0),
-            child: pw.RichText(
-              softWrap: true,
-              overflow: pw.TextOverflow.span,
-              text: pw.TextSpan(text: line, style: defaultTextStyle),
-            ),
-          ),
+      }
+      //then put the block styles
+      if (blockAttributes != null) {
+        _applyBlockAttributes(
+          spansToWrap,
+          blockAttributes,
+          contentPerPage,
         );
       }
     }
     return contentPerPage;
+  }
+
+  void verifyBlock(Map<String, dynamic>? blockAttributes) {
+    if (blockAttributes?['list'] != null) {
+      numberList++;
+      lastWasList = true;
+    } else {
+      numberList = 0;
+      lastWasList = false;
+    }
+    if (blockAttributes?['code-block'] != null) {
+      numCodeLine++;
+    } else {
+      numCodeLine = 0;
+    }
+  }
+
+  void _applyBlockAttributes(
+      List<pw.InlineSpan> currentSpans, Map<String, dynamic> blockAttributes, List<pw.Widget> contentPerPage) async {
+    final int? header = int.tryParse(blockAttributes['header'] ?? 'null');
+    final String? align = blockAttributes['align'];
+    final String? listType = blockAttributes['list'];
+    final int? indent = blockAttributes['indent'];
+    final bool? codeblock = blockAttributes['code-block'];
+    final bool? blockquote = blockAttributes['blockquote'];
+    final int indentLevel = indent ?? 0;
+    if (header != null) {
+      if (align != null) {
+        contentPerPage.add(await getAlignedHeaderBlock(currentSpans, header, align, indentLevel));
+        return;
+      }
+      contentPerPage.add(await getHeaderBlock(currentSpans, header, indentLevel));
+      return;
+    }
+    if (codeblock != null) {
+      contentPerPage.add(await getCodeBlock(currentSpans));
+    }
+    if (blockquote != null) {
+      contentPerPage.add(await getBlockQuote(currentSpans));
+    }
+    if (listType != null) {
+      contentPerPage.add(await getListBlock(currentSpans, listType, align ?? 'left', indentLevel));
+      return;
+    }
   }
 }

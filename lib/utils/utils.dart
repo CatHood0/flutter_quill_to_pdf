@@ -12,7 +12,8 @@ bool? stringToSafeBool(String? str) {
 }
 
 bool isHTML(String str) {
-  final RegExp htmlRegExp = RegExp('<[^>]*>', multiLine: true, caseSensitive: false);
+  final RegExp htmlRegExp =
+      RegExp('<[^>]*>', multiLine: true, caseSensitive: false);
   return htmlRegExp.hasMatch(str);
 }
 

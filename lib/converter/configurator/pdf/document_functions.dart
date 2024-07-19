@@ -7,7 +7,8 @@ mixin DocumentFunctions<D extends Delta, T, RW extends Object> {
   ///put the attributes to the paragraph
   ///
   ///[Use the parameter for print a just one document] and not all the project
-  Future<List<Map<String, dynamic>>> generatePages({required List<D> documents});
+  Future<List<Map<String, dynamic>>> generatePages(
+      {required List<D> documents});
 
   ///This function generate [widgets] to create a book with custom views of the content
   Future<RW> blockGenerators(T lines);

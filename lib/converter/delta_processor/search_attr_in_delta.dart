@@ -29,30 +29,37 @@ String? searchNextAttr({
       return null;
     }
     if (limitTo == DeltaDetectionLimit.newline) {
-      if (operation.data is String && Constant.newLinesInsertions.hasMatch((operation.data as String)) && operation.attributes != null) {
+      if (operation.data is String &&
+          Constant.newLinesInsertions.hasMatch((operation.data as String)) &&
+          operation.attributes != null) {
         final String? attribute = operation.attributes?[attr];
         if (attribute != null) {
           return attribute;
         }
       }
       // just continue if the insert doesnt contains any new line
-      if (operation.data is String && !operation.data.toString().contains(_newLinesRegexp)) {
+      if (operation.data is String &&
+          !operation.data.toString().contains(_newLinesRegexp)) {
         index++;
         continue;
       }
-      if (operation.data is String && operation.data.toString().contains(_newLinesRegexp)) {
+      if (operation.data is String &&
+          operation.data.toString().contains(_newLinesRegexp)) {
         return null;
       }
     }
     //Search the attribute until the end of the delta
     if (limitTo == DeltaDetectionLimit.end) {
-      if (operation.data is String && Constant.newLinesInsertions.hasMatch((operation.data as String)) && operation.attributes != null) {
+      if (operation.data is String &&
+          Constant.newLinesInsertions.hasMatch((operation.data as String)) &&
+          operation.attributes != null) {
         final String? attribute = operation.attributes?[attr];
         if (attribute != null) {
           return attribute;
         }
       }
-      if (operation.data is String && !operation.data.toString().contains(_newLinesRegexp)) {
+      if (operation.data is String &&
+          !operation.data.toString().contains(_newLinesRegexp)) {
         index++;
         continue;
       }
@@ -60,13 +67,16 @@ String? searchNextAttr({
     //Search until the next insert
     if (limitTo == DeltaDetectionLimit.nextInsert) {
       breakLoop = true;
-      if (operation.data is String && Constant.newLinesInsertions.hasMatch((operation.data as String)) && operation.attributes != null) {
+      if (operation.data is String &&
+          Constant.newLinesInsertions.hasMatch((operation.data as String)) &&
+          operation.attributes != null) {
         final String? attribute = operation.attributes?[attr];
         if (attribute != null) {
           return attribute;
         }
       }
-      if (operation.data is String && !operation.data.toString().contains(_newLinesRegexp)) {
+      if (operation.data is String &&
+          !operation.data.toString().contains(_newLinesRegexp)) {
         index++;
         continue;
       }
@@ -74,7 +84,9 @@ String? searchNextAttr({
     if (limitTo == DeltaDetectionLimit.mid) {
       final int mid = (delta.length / 2).floor();
       if (index <= mid) {
-        if (operation.data is String && Constant.newLinesInsertions.hasMatch((operation.data as String)) && operation.attributes != null) {
+        if (operation.data is String &&
+            Constant.newLinesInsertions.hasMatch((operation.data as String)) &&
+            operation.attributes != null) {
           final String? attribute = operation.attributes?[attr];
           if (attribute != null) {
             return attribute;

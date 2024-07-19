@@ -89,22 +89,17 @@ String applyAttributesIfNeeded({
               : Constant.DEFAULT_FONT_SIZE.toString();
       final String insertionData =
           '{"insert":${jsonEncode(operation.data.toString().encodeSymbols)}';
-      final double lineSpacingHelper =
-          overrideAttributes ? attr.lineSpacing : Constant.DEFAULT_LINE_HEIGHT;
-      final double spacing = double.tryParse(
-            searchNextAttr(
-                    delta: delta,
-                    currentIndex: _index,
-                    limitTo: DeltaDetectionLimit.newline,
-                    attr: 'line-height') ??
-                'null',
-          ) ??
-          lineSpacingHelper;
+      final double? lineSpacingHelper = overrideAttributes
+          ? attr.lineSpacing ?? Constant.DEFAULT_LINE_HEIGHT
+          : null;
+      final double? spacing = lineSpacingHelper;
       final Map<String, dynamic> mapAttrs = <String, dynamic>{
-        "line-height": nextOp?.attributes != null &&
-                nextOp!.attributes!.containsKey('code-block')
+        "line-height": lineSpacingHelper == null
             ? null
-            : "$spacing",
+            : nextOp?.attributes != null &&
+                    nextOp!.attributes!.containsKey('code-block')
+                ? null
+                : "$spacing",
         "size": nextOp?.attributes != null &&
                 nextOp!.attributes!.containsKey('code-block')
             ? null
@@ -190,12 +185,13 @@ String applyAttributesIfNeeded({
       _buffer.write(
           ',{"insert":"${(operation.data as String).replaceAll('\n', r'\n')}"${attributesJson == null ? '},' : ',"attributes":${jsonEncode(attributesJson)}}'}');
     } else {
-      final double lineSpacingHelper =
-          overrideAttributes ? attr.lineSpacing : Constant.DEFAULT_LINE_HEIGHT;
-      double spacing =
+      final double? lineSpacingHelper = overrideAttributes
+          ? attr.lineSpacing ?? Constant.DEFAULT_LINE_HEIGHT
+          : null;
+      double? spacing =
           operation.attributes?['line-height'] ?? lineSpacingHelper;
       final Map<String, dynamic> map = <String, dynamic>{
-        "line-height": "$spacing",
+        if (spacing != null) "line-height": "$spacing",
         ...(operation.attributes ?? <String, dynamic>{})
       };
       final String attributes = jsonEncode(map);

@@ -8,7 +8,7 @@ class DeltaAttributesOptions {
   bool bold;
   bool italic;
   bool underline;
-  double lineSpacing;
+  double? lineSpacing;
   String fontFamily;
   //block
   String? align;
@@ -31,8 +31,7 @@ class DeltaAttributesOptions {
     this.hexBackgroundColor,
     this.link,
     this.indent = -1,
-  })  : assert(lineSpacing <= 2.0 && lineSpacing >= 1.0),
-        assert(indent == -1 || (indent > 0 && indent <= 4)),
+  })  : assert(indent == -1 || (indent > 0 && indent <= 4)),
         assert(align == null ||
             (align.equals('left') ||
                 align.equals('right') ||
@@ -59,7 +58,7 @@ class DeltaAttributesOptions {
       strikethrough: false,
       indent: -1,
       link: null,
-      lineSpacing: lineSpacing ?? 1.0,
+      lineSpacing: lineSpacing,
       fontFamily: fontFamily ?? 'Arial',
       fontSize: fontSize ?? 12,
       hexColor: hexColor,

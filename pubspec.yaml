@@ -9,6 +9,16 @@ environment:
   sdk: ">=3.4.0 <4.0.0"
   flutter: ">=1.17.0"
 
+topics: 
+  - pdf
+  - Delta
+  - quill
+  - quill_delta
+  - widgets
+  - pdf_widgets
+  - converter
+  - pdf_converter
+
 screenshots:
   - description: "Delta in editor"
     path: example/assets/delta_to_convert.jpg

@@ -7,7 +7,8 @@ extension StringNullableExt on String? {
     return '[$this]';
   }
 
-  String? replaceAllNewLinesWith(Object object) => this?.replaceAll('\n', '$object');
+  String? replaceAllNewLinesWith(Object object) =>
+      this?.replaceAll('\n', '$object');
 
   ///Equals is a similar function that use Java or Kotlin
   ///classes to see the equality from two objects
@@ -27,7 +28,8 @@ extension StringExtension on String {
     return '[$this]';
   }
 
-  bool get isTotallyEmpty => replaceAll(RegExp(r'\s+'), '').replaceAll(RegExp('\\n|\n'), '').isEmpty;
+  bool get isTotallyEmpty =>
+      replaceAll(RegExp(r'\s+'), '').replaceAll(RegExp('\\n|\n'), '').isEmpty;
 
   List<String> get splitBasedNewLine => split('\n');
 
@@ -35,7 +37,10 @@ extension StringExtension on String {
 
   String get replaceHtmlBrToManyNewLines => replaceAll('<br>', '\n');
 
-  bool equals(String other, {bool caseSensitive = true, Pattern? pattern, bool useThisInstead = false}) {
+  bool equals(String other,
+      {bool caseSensitive = true,
+      Pattern? pattern,
+      bool useThisInstead = false}) {
     if (!caseSensitive) return toLowerCase() == other.toLowerCase();
     return pattern != null
         ? pattern is RegExp
@@ -49,19 +54,23 @@ extension StringExtension on String {
   ///Instead <span style="..."><strong>bold</strong></span>
   ///We decide create a converter that fix this minimal bug
   String get convertWrongInlineStylesToSpans {
-    return replaceAllMapped(RegExp(r'(<em\s*(style=".*?")>(.+?)<\/em>)'), (Match match) {
+    return replaceAllMapped(RegExp(r'(<em\s*(style=".*?")>(.+?)<\/em>)'),
+        (Match match) {
       final String? styles = match.group(2);
       final String? content = match.group(3);
       return '<span $styles><em>$content</em></span>';
-    }).replaceAllMapped(RegExp(r'(<strong\s*(style=".*?")>(.+?)<\/strong>)'), (Match match) {
+    }).replaceAllMapped(RegExp(r'(<strong\s*(style=".*?")>(.+?)<\/strong>)'),
+        (Match match) {
       final String? styles = match.group(2);
       final String? content = match.group(3);
       return '<span $styles><strong>$content</strong></span>';
-    }).replaceAllMapped(RegExp(r'(<u\s*(style=".*?")>(.+?)<\/u>)'), (Match match) {
+    }).replaceAllMapped(RegExp(r'(<u\s*(style=".*?")>(.+?)<\/u>)'),
+        (Match match) {
       final String? styles = match.group(2);
       final String? content = match.group(3);
       return '<span $styles><u>$content</u></span>';
-    }).replaceAllMapped(RegExp(r'(<s\s*(style=".*?")>(.+?)<\/s>)'), (Match match) {
+    }).replaceAllMapped(RegExp(r'(<s\s*(style=".*?")>(.+?)<\/s>)'),
+        (Match match) {
       final String? styles = match.group(2);
       final String? content = match.group(3);
       return '<span $styles><s>$content</s></span>';
@@ -115,42 +124,49 @@ extension StringExtension on String {
   ///A simple inline style html to markdown converter
   //TODO: implement link conversion
   String get convertHTMLToMarkdown =>
-      replaceAllMapped(RegExp(r'<strong>(?<bold>(?:(?!(<strong>|<\/strong>)).)+)<\/strong>'), (Match match) {
+      replaceAllMapped(RegExp(r'<strong>(?<bold>(?:(?!(<strong>|<\/strong>)).)+)<\/strong>'),
+          (Match match) {
         return '**${match.group(1)!}**';
-      }).replaceAllMapped(RegExp(r'<em>(?<italic>(?:(?!(<em>|<\/em>)).)+)<\/em>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<em>(?<italic>(?:(?!(<em>|<\/em>)).)+)<\/em>'),
+          (Match match) {
         return '*${match.group(1)!}*';
-      }).replaceAllMapped(RegExp(r'<s>(?<strike>(?:(?!(<s>|<\/s>)).)+)<\/s>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<s>(?<strike>(?:(?!(<s>|<\/s>)).)+)<\/s>'),
+          (Match match) {
         return '~~${match.group(1)!}~~';
-      }).replaceAllMapped(RegExp(r'<s><u>(?<strike>(?:(?!(<s>|<\/s>)).)+)<\/u><\/s>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<s><u>(?<strike>(?:(?!(<s>|<\/s>)).)+)<\/u><\/s>'),
+          (Match match) {
         return '~~_${match.group(1)!}_~~';
       }).replaceAllMapped(RegExp(r'<em><s><u>(?<strikeItalicUnderline>(?:(?!(<em><s><u>|<\/u><\/s><\/em>)).)+)<\/u><\/s><\/em>'),
           (Match match) {
         return '*~~_${match.group(1)!}_~~*';
-      }).replaceAllMapped(
-          RegExp(
-              r'<strong><em><s><u>(?<strikeBoldItalicUnderline>(?:(?!(<strong><em><s><u>|<\/u><\/s><\/em><\/strong>)).)+)<\/u><\/s><\/em><\/strong>'),
+      }).replaceAllMapped(RegExp(r'<strong><em><s><u>(?<strikeBoldItalicUnderline>(?:(?!(<strong><em><s><u>|<\/u><\/s><\/em><\/strong>)).)+)<\/u><\/s><\/em><\/strong>'),
           (Match match) {
         return '***~~_${match.group(1)!}_~~***';
-      }).replaceAllMapped(
-          RegExp(r'<strong><s><u>(?<strikeBoldUnderline>(?:(?!(<strong><s><u>|<\/u><\/s><\/strong>)).)+)<\/u><\/s><\/strong>'),
+      }).replaceAllMapped(RegExp(r'<strong><s><u>(?<strikeBoldUnderline>(?:(?!(<strong><s><u>|<\/u><\/s><\/strong>)).)+)<\/u><\/s><\/strong>'),
           (Match match) {
         return '**~~_${match.group(1)!}_~~**';
-      }).replaceAllMapped(RegExp(r'<strong><s>(?<strikeBold>(?:(?!(<strong><s>|<\/s><\/strong>)).)+)<\/s><\/strong>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<strong><s>(?<strikeBold>(?:(?!(<strong><s>|<\/s><\/strong>)).)+)<\/s><\/strong>'),
+          (Match match) {
         return '**~~${match.group(1)!}~~**';
-      }).replaceAllMapped(RegExp(r'<u>(?<underline>(?:(?!(<u>|<\/u>)).)+)<\/u>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<u>(?<underline>(?:(?!(<u>|<\/u>)).)+)<\/u>'),
+          (Match match) {
         return '_${match.group(1)!}_';
-      }).replaceAllMapped(RegExp(r'<em><s>(?<strikeItalic>(?:(?!(<em><s>|<\/s><\/em>)).)+)<\/s><\/em>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<em><s>(?<strikeItalic>(?:(?!(<em><s>|<\/s><\/em>)).)+)<\/s><\/em>'),
+          (Match match) {
         return '*~~${match.group(1)!}~~*';
-      }).replaceAllMapped(RegExp(r'<em><s><u>(?<strike>(?:(?!(<em><s><u>|<\/u><\/s><\/em>)).)+)<\/u><\/s><\/em>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<em><s><u>(?<strike>(?:(?!(<em><s><u>|<\/u><\/s><\/em>)).)+)<\/u><\/s><\/em>'),
+          (Match match) {
         return '*~~_${match.group(1)!}_~~*';
-      }).replaceAllMapped(RegExp(r'<em><u>(?<italicunderline>(?:(?!(<em><u>|<\/u><\/em>)).)+)<\/u><\/em>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<em><u>(?<italicunderline>(?:(?!(<em><u>|<\/u><\/em>)).)+)<\/u><\/em>'),
+          (Match match) {
         return '*_${match.group(1)!}_*';
-      }).replaceAllMapped(RegExp(r'<strong><u>(?<boldunderline>(?:(?!(<strong><u>|<\/u><\/strong>)).)+)<\/u><\/strong>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<strong><u>(?<boldunderline>(?:(?!(<strong><u>|<\/u><\/strong>)).)+)<\/u><\/strong>'),
+          (Match match) {
         return '**_${match.group(1)!}_**';
-      }).replaceAllMapped(RegExp(r'<strong><em>(?<italicbold>(?:(?!(<strong><em>|<\/strong><\/em>)).)+)<\/em><\/strong>'), (Match match) {
+      }).replaceAllMapped(RegExp(r'<strong><em>(?<italicbold>(?:(?!(<strong><em>|<\/strong><\/em>)).)+)<\/em><\/strong>'),
+          (Match match) {
         return '***${match.group(1)!}***';
-      }).replaceAllMapped(
-          RegExp(r'<strong><em><u>(?<bolditalicunderline>(?:(?!(<strong><em><u>|<\/u><\/em><\/strong>)).)+)<\/u><\/em><\/strong>'),
+      }).replaceAllMapped(RegExp(r'<strong><em><u>(?<bolditalicunderline>(?:(?!(<strong><em><u>|<\/u><\/em><\/strong>)).)+)<\/u><\/em><\/strong>'),
           (Match match) {
         return '***_${match.group(1)!}_***';
       }).replaceAllMapped(Constant.WRONG_IMAGE_MATCHING, (Match match) {
@@ -161,8 +177,10 @@ extension StringExtension on String {
 
   ///Since [vsc_quill_delta_to_html] encode the text with UTF8,
   ///don't decode at the output, this function solve this
-  String get convertUTF8QuotesToValidString => replaceAll('&lt;', '<').replaceAll('&gt;', '>');
-  String get recovertUTF8QuotesToHumanStringChars => replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  String get convertUTF8QuotesToValidString =>
+      replaceAll('&lt;', '<').replaceAll('&gt;', '>');
+  String get recovertUTF8QuotesToHumanStringChars =>
+      replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
   ///Used to solved common errors in raw delta strings, since we don't used delta literals
   String get fixCommonErrorInsertsInRawDelta => replaceAll('"}]{"', '"},{"')
@@ -173,7 +191,8 @@ extension StringExtension on String {
       .replaceAll(RegExp(r'\{"insert":"\\n"\}\}'), r'{"insert":"\n"}')
       .replaceAll(RegExp(r',"attributes":\{\}'), r'') //removes empty attributes
       .replaceAll(RegExp(r'\{"insert":""(,"attributes":\{\S+\}\})?(,)?'), '')
-      .replaceAll(RegExp(r'"\}{1,2}\],\[\{{1,2}"insert"'), '"},{"insert"') //removes }],[{
+      .replaceAll(RegExp(r'"\}{1,2}\],\[\{{1,2}"insert"'),
+          '"},{"insert"') //removes }],[{
       //deletes more from ( -> {"insert":"words"}}} <-)
       .replaceAll(RegExp(r'\}(\}+)$'), '}}')
       .replaceAll(RegExp(r'\}(\}+)(,+)$'), '}},')
@@ -185,7 +204,8 @@ extension StringExtension on String {
               //removes []
               '${match.group(1)}')
       //deletes unnessary brackets in start and end
-      .replaceFirst(RegExp('^(,+){'), '{') //deletes the first one like: ',{"insert":"word 1"}' -> '{"insert":"word 1"}'
+      .replaceFirst(RegExp('^(,+){'),
+          '{') //deletes the first one like: ',{"insert":"word 1"}' -> '{"insert":"word 1"}'
       .replaceFirst(
           RegExp(
               r'\}(,+)$'), //deletes the last one like: '{"insert":"word 1"},{"insert":"final"},' -> {"insert":"word 1"},{"insert":"final"}'
