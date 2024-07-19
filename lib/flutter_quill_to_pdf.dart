@@ -15,7 +15,6 @@ export 'package:flutter_quill_to_pdf/converter/pdf_converter.dart';
 //typdefs
 export 'package:flutter_quill_to_pdf/utils/typedefs.dart';
 //extensions
-export 'package:flutter_quill_to_pdf/core/extensions/color_extension.dart';
 export 'package:flutter_quill_to_pdf/core/extensions/md_extension.dart';
 export 'package:flutter_quill_to_pdf/core/extensions/pdf_extension.dart';
 export 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
