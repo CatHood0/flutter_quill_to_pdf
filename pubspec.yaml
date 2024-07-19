@@ -11,10 +11,10 @@ environment:
 
 topics: 
   - pdf
-  - quill_delta
-  - pdf_widgets
+  - quill-delta
+  - pdf-widgets
   - converter
-  - pdf_converter
+  - pdf-converter
 
 screenshots:
   - description: "Delta in editor"
