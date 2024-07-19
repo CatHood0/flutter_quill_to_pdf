@@ -11,10 +11,7 @@ environment:
 
 topics: 
   - pdf
-  - Delta
-  - quill
   - quill_delta
-  - widgets
   - pdf_widgets
   - converter
   - pdf_converter
