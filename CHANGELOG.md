@@ -2,16 +2,17 @@
 
 **¡BREAKING CHANGES!**
 
-Now PDF's are builded by a better way. 
+The way of build the PDF's it's different and better 
 
-### Before implementation (using vsc_quill_delta_to_html and html2md with RegExp patterns)
-The PDF is builded: first the Delta is converted to a custom implementation, then, after it will be transformed to a Markdown with some HTML styles to avoid losing align attrs or colors. 
+### Before implementation (using `vsc_quill_delta_to_html` and `html2md` with `RegExp` patterns)
 
-On the creation of the PDF (using PdfService) all of this HTML with Markdown are detected using RegExp that made more difficult had a correct performance. Some devices even could crash on the building of that PDF way.
+The `PDF` is builded: first the `Delta` is converted to a custom implementation, then, after it will be transformed to a `Markdown` with some `HTML` styles to avoid losing align attrs or colors. 
 
-### New implementation (using flutter_quill_delta_easy_parser)
+On the creation of the `PDF` (using `PdfService`) all of this `HTML` with `Markdown` are detected using `RegExp` that made more difficult had a correct performance. Some devices even could crash on the building of that `PDF` way.
 
-Transform directly a Delta to a Structured-Document type that it's more easy to be readed by a human, and getting the attributes from any Line or the block attributes from the current paragraph.
+### New implementation (using `flutter_quill_delta_easy_parser`)
+
+Transform directly a `Delta` to a `Structured-Document` type that it's more easy to be readed by a human, and getting the attributes from any `Line` or the block attributes from the current `Paragraph`.
 
 ### Other Changes
 
