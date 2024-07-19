@@ -1,18 +1,16 @@
 # Flutter Quill to PDF
 
-This package allow us create PDF's using deltas from Quill.
+This package allow us create PDF's using Deltas from Quill.
 
 Some options that can be configured:
 
 - `DeltaAttributesOptions` (this attributes will be applied to whole delta)
 - We can use custom fonts. Using `onRequest` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package _Just works automatically with the default library implementation_
-- `CustomConverter`, which helps you create custom PDF widgets using custom regular expressions.
+- `CustomConverter`, which helps you create custom PDF widgets using custom regular expressions. _By now is not working_
 - Optional front matter and back matter
 - Page format using `PDFPageFormat` class
-- `CustomPDFWidget` functions in `PDFConverter`that let us customize the detected style, and create a custom pdf widget implementation
+- `CustomPDFWidget` functions in `PDFConverter` that let us customize the detected style, and create a custom pdf widget implementation _By now is not working_
 - `ThemeData` optional theme data that let us changes the theme for to pdf document
-- Set custom rules from `html2md` to customize your own markdown style detection _(It could have conflicts if don't customize the `CustomPDFWidget` functions to detect your custom markdown style implementation)_
-- Set a custom `ConverterOption` to `PDFConverter` to customize your own html rendering implementation _(It could have conflicts if you don't also make your own `CustomPDFWidget` functions, to detect your new html style. And you should also have to change the default rules of the package to make correct detect of this custom implemenation)_
 
 > By default, the delta is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes (if it is not null), making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
 
@@ -27,7 +25,7 @@ Some options that can be configured:
 
 ```yaml
 dependencies:
-  flutter_quill_to_pdf: ^1.2.2
+  flutter_quill_to_pdf: ^2.0.0
 ```
 
 ### Import package
@@ -69,7 +67,6 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 PDFConverter pdfConverter = PDFConverter(
     backMatterDelta: null,
     frontMatterDelta: null,
-    customConverters: [],
     document: QuillController.basic().document.toDelta(),
     fallbacks: [...your global fonts],
     onRequestBoldFont: (String fontFamily) async {
@@ -105,48 +102,6 @@ final pw.Document? document = await pdfConverter.createDocument();
 await pdfConverter.createDocumentFile(path: filepath, ...other optional params);
 ```
 
-## More information about other features
-
-### If you want to get the html from delta, you can use `convertDeltaToHtml` function
-
-```dart
-//it looks like
-String convertDeltaToHtml(Delta delta,
-    [ConverterOptions? options, String Function(DeltaInsertOp customOp, DeltaInsertOp? contextOp)? customRenderCallback]) {
-  final QuillDeltaToHtmlConverter converterDeltaToHTML = QuillDeltaToHtmlConverter(
-    delta.toJson(),
-    options ?? ConverterOptions.forEmail(), //If you want to use local converter options use "HTMLConverterOptions.options()"
-  );
-  converterDeltaToHTML.renderCustomWith = customRenderCallback; // use this callback if you want or need render a custom attribute or block
-  return converterDeltaToHTML.convert();
-}
-```
-
-### If you want to get the markdown, you need to make some steps
-
-1. Use `convertDeltaToHtml` function to get html from delta
-
-2. Use html string, and pass as param in `convertHtmlToMarkdown`
-
-3. Pass your custom rules implementation, or just pass the default ones from library, using `MarkdownRules` class (Optional)
-
-```dart
-//it looks like
-//If you don't pass any new rule, the converter will use the default ones from html2md
-String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String> ignoreRules,
-    {bool removeLeadingWhitespaces = false, bool escape = true}) {
-  if (!ignoreRules.contains('underline')) ignoreRules.add('underline');
-  return hm2.convert(
-    styleOptions: <String, String>{'emDelimiter': '*'},
-    htmlText,
-    escape: escape,
-    rules: rules,
-    removeLeadingWhitespaces: removeLeadingWhitespaces,
-    ignore: ignoreRules,
-  );
-}
-```
-
 ## Supported
 
 - Font family
@@ -165,119 +120,12 @@ String convertHtmlToMarkdown(String htmlText, List<hm2.Rule>? rules, List<String
 - Embed image
 - Header
 - List
+- Indent 
 
 ## No supported
 
-- Indent (working on it)
 - Superscript/Subscript (Working on it)
 - Embed formula (Not planned)
 - Embed video (Not planned)
-
-## Custom rendering (HTML and Markdown)
-
-### You could configure the delta to html options to create your own implementation (optional)
-
-_This is a fragment from: [vsc_quill_delta_to_html](https://github.com/VisualSystemsCorp/vsc_quill_delta_to_html) description (If you want to know more about these configs, and custom attributes rendering, visit his github)_
-
-We can configure a custom `ConverterOptions` using the param `convertOptions` from `PDFConverter()`
-
-`QuillDeltaToHtmlConverter` accepts a few configuration (`ConverterOptions`, `OpConverterOptions`,
-and `OpAttributeSanitizerOptions`) options as shown below:
-
-| Option                                    | Type                                                | Default        | Description                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ----------------------------------------- | --------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `converterOptions.paragraphTag`           | string                                              | 'p'            | Custom tag to wrap inline html elements                                                                                                                                                                                                                                                                                                                                                                                         |
-| `converterOptions.encodeHtml`             | boolean                                             | true           | If true, `<, >, /, ', ", &` characters in content will be encoded.                                                                                                                                                                                                                                                                                                                                                              |
-| `converterOptions.classPrefix`            | string                                              | 'ql'           | A css class name to prefix class generating styles such as `size`, `font`, etc.                                                                                                                                                                                                                                                                                                                                                 |
-| `converterOptions.inlineStylesFlag`       | boolean                                             | false          | If true, use inline styles instead of classes.                                                                                                                                                                                                                                                                                                                                                                                  |
-| `converterOptions.inlineStyles`           | InlineStyles                                        | null           | If non-null, use inline styles instead of classes. See Rendering Inline Styles section below for usage.                                                                                                                                                                                                                                                                                                                         |
-| `multiLineBlockquote`                     | boolean                                             | true           | Instead of rendering multiple `blockquote` elements for quotes that are consecutive and have same styles(`align`, `indent`, and `direction`), it renders them into only one                                                                                                                                                                                                                                                     |
-| `multiLineHeader`                         | boolean                                             | true           | Same deal as `multiLineBlockquote` for headers                                                                                                                                                                                                                                                                                                                                                                                  |
-| `multiLineCodeblock`                      | boolean                                             | true           | Same deal as `multiLineBlockquote` for code-blocks                                                                                                                                                                                                                                                                                                                                                                              |
-| `multiLineParagraph`                      | boolean                                             | true           | Set to false to generate a new paragraph tag after each enter press (new line)                                                                                                                                                                                                                                                                                                                                                  |
-| `multiLineCustomBlock`                    | boolean                                             | true           | Same deal as `multiLineBlockquote` for custom blocks.                                                                                                                                                                                                                                                                                                                                                                           |
-| `bulletListTag`                           | string                                              | 'ul'           | Tag for unordered bullet lists.                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `orderedListTag`                          | string                                              | 'ol'           | Tag for ordered/numbered lists.                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `converterOptions.linkRel`                | string                                              | none generated | Specifies a value to put on the `rel` attr on all links. This can be overridden by an individual link op by specifying the `rel` attribute in the respective op's attributes                                                                                                                                                                                                                                                    |
-| `converterOptions.linkTarget`             | string                                              | '\_blank'      | Specifies target for all links; use `''` (empty string) to not generate `target` attribute. This can be overridden by an individual link op by specifiying the `target` with a value in the respective op's attributes.                                                                                                                                                                                                         |
-| `converterOptions.allowBackgroundClasses` | boolean                                             | false          | If true, css classes will be added for background attr                                                                                                                                                                                                                                                                                                                                                                          |
-| `sanitizerOptions.urlSanitizer`           | `String? Function(String url)`                      | null           | A function that is called once per url in the ops (image, video, link) for you to do custom sanitization. If your function returns a string, it is assumed that you sanitized the url and no further sanitization will be done by the library; when anything other than a string is returned (e.g. undefined), it is assumed that no sanitization has been done and the library's own function will be used to clean up the url |
-| `sanitizerOptions.allow8DigitHexColors`   | boolean                                             | false          | If true, hex colors in `#AARRGGBB` format are allowed in the ops                                                                                                                                                                                                                                                                                                                                                                |
-| `converterOptions.customTag`              | `String? Function(String format, DeltaInsertOp op)` | null           | Callback allows to provide custom html tag for some format                                                                                                                                                                                                                                                                                                                                                                      |
-| `converterOptions.customTagAttributes`    | `Map<String, String>? Function(DeltaInsertOp op)`   | null           | Allows custom html tag attributes for the given op                                                                                                                                                                                                                                                                                                                                                                              |
-| `converterOptions.customCssClasses`       | `List<String>? Function(DeltaInsertOp op)`          | null           | Allows custom CSS classes for the given op                                                                                                                                                                                                                                                                                                                                                                                      |
-| `converterOptions.customCssStyles`        | `List<String>? Function(DeltaInsertOp op)`          | null           | Allows custom CSS styles attributes for the given op                                                                                                                                                                                                                                                                                                                                                                            |
-
-### You also could configure custom markdown rules to accept and format correctly your custom HTML implementation (optional)
-
-You can set custom rules to PDFConverter using
-
-```dart
-//By default is null, and it will throws error if rules are empty
-PDFConverter(..., customRules: [...your custom rules]);
-```
-
-_This is a fragment from [html2md](https://github.com/jarontai/html2md) package documentation_
-
-#### Custom Rules
-
-Want to customize element converting? Write your rules!
-
-Rule fields explaination
-
-```dart
-final String name; // unique rule name
-final List<String>? filters; // simple element name filters, e.g. ['aside']
-final FilterFn? filterFn; // function for building complex element filter logic
-final Replacement? replacement; // function for doing the replacing
-final Append? append; // function for appending content
-```
-
-Rule example - Convert the onebox section of [discourse](https://www.discourse.org/) post to a link
-
-```html
-<aside class="onebox">
-  <header class="source">
-    <img
-      src="https://discoursesite/uploads/default/original/1X/test.png"
-      class="site-icon"
-      width="32"
-      height="32"
-    />
-    <a
-      href="https://events.google.com/io/program/content?4=topic_flutter&amp;lng=zh-CN"
-      target="_blank"
-      rel="noopener"
-      >Google I/O 2021</a
-    >
-  </header>
-</aside>
-```
-
-```dart
-Rule(
-  'discourse-onebox',
-  filterFn: (node) {
-    // Find aside with onebox class
-    if (node.nodeName == 'aside' &&
-        node.className.contains('onebox')) {
-        return true;
-    }
-    return false;
-  },
-  replacement: (content, node) {
-    // find the first a element under header
-    var header = node.firstChild;
-    var link = header!
-        .childNodes()
-        .firstWhere((element) => element.nodeName == 'a');
-    var href = link.getAttribute('href');
-    if (href != null && href.isNotEmpty) {
-      return '[$href]($href)'; // build the link
-    }
-    return '';
-  },
-)
-```
 
 You can contribute reporting issues or requesting to add new features in: https://github.com/CatHood0/flutter_quill_to_pdf

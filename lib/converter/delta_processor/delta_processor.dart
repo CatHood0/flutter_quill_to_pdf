@@ -3,14 +3,13 @@
 import 'dart:convert';
 import 'package:dart_quill_delta/dart_quill_delta.dart' as fq;
 import 'package:dart_quill_delta/dart_quill_delta.dart' as ops;
+import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
-import 'package:flutter_quill_to_pdf/core/extensions/delta_extension_utils.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/map_extension.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 import 'package:flutter_quill_to_pdf/utils/utils.dart';
 
 import '../../core/constant/constants.dart';
-import 'search_attr_in_delta.dart';
 
 int _index = 0;
 final StringBuffer _buffer = StringBuffer();
@@ -24,7 +23,6 @@ String applyAttributesIfNeeded({
   _index = 0;
   _buffer.clear();
   if (json.isEmpty) return json;
-  json = json.closeWithBracketsIfNeeded;
   fq.Delta delta = fq.Delta.fromJson(jsonDecode(json)).fullDenormalizer();
   while (_index < delta.length) {
     final int nextIndex = _index + 1;
@@ -88,7 +86,7 @@ String applyAttributesIfNeeded({
               ? '${attr.fontSize.toInt()}'
               : Constant.DEFAULT_FONT_SIZE.toString();
       final String insertionData =
-          '{"insert":${jsonEncode(operation.data.toString().encodeSymbols)}';
+          '{"insert":${jsonEncode(operation.data.toString())}';
       final double? lineSpacingHelper = overrideAttributes
           ? attr.lineSpacing ?? Constant.DEFAULT_LINE_HEIGHT
           : null;
@@ -153,7 +151,7 @@ String applyAttributesIfNeeded({
               ? '${attr.indent}'
               : null
           : null;
-      String? indentAttr = operation.attributes?['indent'] ?? indentHelper;
+      int? indentAttr = operation.attributes?['indent'] ?? indentHelper;
       final bool quote = operation.attributes?['blockquote'] ?? false;
       final bool codeBlock = operation.attributes?['code-block'] ?? false;
       final int? headerAttr = operation.attributes?['header'];
@@ -196,7 +194,7 @@ String applyAttributesIfNeeded({
       };
       final String attributes = jsonEncode(map);
       _buffer.write(
-          ',{"insert":"${(operation.data as String).encodeSymbols.replaceAll('\n', r'\n')}","attributes":$attributes},');
+          ',{"insert":"${(operation.data as String).replaceAll('\n', r'\n')}","attributes":$attributes},');
     }
     _index++;
   }

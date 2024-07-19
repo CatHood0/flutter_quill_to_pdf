@@ -391,10 +391,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_quill
-      sha256: e301cb30c7e4a6e496b40b5c809c8ec69fbef6c4a5545b8f8c29e42e2f8c0651
+      sha256: "3e7a8c12eff223c143ffa7b097ea4660916787aedc864aa5cd25ee7b5bc2de03"
       url: "https://pub.dev"
     source: hosted
-    version: "10.0.1"
+    version: "10.0.2"
   flutter_quill_delta_easy_parser:
     dependency: transitive
     description:
@@ -415,10 +415,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_quill_extensions
-      sha256: f424c403a673a6fce0740c42890f3f4ffd681a2d00525f3de79886493be868ac
+      sha256: "02185a8650646a775a3b017d30904897c34c09f29db4d05e4485485d3b5e9873"
       url: "https://pub.dev"
     source: hosted
-    version: "10.0.1"
+    version: "10.0.2"
   flutter_quill_to_pdf:
     dependency: "direct main"
     description:

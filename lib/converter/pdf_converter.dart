@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
-import 'package:flutter/foundation.dart';
 import 'package:pdf/pdf.dart' show PdfColor;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' as qpdf;
@@ -21,6 +20,7 @@ class PDFConverter {
   final qpdf.PDFPageFormat params;
 
   ///[CustomConverter] allow devs to use [custom] regex patterns to detect and [create] custom widgets
+  @Deprecated('This option is not longer used by the converter and will be removed on future releases')
   final List<CustomConverter> customConverters;
 
   ///A simple [request] font when converter detect a font
@@ -142,14 +142,10 @@ class PDFConverter {
     this.onDetectList,
   })  : assert(params.height > 30, 'Page size height isn\'t valid'),
         assert(params.width > 30, 'Page size width isn\'t valid'),
-        assert(params.marginBottom >= 0.0,
-            'Margin to bottom with value ${params.marginBottom}'),
-        assert(params.marginLeft >= 0.0,
-            'Margin to left with value ${params.marginLeft}'),
-        assert(params.marginRight >= 0.0,
-            'Margin to right with value ${params.marginRight}'),
-        assert(params.marginTop >= 0.0,
-            'Margin to tp with value ${params.marginTop}') {
+        assert(params.marginBottom >= 0.0, 'Margin to bottom with value ${params.marginBottom}'),
+        assert(params.marginLeft >= 0.0, 'Margin to left with value ${params.marginLeft}'),
+        assert(params.marginRight >= 0.0, 'Margin to right with value ${params.marginRight}'),
+        assert(params.marginTop >= 0.0, 'Margin to tp with value ${params.marginTop}') {
     globalFontsFallbacks = <pw.Font>[
       ...fallbacks,
       pw.Font.helvetica(),
@@ -206,25 +202,20 @@ class PDFConverter {
       onRequestFont: onRequestFont,
       backM: !shouldProcessDeltas
           ? backMatterDelta
-          : processDelta(backMatterDelta, deltaOptionalAttr,
-              overrideAttributesPassedByUser),
+          : processDelta(backMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
       frontM: !shouldProcessDeltas
           ? frontMatterDelta
-          : processDelta(frontMatterDelta, deltaOptionalAttr,
-              overrideAttributesPassedByUser),
+          : processDelta(frontMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
       onRequestItalicFont: onRequestItalicFont,
       customConverters: customConverters,
-      document: !shouldProcessDeltas
-          ? document
-          : processDelta(
-              document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
+      document:
+          !shouldProcessDeltas ? document : processDelta(document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
     );
     try {
       return await converter.generateDoc();
     } catch (e) {
       onException?.call(e);
-      debugPrint(e.toString());
-      return null;
+      rethrow;
     }
   }
 
@@ -270,18 +261,14 @@ class PDFConverter {
       onDetectList: onDetectList,
       backM: !shouldProcessDeltas
           ? backMatterDelta
-          : processDelta(backMatterDelta, deltaOptionalAttr,
-              overrideAttributesPassedByUser),
+          : processDelta(backMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
       frontM: !shouldProcessDeltas
           ? frontMatterDelta
-          : processDelta(frontMatterDelta, deltaOptionalAttr,
-              overrideAttributesPassedByUser),
+          : processDelta(frontMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
       onRequestItalicFont: onRequestItalicFont,
       customConverters: customConverters,
-      document: !shouldProcessDeltas
-          ? document
-          : processDelta(
-              document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
+      document:
+          !shouldProcessDeltas ? document : processDelta(document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
     );
     try {
       final pw.Document doc = await converter.generateDoc();
@@ -289,19 +276,14 @@ class PDFConverter {
       onSucessWrite?.call(path);
     } catch (e) {
       onException?.call(e);
-      debugPrint(e.toString());
-      if (onException == null) debugPrint(e.toString());
     }
   }
 
-  static Delta? processDelta(Delta? delta, DeltaAttributesOptions options,
-      bool overrideAttributesPassedByUser) {
+  static Delta? processDelta(Delta? delta, DeltaAttributesOptions options, bool overrideAttributesPassedByUser) {
     if (delta == null) return null;
     if (delta.isEmpty) return delta;
     final String json = applyAttributesIfNeeded(
-            json: jsonEncode(delta.toJson()),
-            attr: options,
-            overrideAttributes: overrideAttributesPassedByUser)
+            json: jsonEncode(delta.toJson()), attr: options, overrideAttributes: overrideAttributesPassedByUser)
         .fixCommonErrorInsertsInRawDelta
         .withBrackets;
     return Delta.fromJson(jsonDecode(json));

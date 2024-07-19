@@ -1,6 +1,6 @@
 import '../constant/constants.dart';
 
-extension MdHeaderLevelExtension on int {
+extension MdHeaderLevelExtension on num {
   double resolveHeaderLevel(
       {List<double> headingSizes = Constant.default_heading_size}) {
     return this == 1

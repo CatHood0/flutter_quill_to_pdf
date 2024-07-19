@@ -1,3 +1,32 @@
+# 2.0.0
+
+**¡BREAKING CHANGES!**
+
+Now PDF's are builded by a better way. 
+
+### Before implementation (using vsc_quill_delta_to_html and html2md with RegExp patterns)
+The PDF is builded: first the Delta is converted to a custom implementation, then, after it will be transformed to a Markdown with some HTML styles to avoid losing align attrs or colors. 
+
+On the creation of the PDF (using PdfService) all of this HTML with Markdown are detected using RegExp that made more difficult had a correct performance. Some devices even could crash on the building of that PDF way.
+
+### New implementation (using flutter_quill_delta_easy_parser)
+
+Transform directly a Delta to a Structured-Document type that it's more easy to be readed by a human, and getting the attributes from any Line or the block attributes from the current paragraph.
+
+### Other Changes
+
+* Fix: app crashed when use `createDocument` method.
+* Fix: bad perfomance while building a PDF.
+* Chore: deprecated `customConverters` param from `PDFConverter` to avoid using after this release
+* Fix: removed most of the `RegExp` used on Constant class.
+* Fix: removed `MarkdownRules` class since is not necessary now.
+* Fix: removed `vsc_quill_delta_to_html` and `html2md` since are not used now.
+* Fix: removed `HTMLConverterOptions` local implementation since is not used now.
+* Chore: removed `setCustomRules` method from Converter 
+* Chore: moved some const values to example since wont be necessary be in the package.
+
+**By now this version is not using CustomPDFWidget or PdfWidgetGenerator. This is just a temporary issue that will be fixed on next releases**
+
 # 1.2.2
 
 - [Fix] delta to html doesn't detect double values

@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 import 'package:path_provider/path_provider.dart';
@@ -30,6 +27,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   bool lastWasList = false;
   final Delta? frontM;
   final Delta? backM;
+  @Deprecated('This option is not longer used by the converter and will be removed on future releases')
   final List<CustomConverter> customConverters;
   final Future<pw.Font> Function(String fontFamily) onRequestFont;
   final Future<pw.Font> Function(String fontFamily) onRequestBoldFont;
@@ -99,10 +97,10 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   Future<pw.Widget> getImageBlock(Line line, [pw.Alignment? alignment]) async {
     double? width = null;
     double? height = null;
-    final String path = (line.data as Map<String,dynamic>)['image'];
+    final String path = (line.data as Map<String, dynamic>)['image'];
     final Map<String, dynamic> attributes = parseCssStyles(line.attributes?['style'] ?? '', 'left');
-    if(attributes.isNotEmpty){
-      width = attributes['width'];
+    if (attributes.isNotEmpty) {
+      width = attributes['width'] ?? pageWidth;
       height = attributes['height'];
     }
     late final File? file;
@@ -113,22 +111,12 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       try {
         file = File(pathStorage);
         await Dio().download(url, pathStorage);
-      } on DioException catch (e) {
-        final Map<String, dynamic> mapError = <String, dynamic>{
-          'error': e.error,
-          'message': e.message,
-          'request_options': e.requestOptions,
-          'response': e.response,
-          'stacktrace': e.stackTrace,
-          'type': e.type.name,
-        };
-        debugPrint('${e.message}\n\n${jsonEncode(mapError)}');
-        return pw.SizedBox.shrink();
+      } on DioException {
+        rethrow;
       }
     }
     file = File(path);
-    if (!(await file.exists())) {
-      //if not exist the image will create a warning
+    if ((await file.exists()) == false) {
       return pw.SizedBox.shrink();
     }
     // verify if exceded height using page format params
@@ -141,6 +129,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       text: pw.WidgetSpan(
         child: pw.Container(
           alignment: alignment,
+          constraints: height == null ? const pw.BoxConstraints(maxHeight: 450) : null,
           child: pw.Image(
             pw.MemoryImage((await file.readAsBytes())),
             dpi: 230,
@@ -160,12 +149,21 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final PdfColor? backgroundTextColor = pdfColorString(line.attributes?['background']);
     final double? spacing = line.attributes?['line-height'];
     final String? fontFamily = line.attributes?['font'];
-    final double? fontSizeMatch = line.attributes?['size'];
+    final String? fontSizeMatch = line.attributes?['size'];
+    double fontSizeHelper = defaultTextStyle.fontSize!;
+    if (fontSizeMatch != null) {
+      if (fontSizeMatch == 'small') fontSizeHelper = 8;
+      if (fontSizeMatch == 'large') fontSizeHelper = 15.5;
+      if (fontSizeMatch == 'huge') fontSizeHelper = 18.5;
+      if (fontSizeMatch != 'huge' && fontSizeMatch != 'large' && fontSizeMatch != 'small') {
+        fontSizeHelper = double.parse(fontSizeMatch);
+      }
+    }
     final bool bold = line.attributes?['bold'] ?? false;
     final bool italic = line.attributes?['italic'] ?? false;
     final bool strike = line.attributes?['strike'] ?? false;
     final bool underline = line.attributes?['underline'] ?? false;
-    final double? fontSize = !addFontSize ? null : fontSizeMatch;
+    final double? fontSize = !addFontSize ? null : fontSizeHelper;
     final String content = line.data as String;
     final double? lineSpacing = spacing?.resolveLineHeight();
     final pw.Font font = await onRequestFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY);
@@ -260,7 +258,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       color: PdfColor.fromHex("#808080"),
     );
     final pw.TextStyle codeBlockStyle = codeBlockTextStyle ?? defaultCodeBlockStyle;
-    numCodeLine += 1;
     final pw.Widget widget = pw.Container(
       width: pageWidth,
       color: this.codeBlockBackgroundColor ?? PdfColor.fromHex('#fbfbf9'),
@@ -277,7 +274,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         ),
       ),
     );
-    numCodeLine = 0;
     return widget;
   }
 
@@ -353,7 +349,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     int indentLevel, [
     pw.TextStyle? style,
   ]) async {
-    final int indentation = indentLevel * 3;
+    final int indentation = indentLevel * 7;
     final String alignment = align;
     final pw.Alignment al = alignment.resolvePdfBlockAlign;
     final pw.TextAlign textAlign = alignment.resolvePdfTextAlign;
@@ -380,7 +376,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final double spacing = (spansToWrap.firstOrNull?.style?.lineSpacing ?? 1.0);
     return pw.Container(
       alignment: align.resolvePdfBlockAlign,
-      padding: pw.EdgeInsets.symmetric(vertical: spacing.resolvePaddingByLineHeight()),
+      padding: pw.EdgeInsets.only(left: indentLevel * 7, bottom: spacing.resolvePaddingByLineHeight()),
       child: pw.RichText(
         textAlign: align.resolvePdfTextAlign,
         softWrap: true,
@@ -408,7 +404,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       widgets = pw.WidgetSpan(
         child: pw.Container(
           padding: pw.EdgeInsets.only(
-              left: indentLevel > 0 ? indentLevel * 3 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
+              left: indentLevel > 0 ? indentLevel * 7 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
           child: pw.RichText(
             softWrap: true,
             textAlign: align.resolvePdfTextAlign,
@@ -426,7 +422,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       widgets = pw.WidgetSpan(
         child: pw.Container(
           padding: pw.EdgeInsets.only(
-              left: indentLevel > 0 ? indentLevel * 3 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
+              left: indentLevel > 0 ? indentLevel * 7 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
           child: pw.Row(
             children: <pw.Widget>[
               pw.Checkbox(
@@ -453,7 +449,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     }
     return pw.Container(
       padding: pw.EdgeInsets.only(
-        left: indentLevel > 0 ? indentLevel * 3 : 15,
+        left: indentLevel > 0 ? indentLevel * 7 : 15,
         bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5,
       ),
       child: pw.RichText(

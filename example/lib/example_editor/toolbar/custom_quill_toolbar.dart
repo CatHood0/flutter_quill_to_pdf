@@ -1,3 +1,4 @@
+import 'package:example/example_editor/buttons/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
@@ -40,7 +41,7 @@ class CustomQuillToolbar extends StatelessWidget {
         QuillToolbarFontSizeButton(
           options: toolbarConfigurations.buttonOptions.fontSize.copyWith(
             initialValue: 'Normal',
-            rawItemsMap: Constant.fontSizes,
+            rawItemsMap: fontSizes,
           ),
           controller: controller,
         ),
@@ -197,7 +198,7 @@ class CustomQuillToolbar extends StatelessWidget {
       headerStyleType: HeaderStyleType.buttons,
       embedButtons: FlutterQuillEmbeds.toolbarButtons(videoButtonOptions: null),
       toolbarSize: toolbarSize,
-      fontFamilyValues: Constant.fontFamilies,
+      fontFamilyValues: fontFamilies,
       multiRowsDisplay: false,
       buttonOptions: const QuillSimpleToolbarButtonOptions(
         codeBlock: QuillToolbarToggleStyleButtonOptions(),

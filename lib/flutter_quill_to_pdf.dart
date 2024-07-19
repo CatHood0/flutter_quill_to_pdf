@@ -3,7 +3,7 @@ library flutter_quill_to_pdf;
 //generators
 export 'package:flutter_quill_to_pdf/converter/configurator/pdf/pdf_configurator.dart';
 export 'package:flutter_quill_to_pdf/converter/service/pdf_service.dart';
-//ytils
+//utils
 export 'package:flutter_quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
 export 'package:flutter_quill_to_pdf/converter/configurator/converter_option/custom_converter.dart';
 export 'package:flutter_quill_to_pdf/converter/delta_processor/delta_processor.dart';

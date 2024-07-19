@@ -49,7 +49,7 @@ class CustomQuillEditor extends HookWidget {
         customStyleBuilder: (Attribute<dynamic> attribute) {
           if (attribute.key.equals('line-height')) {
             return TextStyle(
-              height: double.parse(attribute.value),
+              height: attribute.value,
             );
           }
           if (attribute.key.equals('bold')) {
@@ -74,7 +74,7 @@ class CustomQuillEditor extends HookWidget {
           }
           if (attribute.key.equals('header')) {
             return TextStyle(
-              fontSize: '${attribute.value}'.resolveHeaderLevel(),
+              fontSize: (attribute.value as num).resolveHeaderLevel().toDouble(),
               color: Colors.black,
             );
           }
