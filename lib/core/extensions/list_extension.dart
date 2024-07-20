@@ -1,5 +1,3 @@
-import '../../utils/typedefs.dart';
-
 extension ListExtension<T> on List<T> {
   ///Merge to many list as we wants in a same list
   void merge(List<List<T>> listToAdd) {
@@ -8,18 +6,6 @@ extension ListExtension<T> on List<T> {
       addAll(listToAdd.elementAt(i));
       i++;
     }
-  }
-
-  ///Update the data where predicate match
-  List<T> updateWhere({required T data, required Predicate<T> predicate}) {
-    final List<T> temp = <T>[...this];
-    for (int i = 0; i < temp.length; i++) {
-      final T currentData = temp.elementAt(i);
-      if (predicate(currentData)) {
-        temp[i] = data;
-      }
-    }
-    return <T>[...temp];
   }
 
   ///Ignore the item if predicate match

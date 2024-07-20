@@ -179,7 +179,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       //verify if the data line is a embed
       if (paragraph.type == ParagraphType.embed && paragraph.lines.firstOrNull?.data is Map) {
         final Line line = paragraph.lines.first;
-        if ((line.data as Map)['video'] != null) {
+        if ((line.data as Map<String,dynamic>)['video'] != null) {
           contentPerPage.add(pw.RichText(text: pw.TextSpan(text: (line.data as Map<String, dynamic>)['video'])));
           continue;
         }

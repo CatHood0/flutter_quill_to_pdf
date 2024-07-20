@@ -86,7 +86,7 @@ extension TextStyleInlineExtension on pw.TextStyle {
     pw.TextDecoration? decoration = null;
     if (under && strike) {
       decoration = pw.TextDecoration.combine(
-        [pw.TextDecoration.lineThrough, pw.TextDecoration.underline],
+        <pw.TextDecoration>[pw.TextDecoration.lineThrough, pw.TextDecoration.underline],
       );
     } else if (strike) {
       decoration = pw.TextDecoration.lineThrough;
