@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:html' as web;
+import 'dart:typed_data';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:pdf/pdf.dart' show PdfColor;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' as qpdf;
-
-import '../flutter_quill_to_pdf.dart';
 
 class PDFConverter {
   //Is the main body of the PDF document
@@ -21,26 +21,33 @@ class PDFConverter {
 
   ///[CustomConverter] allow devs to use [custom] regex patterns to detect and [create] custom widgets
   @Deprecated('This option is not longer used by the converter and will be removed on future releases')
-  final List<CustomConverter> customConverters;
+  final List<qpdf.CustomConverter> customConverters;
+
+  ///[CustomPDFWidget] allow devs to use builders to create custom widgets
+  final List<qpdf.CustomWidget> customBuilders;
 
   ///A simple [request] font when converter detect a font
-  final Future<pw.Font> Function(String) onRequestFont;
+  final Future<pw.Font> Function(String)? onRequestFont;
 
   ///A simple [request] font when converter detect a font
-  final Future<pw.Font> Function(String) onRequestBoldFont;
+  final Future<pw.Font> Function(String)? onRequestBoldFont;
 
   ///A simple [request] font when converter detect a font
-  final Future<pw.Font> Function(String) onRequestItalicFont;
+  final Future<pw.Font> Function(String)? onRequestItalicFont;
 
   ///A simple [request] font when converter detect a font
-  final Future<pw.Font> Function(String) onRequestBoldItalicFont;
+  final Future<pw.Font> Function(String)? onRequestBoldItalicFont;
 
   ///Used by PDF converter to transform [delta to html].
   ///if you use your own delta implementation, use this to avoid [conflicts]
+  @Deprecated(
+      'customDeltaToHTMLConverter is no longer used since this implementation was changed and will be removed on future releases')
   final String Function(Delta)? customDeltaToHTMLConverter;
 
   ///Used by PDF converter to transform [formatted html to markdown]
   ///By default, [markdown] contains [html] into it
+  @Deprecated(
+      'customHTMLToMarkdownConverter is no longer used since this implementation was changed and will be removed on future releases')
   final String Function(String)? customHTMLToMarkdownConverter;
 
   ///If you need to [customize] the [theme] of the [pdf document], override this param
@@ -74,31 +81,32 @@ class PDFConverter {
   ///Customize the left/right divider color to blockquotes
   final PdfColor? blockQuoteDividerColor;
 
-  final CustomPDFWidget? onDetectImageBlock;
+  final qpdf.PDFBlockWidgetBuilder? onDetectImageBlock;
 
   ///Detect Rich text styles like: size, spacing, font family
-  final CustomPDFWidget? onDetectInlineRichTextStyles;
+  final qpdf.PDFInlineWidgetBuilder? onDetectInlineRichTextStyles;
 
   ///Detect simple: # header
-  final CustomPDFWidget? onDetectHeaderBlock;
+  final qpdf.PDFBlockWidgetBuilder? onDetectHeaderBlock;
 
-  final CustomPDFWidget? onDetectHeaderAlignedBlock;
+  final qpdf.PDFBlockWidgetBuilder? onDetectHeaderAlignedBlock;
 
-  final CustomPDFWidget? onDetectAlignedParagraph;
+  final qpdf.PDFBlockWidgetBuilder? onDetectAlignedParagraph;
 
-  final CustomPDFWidget? onDetectCommonText;
+  final qpdf.PDFInlineWidgetBuilder? onDetectCommonText;
 
-  final CustomPDFWidget? onDetectInlinesMarkdown;
+  @Deprecated('onDetectInlinesMarkdown is no longer used and will be removed on future releases')
+  final qpdf.CustomPDFWidget? onDetectInlinesMarkdown;
 
-  final CustomPDFWidget? onDetectLink;
+  final qpdf.PDFInlineWidgetBuilder? onDetectLink;
   //Detect markdown list: * bullet, 1. ordered, [x] check list (still has errors in render or in detect indent)
-  final CustomPDFWidget? onDetectList;
+  final qpdf.PDFBlockWidgetBuilder? onDetectList;
 
   /// Detect html code tag <pre>some code</pre> and it could be multiline
-  final CustomPDFWidget? onDetectCodeBlock;
+  final qpdf.PDFBlockWidgetBuilder? onDetectCodeBlock;
 
   /// Detect html blockquote tag <blockquote>text in blockquote</blockquote> and it could be multiline
-  final CustomPDFWidget? onDetectBlockquote;
+  final qpdf.PDFBlockWidgetBuilder? onDetectBlockquote;
 
   ///If this [request] is null, list is [empty] or is list [null], will be used another by default
   final Future<List<pw.Font>?> Function(String)? onRequestFallbackFont;
@@ -109,12 +117,13 @@ class PDFConverter {
     required this.document,
     required this.frontMatterDelta,
     required this.backMatterDelta,
-    required this.customConverters,
-    required this.onRequestBoldFont,
-    required this.onRequestBoldItalicFont,
-    required this.onRequestFallbackFont,
-    required this.onRequestFont,
-    required this.onRequestItalicFont,
+    this.customConverters = const <qpdf.CustomConverter>[],
+    this.customBuilders = const <qpdf.CustomWidget>[],
+    this.onRequestBoldFont,
+    this.onRequestBoldItalicFont,
+    this.onRequestFallbackFont,
+    this.onRequestFont,
+    this.onRequestItalicFont,
     required List<pw.Font> fallbacks,
     this.blockQuotePaddingLeft,
     this.blockQuotePaddingRight,
@@ -165,18 +174,19 @@ class PDFConverter {
 
   ///Creates the PDF document an return this one
   Future<pw.Document?> createDocument({
-    DeltaAttributesOptions? deltaOptionalAttr,
+    qpdf.DeltaAttributesOptions? deltaOptionalAttr,
     bool overrideAttributesPassedByUser = false,
     void Function(dynamic error)? onException,
     bool shouldProcessDeltas = true,
   }) async {
-    deltaOptionalAttr ??= DeltaAttributesOptions.common();
-    final Converter<Delta, pw.Document> converter = PdfService(
+    deltaOptionalAttr ??= qpdf.DeltaAttributesOptions.common();
+    final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
       params: params,
       fonts: globalFontsFallbacks,
       onRequestBoldFont: onRequestBoldFont,
       onRequestBothFont: onRequestBoldItalicFont,
       customTheme: themeData,
+      customBuilders: customBuilders,
       blockQuoteBackgroundColor: blockQuoteBackgroundColor,
       blockQuoteDividerColor: blockQuoteDividerColor,
       codeBlockBackgroundColor: codeBlockBackgroundColor,
@@ -219,20 +229,25 @@ class PDFConverter {
     }
   }
 
-  ///This Create the PDF document and write it to storage path
-  //This implementation can throw PathNotFoundException or exceptions based in Storage capabilities
+  /// This Create the PDF document and write it to storage path
+  /// This implementation can throw PathNotFoundException or exceptions based in Storage capabilities
+  ///
+  /// [isWeb] is used to know is the current platform is web since the way of the how is saved PDF file
+  /// is different from the common on mobile devices or Desktop
   Future<void> createDocumentFile({
     required String path,
     void Function(dynamic error)? onException,
     void Function([Object? data])? onSucessWrite,
-    DeltaAttributesOptions? deltaOptionalAttr,
+    qpdf.DeltaAttributesOptions? deltaOptionalAttr,
     bool overrideAttributesPassedByUser = false,
     bool shouldProcessDeltas = true,
+    bool isWeb = false,
   }) async {
-    deltaOptionalAttr ??= DeltaAttributesOptions.common();
-    final Converter<Delta, pw.Document> converter = PdfService(
+    deltaOptionalAttr ??= qpdf.DeltaAttributesOptions.common();
+    final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
       params: params,
       fonts: globalFontsFallbacks,
+      customBuilders: customBuilders,
       onRequestBoldFont: onRequestBoldFont,
       onRequestBothFont: onRequestBoldItalicFont,
       onRequestFallbacks: onRequestFallbackFont,
@@ -272,17 +287,28 @@ class PDFConverter {
     );
     try {
       final pw.Document doc = await converter.generateDoc();
-      await File(path).writeAsBytes(await doc.save());
+      final Uint8List bytes = await doc.save();
+      if (isWeb) {
+        List<int> fileInts = List<int>.from(bytes);
+        web.AnchorElement()
+          ..href = "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}"
+          ..setAttribute("download", "${DateTime.now().millisecondsSinceEpoch}.pdf")
+          ..click();
+        onSucessWrite?.call('');
+        return;
+      }
+      await File(path).writeAsBytes(bytes);
       onSucessWrite?.call(path);
     } catch (e) {
       onException?.call(e);
     }
   }
 
-  static Delta? processDelta(Delta? delta, DeltaAttributesOptions options, bool overrideAttributesPassedByUser) {
+  static Delta? processDelta(Delta? delta, qpdf.DeltaAttributesOptions options, bool overrideAttributesPassedByUser) {
     if (delta == null) return null;
     if (delta.isEmpty) return delta;
-    final String json = applyAttributesIfNeeded(
+    final String json = qpdf
+        .applyAttributesIfNeeded(
             json: jsonEncode(delta.toJson()), attr: options, overrideAttributes: overrideAttributesPassedByUser)
         .fixCommonErrorInsertsInRawDelta
         .withBrackets;

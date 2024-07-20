@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:collection/collection.dart';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
@@ -28,21 +29,24 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final Delta? backM;
   @Deprecated('This option is not longer used by the converter and will be removed on future releases')
   final List<CustomConverter> customConverters;
-  final Future<pw.Font> Function(String fontFamily) onRequestFont;
-  final Future<pw.Font> Function(String fontFamily) onRequestBoldFont;
-  final Future<pw.Font> Function(String fontFamily) onRequestItalicFont;
-  final Future<pw.Font> Function(String fontFamily) onRequestBothFont;
-  final CustomPDFWidget? onDetectImageBlock;
-  final CustomPDFWidget? onDetectInlineRichTextStyles;
-  final CustomPDFWidget? onDetectHeaderBlock;
-  final CustomPDFWidget? onDetectHeaderAlignedBlock;
-  final CustomPDFWidget? onDetectAlignedParagraph;
-  final CustomPDFWidget? onDetectCommonText;
+  final List<CustomWidget> customBuilders;
+  final Future<pw.Font> Function(String fontFamily)? onRequestFont;
+  final Future<pw.Font> Function(String fontFamily)? onRequestBoldFont;
+  final Future<pw.Font> Function(String fontFamily)? onRequestItalicFont;
+  final Future<pw.Font> Function(String fontFamily)? onRequestBothFont;
+  final PDFBlockWidgetBuilder? onDetectImageBlock;
+  final PDFInlineWidgetBuilder? onDetectInlineRichTextStyles;
+  final PDFBlockWidgetBuilder? onDetectHeaderBlock;
+  final PDFBlockWidgetBuilder? onDetectHeaderAlignedBlock;
+  final PDFBlockWidgetBuilder? onDetectAlignedParagraph;
+  final PDFInlineWidgetBuilder? onDetectCommonText;
+
+  @Deprecated('onDetectInlinesMarkdown is no longer used and will be removed on future releases')
   final CustomPDFWidget? onDetectInlinesMarkdown;
-  final CustomPDFWidget? onDetectLink;
-  final CustomPDFWidget? onDetectList;
-  final CustomPDFWidget? onDetectCodeBlock;
-  final CustomPDFWidget? onDetectBlockquote;
+  final PDFInlineWidgetBuilder? onDetectLink;
+  final PDFBlockWidgetBuilder? onDetectList;
+  final PDFBlockWidgetBuilder? onDetectCodeBlock;
+  final PDFBlockWidgetBuilder? onDetectBlockquote;
   final pw.Font? codeBlockFont;
   final pw.TextStyle? codeBlockTextStyle;
   final PdfColor? codeBlockBackgroundColor;
@@ -57,12 +61,13 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final int defaultFontSize = Constant.DEFAULT_FONT_SIZE; //avoid spans without font sizes not appears in the document
   late final double pageWidth, pageHeight;
   PdfConfigurator({
-    required this.onRequestBoldFont,
-    required this.onRequestBothFont,
-    required this.onRequestFallbacks,
-    required this.onRequestFont,
-    required this.onRequestItalicFont,
+    this.onRequestBoldFont,
+    this.onRequestBothFont,
+    this.onRequestFallbacks,
+    this.onRequestFont,
+    this.onRequestItalicFont,
     required this.customConverters,
+    required this.customBuilders,
     required super.document,
     this.blockQuotePaddingLeft,
     this.blockQuotePaddingRight,
@@ -311,9 +316,9 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           decorationStyle: pw.TextDecorationStyle.solid,
           decorationColor: defaultLinkColor,
           font: font,
-          fontBold: await onRequestBoldFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontItalic: await onRequestItalicFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontBoldItalic: await onRequestBothFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBold: await onRequestBoldFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontItalic: await onRequestItalicFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBoldItalic: await onRequestBothFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
           fontFallback: fonts,
           fontSize: !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
           lineSpacing: lineSpacing,
