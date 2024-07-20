@@ -29,7 +29,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final Delta? backM;
   @Deprecated('This option is not longer used by the converter and will be removed on future releases')
   final List<CustomConverter> customConverters;
-  final List<CustomWidget> customBuilders;
+  final Map<TypeWidget, CustomWidget> customBuilders;
   final Future<pw.Font> Function(String fontFamily)? onRequestFont;
   final Future<pw.Font> Function(String fontFamily)? onRequestBoldFont;
   final Future<pw.Font> Function(String fontFamily)? onRequestItalicFont;

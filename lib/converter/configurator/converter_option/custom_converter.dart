@@ -27,12 +27,10 @@ enum Scope {
 /// The Scope limit where be usage [PDFInlineWidgetBuilder] or [PDFBlockWidgetBuilder]
 ///
 class CustomWidget {
-  final TypeWidget predicate;
   final Scope level;
   final PDFInlineWidgetBuilder? inlineWidgetCallback;
   final PDFBlockWidgetBuilder? blockWidgetCallback;
   CustomWidget({
-    required this.predicate,
     required this.level,
     this.inlineWidgetCallback,
     this.blockWidgetCallback,
@@ -40,19 +38,6 @@ class CustomWidget {
           inlineWidgetCallback != null || blockWidgetCallback != null,
           "Both PDFWidgetBuilders cannot be null. One of them must be defined",
         );
-
-  @override
-  bool operator ==(covariant CustomWidget other) {
-    if (identical(this, other)) return true;
-
-    return other.predicate == predicate && other.predicate == predicate && other.level == level;
-  }
-
-  @override
-  int get hashCode => predicate.hashCode ^ predicate.hashCode ^ level.hashCode;
-
-  @override
-  String toString() => 'CustomDetector(detectorPattern: ${predicate.name}, Block-level: ${level.name})';
 }
 
 ///CustomConverter is used to match lines with a formatting using custom regex and
