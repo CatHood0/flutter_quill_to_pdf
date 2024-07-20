@@ -398,7 +398,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     int indentLevel, [
     pw.TextStyle? style,
   ]) async {
-    late final pw.WidgetSpan widgets;
+    pw.WidgetSpan? widgets = null;
     final double? spacing = (spansToWrap.firstOrNull?.style?.lineSpacing);
     if (listType != 'uncheked' && listType != 'checked') {
       final String typeList = listType == 'ordered' ? '$numberList.' : '•';
@@ -460,7 +460,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         overflow: pw.TextOverflow.span,
         text: pw.TextSpan(
           children: <pw.InlineSpan>[
-            widgets,
+            widgets!,
           ],
         ),
       ),
