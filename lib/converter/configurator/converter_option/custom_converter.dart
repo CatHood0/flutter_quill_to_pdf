@@ -9,7 +9,7 @@ enum Scope {
 class CustomWidget<T, B> {
   final bool Function(T t) predicate;
   final Scope scope;
-  final PDFWidgetBuilder<B>? widgetCallback;
+  final PDFWidgetBuilder<B> widgetCallback;
   CustomWidget({
     required this.predicate,
     required this.scope,
