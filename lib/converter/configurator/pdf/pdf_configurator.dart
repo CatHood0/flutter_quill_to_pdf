@@ -170,7 +170,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final double? fontSize = !addFontSize ? null : fontSizeHelper;
     final String content = line.data as String;
     final double? lineSpacing = spacing?.resolveLineHeight();
-    final pw.Font font = await onRequestFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY);
+    final pw.Font font = await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? pw.Font.helvetica();
     final List<pw.Font> fonts =
         await onRequestFallbacks?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? <pw.Font>[];
     // Give just the necessary fallbacks for the founded fontFamily
@@ -184,9 +184,9 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           ]),
           decorationStyle: pw.TextDecorationStyle.solid,
           decorationColor: textColor ?? backgroundTextColor,
-          fontBold: await onRequestBoldFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontItalic: await onRequestItalicFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontBoldItalic: await onRequestBothFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBold: await onRequestBoldFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontItalic: await onRequestItalicFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBoldItalic: await onRequestBothFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
           fontFallback: fonts,
           fontSize: !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
           lineSpacing: lineSpacing,
@@ -201,9 +201,9 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           ]),
           decorationStyle: pw.TextDecorationStyle.solid,
           decorationColor: textColor ?? backgroundTextColor,
-          fontBold: await onRequestBoldFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontItalic: await onRequestItalicFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontBoldItalic: await onRequestBothFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBold: await onRequestBoldFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontItalic: await onRequestItalicFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBoldItalic: await onRequestBothFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
           fontFallback: fonts,
           fontSize: !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
           lineSpacing: lineSpacing,
@@ -297,7 +297,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final bool underline = line.attributes?['underline'] ?? false;
     final String href = line.attributes!['link'];
     final String hrefContent = line.data as String;
-    final pw.Font font = await onRequestFont.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY);
+    final pw.Font font = await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? pw.Font.helvetica();
     final List<pw.Font> fonts =
         await onRequestFallbacks?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? <pw.Font>[];
     spans.add(
