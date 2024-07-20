@@ -24,7 +24,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   //show default this on ordered list
   int numberList = 0;
   int numCodeLine = 0;
-  bool lastWasList = false;
   final Delta? frontM;
   final Delta? backM;
   @Deprecated('This option is not longer used by the converter and will be removed on future releases')

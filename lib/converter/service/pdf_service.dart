@@ -169,7 +169,12 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       }
       //verify if the data line is a embed
       if (paragraph.type == ParagraphType.embed && paragraph.lines.firstOrNull?.data is Map) {
-        contentPerPage.add(await getImageBlock.call(paragraph.lines.first));
+        final Line line = paragraph.lines.first;
+        if ((line.data as Map)['video'] != null) {
+          contentPerPage.add(pw.RichText(text: pw.TextSpan(text: (line.data as Map<String, dynamic>)['video'])));
+          continue;
+        }
+        contentPerPage.add(await getImageBlock.call(line));
         continue;
       }
       for (int l = 0; l < paragraph.lines.length; l++) {
@@ -261,18 +266,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }
 
   void verifyBlock(Map<String, dynamic>? blockAttributes) {
-    if (blockAttributes?['list'] != null) {
-      numberList++;
-      lastWasList = true;
-    } else {
-      numberList = 0;
-      lastWasList = false;
-    }
-    if (blockAttributes?['code-block'] != null) {
-      numCodeLine++;
-    } else {
-      numCodeLine = 0;
-    }
+    blockAttributes?['list'] != null ? numberList++ : numberList = 0;
+    blockAttributes?['code-block'] != null ? numCodeLine++ : numCodeLine = 0;
   }
 
   void _applyBlockAttributes(List<pw.InlineSpan> currentSpans, Map<String, dynamic> blockAttributes) async {
