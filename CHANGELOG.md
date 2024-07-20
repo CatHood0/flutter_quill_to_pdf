@@ -1,3 +1,14 @@
+# 2.1.0
+
+* Chore: now `onRequestFonts` are optional
+* Fix: `PdfWidgetGenerator` was replaced by `PDFWidgetBuilder` 
+* Fix: `video` block is detected as a `image` block
+* Fix: `codeblock` has not padding on it's content
+* Fix: comments to describe how new lines are detected on `blockGenerators` method
+* Fix: `header` block indentation multiplier
+* Feat: support for `customBuilders` again returned to replace `customCOnverters`
+* Chore: was `deprecated` most of the `methods` and `params` that are no longer used
+
 # 2.0.0
 
 **¡BREAKING CHANGES!**
