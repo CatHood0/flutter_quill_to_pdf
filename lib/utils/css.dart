@@ -27,13 +27,13 @@ Map<String, dynamic> parseCssStyles(String? style, String align) {
 
       switch (key) {
         case 'width':
-          attributes['width'] = value;
+          attributes['width'] = double.tryParse(value);
           break;
         case 'height':
-          attributes['height'] = value;
+          attributes['height'] = double.tryParse(value);
           break;
         case 'margin':
-          attributes['margin'] = value;
+          attributes['margin'] = double.tryParse(value);
           break;
         default:
           // Ignore other styles
