@@ -149,7 +149,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       final List<pw.InlineSpan> spansToWrap = <pw.InlineSpan>[];
       final List<pw.InlineSpan> inlineSpansToMerge = <pw.InlineSpan>[];
       verifyBlock(blockAttributes);
-      //verify if it's not just a paragraph that represents a simple new line
+      //verify if paragraph is just a simple new line
       if (paragraph.lines.length == 1 && paragraph.lines.firstOrNull?.data == '\n' && blockAttributes == null) {
         final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(paragraph.lines.first, defaultTextStyle);
         final double spacing = (spans.firstOrNull?.style?.lineSpacing ?? 1.0);
