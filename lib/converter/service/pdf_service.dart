@@ -174,6 +174,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           contentPerPage.add(pw.RichText(text: pw.TextSpan(text: (line.data as Map<String, dynamic>)['video'])));
           continue;
         }
+        //avoid any another embed that is not a image
+        if ((line.data as Map<String, dynamic>)['image'] == null) continue;
         contentPerPage.add(await getImageBlock.call(line));
         continue;
       }
@@ -275,6 +277,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     final String? align = blockAttributes['align'];
     final String? listType = blockAttributes['list'];
     final int? indent = blockAttributes['indent'];
+    final double? lineHeight = blockAttributes['line-height'];
     final bool? codeblock = blockAttributes['code-block'];
     final bool? blockquote = blockAttributes['blockquote'];
     int indentLevel = indent ?? 0;
@@ -291,9 +294,11 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
     if (codeblock != null) {
       contentPerPage.add(await getCodeBlock(currentSpans));
+      return;
     }
     if (blockquote != null) {
       contentPerPage.add(await getBlockQuote(currentSpans));
+      return;
     }
     if (listType != null) {
       contentPerPage.add(await getListBlock(currentSpans, listType, align ?? 'left', indentLevel));
@@ -301,6 +306,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
     if (align != null) {
       contentPerPage.add(await getAlignedParagraphBlock(currentSpans, align, indentLevel));
+      return;
     }
     if (indent != null) {
       final double spacing = (currentSpans.firstOrNull?.style?.lineSpacing ?? 1.0);
@@ -316,6 +322,23 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           ),
         ),
       ));
+      return;
+    }
+    if (lineHeight != null) {
+      contentPerPage.add(
+        pw.Padding(
+          padding: pw.EdgeInsets.only(bottom: lineHeight.resolvePaddingByLineHeight()),
+          child: pw.RichText(
+            softWrap: true,
+            overflow: pw.TextOverflow.span,
+            text: pw.TextSpan(
+              style: defaultTextStyle.copyWith(lineSpacing: lineHeight.resolveLineHeight()),
+              children: currentSpans,
+            ),
+          ),
+        ),
+      );
+      return;
     }
   }
 }
