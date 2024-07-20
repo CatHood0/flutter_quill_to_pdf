@@ -261,6 +261,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final pw.Widget widget = pw.Container(
       width: pageWidth,
       color: this.codeBlockBackgroundColor ?? PdfColor.fromHex('#fbfbf9'),
+      padding: const pw.EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
       child: pw.RichText(
         softWrap: true,
         overflow: pw.TextOverflow.span,
