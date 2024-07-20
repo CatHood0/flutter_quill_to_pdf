@@ -357,7 +357,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final pw.TextAlign textAlign = alignment.resolvePdfTextAlign;
     final double spacing = (spansToWrap.firstOrNull?.style?.lineSpacing ?? 1.0);
     return pw.Container(
-      padding: pw.EdgeInsets.only(left: indentLevel * 7, top: 3, bottom: spacing.resolvePaddingByLineHeight()),
+      padding: pw.EdgeInsets.only(left: indentLevel * 12.5, top: 3, bottom: spacing.resolvePaddingByLineHeight()),
       alignment: al,
       child: pw.RichText(
         textAlign: textAlign,
@@ -378,7 +378,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final double spacing = (spansToWrap.firstOrNull?.style?.lineSpacing ?? 1.0);
     return pw.Container(
       alignment: align.resolvePdfBlockAlign,
-      padding: pw.EdgeInsets.only(left: indentLevel * 7, bottom: spacing.resolvePaddingByLineHeight()),
+      padding: pw.EdgeInsets.only(left: indentLevel * 12.5, bottom: spacing.resolvePaddingByLineHeight()),
       child: pw.RichText(
         textAlign: align.resolvePdfTextAlign,
         softWrap: true,
@@ -406,7 +406,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       widgets = pw.WidgetSpan(
         child: pw.Container(
           padding: pw.EdgeInsets.only(
-              left: indentLevel > 0 ? indentLevel * 7 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
+              left: indentLevel > 0 ? indentLevel * 12.5 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
           child: pw.RichText(
             softWrap: true,
             textAlign: align.resolvePdfTextAlign,
@@ -425,7 +425,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       widgets = pw.WidgetSpan(
         child: pw.Container(
           padding: pw.EdgeInsets.only(
-              left: indentLevel > 0 ? indentLevel * 7 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
+              left: indentLevel > 0 ? indentLevel * 12.5 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
           child: pw.Row(
             children: <pw.Widget>[
               pw.Checkbox(
@@ -452,7 +452,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     }
     return pw.Container(
       padding: pw.EdgeInsets.only(
-        left: indentLevel > 0 ? indentLevel * 7 : 15,
+        left: indentLevel > 0 ? indentLevel * 12.5 : 15,
         bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5,
       ),
       child: pw.RichText(

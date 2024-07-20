@@ -362,7 +362,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       final double spacing = (currentSpans.firstOrNull?.style?.lineSpacing ?? 1.0);
       contentPerPage.add(pw.Container(
         alignment: align?.resolvePdfBlockAlign,
-        padding: pw.EdgeInsets.only(left: indentLevel * 7, bottom: spacing.resolvePaddingByLineHeight()),
+        padding: pw.EdgeInsets.only(left: indentLevel * 12.5, bottom: spacing.resolvePaddingByLineHeight()),
         child: pw.RichText(
           textAlign: align.resolvePdfTextAlign,
           softWrap: true,
