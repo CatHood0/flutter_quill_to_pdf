@@ -44,7 +44,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.onDetectCodeBlock,
     super.onDetectAlignedParagraph,
     super.onDetectCommonText,
-    super.onDetectHeaderAlignedBlock,
     super.onDetectHeaderBlock,
     super.onDetectImageBlock,
     super.onDetectInlineRichTextStyles,
@@ -186,6 +185,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         }
         //avoid any another embed that is not a image
         if ((line.data as Map<String, dynamic>)['image'] == null) continue;
+        if (onDetectImageBlock != null) {
+          contentPerPage.add(onDetectImageBlock!.call(line, paragraph.blockAttributes));
+          continue;
+        }
         contentPerPage.add(await getImageBlock.call(line));
         continue;
       }
@@ -199,6 +202,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               // duplicate content
               _applyBlockAttributes(spansToWrap, blockAttributes);
               spansToWrap.clear();
+            }
+            if (onDetectImageBlock != null) {
+              contentPerPage.add(onDetectImageBlock!.call(line, paragraph.blockAttributes));
+              continue;
             }
             contentPerPage.add(await getImageBlock.call(line));
             continue;
@@ -238,14 +245,27 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
             style = defaultTextStyle.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
           }
           if (line.attributes?['link'] != null) {
+            if (onDetectLink != null) {
+              spansToWrap.addAll(onDetectLink!.call(line, paragraph.blockAttributes));
+              continue;
+            }
             spansToWrap.addAll(await getLinkStyle.call(line, style, addFontSize));
             continue;
+          }
+          if (onDetectInlineRichTextStyles != null) {
+            spansToWrap.addAll(onDetectInlineRichTextStyles!.call(line, paragraph.blockAttributes));
           }
           spansToWrap.addAll(await getRichTextInlineStyles.call(line, style, false, addFontSize));
         } else if (paragraph.type == ParagraphType.inline || blockAttributes == null) {
           if (line.attributes != null) {
+            if (onDetectInlineRichTextStyles != null) {
+              inlineSpansToMerge.addAll(onDetectInlineRichTextStyles!.call(line, paragraph.blockAttributes));
+            }
             inlineSpansToMerge.addAll(await getRichTextInlineStyles.call(line, defaultTextStyle));
             continue;
+          }
+          if (onDetectCommonText != null) {
+            inlineSpansToMerge.addAll(onDetectCommonText!.call(line, paragraph.blockAttributes));
           }
           //if it doesn't have attrs then just put the content
           inlineSpansToMerge.add(pw.TextSpan(text: line.data as String, style: defaultTextStyle));
@@ -295,6 +315,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       indentLevel++;
     }
     if (header != null) {
+      if (onDetectHeaderBlock != null) {
+        contentPerPage.add(onDetectHeaderBlock!.call(currentSpans, blockAttributes));
+        return;
+      }
       if (align != null) {
         contentPerPage.add(await getAlignedHeaderBlock(currentSpans, header, align, indentLevel));
         return;
@@ -303,18 +327,34 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       return;
     }
     if (codeblock != null) {
+      if (onDetectCodeBlock != null) {
+        contentPerPage.add(onDetectCodeBlock!.call(currentSpans, blockAttributes));
+        return;
+      }
       contentPerPage.add(await getCodeBlock(currentSpans));
       return;
     }
     if (blockquote != null) {
+      if (onDetectBlockquote != null) {
+        contentPerPage.add(onDetectBlockquote!.call(currentSpans, blockAttributes));
+        return;
+      }
       contentPerPage.add(await getBlockQuote(currentSpans));
       return;
     }
     if (listType != null) {
+      if (onDetectList != null) {
+        contentPerPage.add(onDetectList!.call(currentSpans, blockAttributes));
+        return;
+      }
       contentPerPage.add(await getListBlock(currentSpans, listType, align ?? 'left', indentLevel));
       return;
     }
     if (align != null) {
+      if (onDetectAlignedParagraph != null) {
+        contentPerPage.add(onDetectAlignedParagraph!.call(currentSpans, blockAttributes));
+        return;
+      }
       contentPerPage.add(await getAlignedParagraphBlock(currentSpans, align, indentLevel));
       return;
     }

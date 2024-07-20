@@ -34,19 +34,18 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final Future<pw.Font> Function(String fontFamily)? onRequestBoldFont;
   final Future<pw.Font> Function(String fontFamily)? onRequestItalicFont;
   final Future<pw.Font> Function(String fontFamily)? onRequestBothFont;
-  final PDFWidgetBuilder<Line>? onDetectImageBlock;
-  final PDFWidgetBuilder<Line>? onDetectInlineRichTextStyles;
-  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectHeaderBlock;
-  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectHeaderAlignedBlock;
-  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectAlignedParagraph;
-  final PDFWidgetBuilder<Line>? onDetectCommonText;
+  final PDFWidgetBuilder<Line, pw.Widget>? onDetectImageBlock;
+  final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectInlineRichTextStyles;
+  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectHeaderBlock;
+  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectAlignedParagraph;
+  final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectCommonText;
 
   @Deprecated('onDetectInlinesMarkdown is no longer used and will be removed on future releases')
   final CustomPDFWidget? onDetectInlinesMarkdown;
-  final PDFWidgetBuilder<Line>? onDetectLink;
-  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectList;
-  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectCodeBlock;
-  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectBlockquote;
+  final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectLink;
+  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectList;
+  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectCodeBlock;
+  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectBlockquote;
   final pw.Font? codeBlockFont;
   final pw.TextStyle? codeBlockTextStyle;
   final PdfColor? codeBlockBackgroundColor;
@@ -83,7 +82,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     this.onDetectCodeBlock,
     this.onDetectAlignedParagraph,
     this.onDetectCommonText,
-    this.onDetectHeaderAlignedBlock,
     this.onDetectHeaderBlock,
     this.onDetectInlinesMarkdown,
     this.onDetectLink,

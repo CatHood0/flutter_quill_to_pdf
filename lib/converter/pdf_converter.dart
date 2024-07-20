@@ -82,32 +82,30 @@ class PDFConverter {
   ///Customize the left/right divider color to blockquotes
   final PdfColor? blockQuoteDividerColor;
 
-  final qpdf.PDFWidgetBuilder<ep.Line>? onDetectImageBlock;
+  final qpdf.PDFWidgetBuilder<ep.Line, pw.Widget>? onDetectImageBlock;
 
   ///Detect Rich text styles like: size, spacing, font family
-  final qpdf.PDFWidgetBuilder<ep.Line>? onDetectInlineRichTextStyles;
+  final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectInlineRichTextStyles;
 
   ///Detect simple: # header
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectHeaderBlock;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectHeaderBlock;
 
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectHeaderAlignedBlock;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectAlignedParagraph;
 
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectAlignedParagraph;
-
-  final qpdf.PDFWidgetBuilder<ep.Line>? onDetectCommonText;
+  final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectCommonText;
 
   @Deprecated('onDetectInlinesMarkdown is no longer used and will be removed on future releases')
   final qpdf.CustomPDFWidget? onDetectInlinesMarkdown;
 
-  final qpdf.PDFWidgetBuilder<ep.Line>? onDetectLink;
+  final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectLink;
   //Detect markdown list: * bullet, 1. ordered, [x] check list (still has errors in render or in detect indent)
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectList;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectList;
 
   /// Detect html code tag <pre>some code</pre> and it could be multiline
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectCodeBlock;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectCodeBlock;
 
   /// Detect html blockquote tag <blockquote>text in blockquote</blockquote> and it could be multiline
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectBlockquote;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectBlockquote;
 
   ///If this [request] is null, list is [empty] or is list [null], will be used another by default
   final Future<List<pw.Font>?> Function(String)? onRequestFallbackFont;
@@ -143,7 +141,6 @@ class PDFConverter {
     this.onDetectCodeBlock,
     this.onDetectAlignedParagraph,
     this.onDetectCommonText,
-    this.onDetectHeaderAlignedBlock,
     this.onDetectHeaderBlock,
     this.onDetectImageBlock,
     this.onDetectInlineRichTextStyles,
@@ -203,7 +200,6 @@ class PDFConverter {
       blockQuotePaddingLeft: blockQuotePaddingLeft,
       blockQuotePaddingRight: blockQuotePaddingRight,
       blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
-      onDetectHeaderAlignedBlock: onDetectHeaderAlignedBlock,
       onDetectHeaderBlock: onDetectHeaderBlock,
       onDetectImageBlock: onDetectImageBlock,
       onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
@@ -265,7 +261,6 @@ class PDFConverter {
       blockQuoteTextStyle: blockQuoteTextStyle,
       onDetectBlockquote: onDetectBlockquote,
       onDetectCodeBlock: onDetectCodeBlock,
-      onDetectHeaderAlignedBlock: onDetectHeaderAlignedBlock,
       onDetectHeaderBlock: onDetectHeaderBlock,
       onDetectImageBlock: onDetectImageBlock,
       blockQuotePaddingLeft: blockQuotePaddingLeft,

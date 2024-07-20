@@ -8,4 +8,4 @@ typedef PdfWidgetGenerator = pw.Widget Function({
   required String input,
   required String lineWithoutFormatting,
 });
-typedef PDFWidgetBuilder<T> = pw.Widget Function(T spansToWrap, Map<String, dynamic>? blockAttributes);
+typedef PDFWidgetBuilder<T, W> = W Function(T spansToWrap, Map<String, dynamic>? blockAttributes);
