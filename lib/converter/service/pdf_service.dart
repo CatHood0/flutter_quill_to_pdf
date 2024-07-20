@@ -149,6 +149,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       final Map<String, dynamic>? blockAttributes = paragraph.blockAttributes;
       final List<pw.InlineSpan> spansToWrap = <pw.InlineSpan>[];
       final List<pw.InlineSpan> inlineSpansToMerge = <pw.InlineSpan>[];
+      bool goToNextParagraph = false;
+      for (CustomWidget customBuilder in super.customBuilders) {
+        if (customBuilder.predicate(paragraph)) {
+          contentPerPage.add(customBuilder.widgetCallback(paragraph, paragraph.blockAttributes));
+          goToNextParagraph = true;
+          break;
+        }
+      }
+      if (goToNextParagraph) continue;
       verifyBlock(blockAttributes);
       //verify if paragraph is just a simple new line
       if (paragraph.lines.length == 1 && paragraph.lines.firstOrNull?.data == '\n' && blockAttributes == null) {

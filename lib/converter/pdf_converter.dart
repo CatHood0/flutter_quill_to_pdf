@@ -25,7 +25,7 @@ class PDFConverter {
   final List<qpdf.CustomConverter> customConverters;
 
   ///[CustomPDFWidget] allow devs to use builders to create custom widgets
-  final List<qpdf.CustomWidget<Object, Object>> customBuilders;
+  final List<qpdf.CustomWidget> customBuilders;
 
   ///A simple [request] font when converter detect a font
   final Future<pw.Font> Function(String)? onRequestFont;
@@ -119,7 +119,7 @@ class PDFConverter {
     required this.frontMatterDelta,
     required this.backMatterDelta,
     this.customConverters = const <qpdf.CustomConverter>[],
-    this.customBuilders = const <qpdf.CustomWidget<Object, Object>>[],
+    this.customBuilders = const <qpdf.CustomWidget>[],
     this.onRequestBoldFont,
     this.onRequestBoldItalicFont,
     this.onRequestFallbackFont,

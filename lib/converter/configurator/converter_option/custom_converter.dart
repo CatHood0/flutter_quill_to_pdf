@@ -1,18 +1,12 @@
+import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/utils/typedefs.dart';
 
-enum Scope {
-  block,
-  inline,
-}
-
 /// [CustomWidget] is used to match lines with a formatting and
-class CustomWidget<T, B> {
-  final bool Function(T t) predicate;
-  final Scope scope;
-  final PDFWidgetBuilder<B> widgetCallback;
+class CustomWidget {
+  final bool Function(Paragraph paragraph) predicate;
+  final PDFWidgetBuilder<Paragraph> widgetCallback;
   CustomWidget({
     required this.predicate,
-    required this.scope,
     required this.widgetCallback,
   }); 
 }
