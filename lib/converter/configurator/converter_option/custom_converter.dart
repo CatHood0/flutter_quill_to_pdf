@@ -1,11 +1,18 @@
 import 'package:flutter_quill_to_pdf/utils/typedefs.dart';
 
+enum Scope {
+  block,
+  inline,
+}
+
 /// [CustomWidget] is used to match lines with a formatting and
 class CustomWidget<T, B> {
   final bool Function(T t) predicate;
+  final Scope scope;
   final PDFWidgetBuilder<B>? widgetCallback;
   CustomWidget({
     required this.predicate,
+    required this.scope,
     required this.widgetCallback,
   }); 
 }
