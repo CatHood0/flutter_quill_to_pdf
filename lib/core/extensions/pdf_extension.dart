@@ -10,6 +10,7 @@ extension PdfDoubleExtension on double {
     if (this == 2.0) return 23.5;
     if (this == 1.5) return 12.5;
     if (this == 1.15) return 6.5;
+    if (this == 1.0) return 3.5;
     return this;
   }
 
@@ -22,7 +23,7 @@ extension PdfDoubleExtension on double {
     if (this == 12.5) return 6.5;
     if (this == 6.5) return 3.5;
     if (this == 23.5) return 12.5;
-    if (this == 1.0) return this;
+    if (this == 3.5) return 1.5;
     return 0;
   }
 }

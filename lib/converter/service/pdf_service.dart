@@ -282,7 +282,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         final double spacing = (inlineSpansToMerge.firstOrNull?.style?.lineSpacing ?? 1.0);
         contentPerPage.add(
           pw.Padding(
-            padding: pw.EdgeInsets.symmetric(vertical: spacing.resolvePaddingByLineHeight()),
+            padding: pw.EdgeInsets.only(bottom: spacing.resolvePaddingByLineHeight()),
             child: pw.RichText(
               softWrap: true,
               overflow: pw.TextOverflow.span,
@@ -377,7 +377,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     if (lineHeight != null) {
       contentPerPage.add(
         pw.Padding(
-          padding: pw.EdgeInsets.only(bottom: lineHeight.resolvePaddingByLineHeight()),
+          padding: pw.EdgeInsets.only(bottom: lineHeight.resolveLineHeight().resolvePaddingByLineHeight()),
           child: pw.RichText(
             softWrap: true,
             overflow: pw.TextOverflow.span,
