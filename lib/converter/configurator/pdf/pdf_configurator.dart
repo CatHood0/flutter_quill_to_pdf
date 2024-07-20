@@ -330,7 +330,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final pw.TextStyle textStyle =
         style?.copyWith(fontSize: defaultFontSize) ?? defaultTextStyle.copyWith(fontSize: defaultFontSize);
     return pw.Container(
-        padding: pw.EdgeInsets.only(left: indentLevel.toDouble() * 3, top: 7, bottom: 3.5),
+        padding: pw.EdgeInsets.only(left: indentLevel.toDouble() * 7, top: 3, bottom: 3.5),
         child: pw.RichText(
           softWrap: true,
           overflow: pw.TextOverflow.span,
@@ -349,13 +349,12 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     int indentLevel, [
     pw.TextStyle? style,
   ]) async {
-    final int indentation = indentLevel * 7;
     final String alignment = align;
     final pw.Alignment al = alignment.resolvePdfBlockAlign;
     final pw.TextAlign textAlign = alignment.resolvePdfTextAlign;
     final double spacing = (spansToWrap.firstOrNull?.style?.lineSpacing ?? 1.0);
     return pw.Container(
-      padding: pw.EdgeInsets.only(left: indentation.toDouble(), top: 3, bottom: spacing.resolvePaddingByLineHeight()),
+      padding: pw.EdgeInsets.only(left: indentLevel * 7, top: 3, bottom: spacing.resolvePaddingByLineHeight()),
       alignment: al,
       child: pw.RichText(
         textAlign: textAlign,
@@ -418,7 +417,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           ),
         ),
       );
-    } else if (listType == 'checked' || listType == 'unchecked') {
+    }
+    if (listType == 'checked' || listType == 'unchecked') {
       widgets = pw.WidgetSpan(
         child: pw.Container(
           padding: pw.EdgeInsets.only(
