@@ -29,24 +29,24 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final Delta? backM;
   @Deprecated('This option is not longer used by the converter and will be removed on future releases')
   final List<CustomConverter> customConverters;
-  final Map<TypeWidget, CustomWidget> customBuilders;
+  final List<CustomWidget<Object, Object>> customBuilders;
   final Future<pw.Font> Function(String fontFamily)? onRequestFont;
   final Future<pw.Font> Function(String fontFamily)? onRequestBoldFont;
   final Future<pw.Font> Function(String fontFamily)? onRequestItalicFont;
   final Future<pw.Font> Function(String fontFamily)? onRequestBothFont;
-  final PDFBlockWidgetBuilder? onDetectImageBlock;
-  final PDFInlineWidgetBuilder? onDetectInlineRichTextStyles;
-  final PDFBlockWidgetBuilder? onDetectHeaderBlock;
-  final PDFBlockWidgetBuilder? onDetectHeaderAlignedBlock;
-  final PDFBlockWidgetBuilder? onDetectAlignedParagraph;
-  final PDFInlineWidgetBuilder? onDetectCommonText;
+  final PDFWidgetBuilder<Line>? onDetectImageBlock;
+  final PDFWidgetBuilder<Line>? onDetectInlineRichTextStyles;
+  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectHeaderBlock;
+  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectHeaderAlignedBlock;
+  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectAlignedParagraph;
+  final PDFWidgetBuilder<Line>? onDetectCommonText;
 
   @Deprecated('onDetectInlinesMarkdown is no longer used and will be removed on future releases')
   final CustomPDFWidget? onDetectInlinesMarkdown;
-  final PDFInlineWidgetBuilder? onDetectLink;
-  final PDFBlockWidgetBuilder? onDetectList;
-  final PDFBlockWidgetBuilder? onDetectCodeBlock;
-  final PDFBlockWidgetBuilder? onDetectBlockquote;
+  final PDFWidgetBuilder<Line>? onDetectLink;
+  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectList;
+  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectCodeBlock;
+  final PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectBlockquote;
   final pw.Font? codeBlockFont;
   final pw.TextStyle? codeBlockTextStyle;
   final PdfColor? codeBlockBackgroundColor;

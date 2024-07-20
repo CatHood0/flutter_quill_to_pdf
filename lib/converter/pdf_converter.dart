@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:html' as web;
 import 'dart:typed_data';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
+import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart' as ep;
 import 'package:pdf/pdf.dart' show PdfColor;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' as qpdf;
@@ -24,7 +25,7 @@ class PDFConverter {
   final List<qpdf.CustomConverter> customConverters;
 
   ///[CustomPDFWidget] allow devs to use builders to create custom widgets
-  final Map<qpdf.TypeWidget, qpdf.CustomWidget> customBuilders;
+  final List<qpdf.CustomWidget<Object, Object>> customBuilders;
 
   ///A simple [request] font when converter detect a font
   final Future<pw.Font> Function(String)? onRequestFont;
@@ -81,32 +82,32 @@ class PDFConverter {
   ///Customize the left/right divider color to blockquotes
   final PdfColor? blockQuoteDividerColor;
 
-  final qpdf.PDFBlockWidgetBuilder? onDetectImageBlock;
+  final qpdf.PDFWidgetBuilder<ep.Line>? onDetectImageBlock;
 
   ///Detect Rich text styles like: size, spacing, font family
-  final qpdf.PDFInlineWidgetBuilder? onDetectInlineRichTextStyles;
+  final qpdf.PDFWidgetBuilder<ep.Line>? onDetectInlineRichTextStyles;
 
   ///Detect simple: # header
-  final qpdf.PDFBlockWidgetBuilder? onDetectHeaderBlock;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectHeaderBlock;
 
-  final qpdf.PDFBlockWidgetBuilder? onDetectHeaderAlignedBlock;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectHeaderAlignedBlock;
 
-  final qpdf.PDFBlockWidgetBuilder? onDetectAlignedParagraph;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectAlignedParagraph;
 
-  final qpdf.PDFInlineWidgetBuilder? onDetectCommonText;
+  final qpdf.PDFWidgetBuilder<ep.Line>? onDetectCommonText;
 
   @Deprecated('onDetectInlinesMarkdown is no longer used and will be removed on future releases')
   final qpdf.CustomPDFWidget? onDetectInlinesMarkdown;
 
-  final qpdf.PDFInlineWidgetBuilder? onDetectLink;
+  final qpdf.PDFWidgetBuilder<ep.Line>? onDetectLink;
   //Detect markdown list: * bullet, 1. ordered, [x] check list (still has errors in render or in detect indent)
-  final qpdf.PDFBlockWidgetBuilder? onDetectList;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectList;
 
   /// Detect html code tag <pre>some code</pre> and it could be multiline
-  final qpdf.PDFBlockWidgetBuilder? onDetectCodeBlock;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectCodeBlock;
 
   /// Detect html blockquote tag <blockquote>text in blockquote</blockquote> and it could be multiline
-  final qpdf.PDFBlockWidgetBuilder? onDetectBlockquote;
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>>? onDetectBlockquote;
 
   ///If this [request] is null, list is [empty] or is list [null], will be used another by default
   final Future<List<pw.Font>?> Function(String)? onRequestFallbackFont;
@@ -118,7 +119,7 @@ class PDFConverter {
     required this.frontMatterDelta,
     required this.backMatterDelta,
     this.customConverters = const <qpdf.CustomConverter>[],
-    this.customBuilders = const <qpdf.TypeWidget, qpdf.CustomWidget>{},
+    this.customBuilders = const <qpdf.CustomWidget<Object, Object>>[],
     this.onRequestBoldFont,
     this.onRequestBoldItalicFont,
     this.onRequestFallbackFont,

@@ -1,43 +1,13 @@
 import 'package:flutter_quill_to_pdf/utils/typedefs.dart';
 
-enum TypeWidget {
-  header, // attribute: header, scope: block
-  alignedHeader, // attribute: header, align, scope: block
-  paragraph, // attribute: bold, italic, underline, strike, color, background, etc. Scope: inline
-  alignParagrah, // attribute: inline attrs,  align, scope: block
-  list, // attribute: list, scope: block
-  indentParagraph, // attribute: indent, scope: block
-  blockquote, // attribute: blockquote, scope: block
-  codeblock, // attribute: codeblock, scope: block
-  lineHeight,
-}
-
-enum Scope {
-  inline,
-  block,
-}
-
 /// [CustomWidget] is used to match lines with a formatting and
-///
-/// Params:
-///      [Scope] limite where must be on blockGenerator this class
-///      [PDFInlineWidgetBuilder] callback to create our custom pdf widgets (limited to inlines)
-///      [PDFBlockWidgetBuilder] callback to create ouw custom pdf widgets (limited to block)
-///
-/// The Scope limit where be usage [PDFInlineWidgetBuilder] or [PDFBlockWidgetBuilder]
-///
-class CustomWidget {
-  final Scope level;
-  final PDFInlineWidgetBuilder? inlineWidgetCallback;
-  final PDFBlockWidgetBuilder? blockWidgetCallback;
+class CustomWidget<T, B> {
+  final bool Function(T t) predicate;
+  final PDFWidgetBuilder<B>? widgetCallback;
   CustomWidget({
-    required this.level,
-    this.inlineWidgetCallback,
-    this.blockWidgetCallback,
-  }) : assert(
-          inlineWidgetCallback != null || blockWidgetCallback != null,
-          "Both PDFWidgetBuilders cannot be null. One of them must be defined",
-        );
+    required this.predicate,
+    required this.widgetCallback,
+  }); 
 }
 
 ///CustomConverter is used to match lines with a formatting using custom regex and
