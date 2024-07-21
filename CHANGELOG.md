@@ -1,3 +1,7 @@
+# 2.1.11
+
+* Chore: updated dependency `flutter_quill_delta_easy_parser` to fix some new line issues 
+
 # 2.1.1
 
 * Fix: `Image` embed `block` attributes are ignored

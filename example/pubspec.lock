@@ -399,10 +399,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_quill_delta_easy_parser
-      sha256: "0bc3a286caf0c2d4857fae038f74e4c616eadd8a5c86a157e4bb073ba167fdc8"
+      sha256: fb255ccf4fc79d70b248e14d243da27b9de5f7b52137c4aadcc6610cc53c322c
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.3"
+    version: "1.0.4"
   flutter_quill_delta_from_html:
     dependency: transitive
     description:
@@ -425,7 +425,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.1.1"
+    version: "2.1.11"
   flutter_test:
     dependency: "direct dev"
     description: flutter
