@@ -1,3 +1,8 @@
+# 2.1.2
+
+* Feat: Support for multilevel `List`
+* Fix: `dart:html` package doesn't let build project example
+
 # 2.1.11
 
 * Chore: updated dependency `flutter_quill_delta_easy_parser` to fix some new line issues 

@@ -179,7 +179,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       //verify if the data line is a embed
       if (paragraph.type == ParagraphType.embed && paragraph.lines.firstOrNull?.data is Map) {
         final Line line = paragraph.lines.first;
-        if ((line.data as Map<String,dynamic>)['video'] != null) {
+        if ((line.data as Map<String, dynamic>)['video'] != null) {
           contentPerPage.add(pw.RichText(text: pw.TextSpan(text: (line.data as Map<String, dynamic>)['video'])));
           continue;
         }
@@ -298,7 +298,39 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }
 
   void verifyBlock(Map<String, dynamic>? blockAttributes) {
-    blockAttributes?['list'] != null ? numberList++ : numberList = 0;
+    final int? indent = blockAttributes?['indent'];
+    if (blockAttributes?['list'] != null) {
+      if (indent != null) {
+        // validate if the last indent is different that the current one 
+        //  
+        // if it is, then must reload the specific index counter to avoid generate 
+        // a bad index for the current item
+        if (lastListIndent != indent) {
+          if (indent == 1) numberIndent1List = 0;
+          if (indent == 2) numberIndent2List = 0;
+          if (indent == 3) numberIndent3List = 0;
+          if (indent == 4) numberIndent4List = 0;
+          if (indent == 5) numberIndent5List = 0;
+        }
+        lastListIndent = indent;
+        if (indent == 1) numberIndent1List++;
+        if (indent == 2) numberIndent2List++;
+        if (indent == 3) numberIndent3List++;
+        if (indent == 4) numberIndent4List++;
+        if (indent == 5) numberIndent5List++;
+      } else {
+        lastListIndent = 0;
+        numberList++;
+      }
+    } else {
+      lastListIndent = 0;
+      numberList = 0;
+      numberIndent1List = 0;
+      numberIndent2List = 0;
+      numberIndent3List = 0;
+      numberIndent4List = 0;
+      numberIndent5List = 0;
+    }
     blockAttributes?['code-block'] != null ? numCodeLine++ : numCodeLine = 0;
   }
 

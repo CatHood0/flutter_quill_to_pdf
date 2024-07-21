@@ -6,6 +6,7 @@ import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
+import 'package:numerus/roman/roman.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart' show PdfColor, PdfColors;
 import 'package:pdf/widgets.dart' as pw;
@@ -23,7 +24,13 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   late final PdfColor defaultLinkColor;
   late final pw.TextStyle defaultTextStyle;
   //show default this on ordered list
+  int lastListIndent = 0;
   int numberList = 0;
+  int numberIndent1List = 0;
+  int numberIndent2List = 0;
+  int numberIndent3List = 0;
+  int numberIndent4List = 0;
+  int numberIndent5List = 0;
   int numCodeLine = 0;
   final Delta? frontM;
   final Delta? backM;
@@ -401,7 +408,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     pw.WidgetSpan? widgets = null;
     final double? spacing = (spansToWrap.firstOrNull?.style?.lineSpacing);
     if (listType != 'uncheked' && listType != 'checked') {
-      final String typeList = listType == 'ordered' ? '$numberList.' : '•';
+      final String typeList = listType == 'ordered' ? _getListIdentifier(indentLevel) : '•';
       //replace with bullet widget by error with fonts callback
       widgets = pw.WidgetSpan(
         child: pw.Container(
@@ -465,5 +472,33 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         ),
       ),
     );
+  }
+
+  String _getListIdentifier(int indentLevel) {
+    if (indentLevel > 0) indentLevel--;
+    if (indentLevel == 1 || indentLevel == 4) {
+      return '${_getLetterIdentifier(indentLevel == 1 ? numberIndent1List : numberIndent4List)}.';
+    }
+    if (indentLevel == 2 || indentLevel == 5) {
+      return '${(indentLevel == 2 ? numberIndent2List : numberIndent5List).toRomanNumeralString()}.';
+    }
+    return '${indentLevel == 0 ? numberList : numberIndent3List}.';
+  }
+
+  String _getLetterIdentifier(int number) {
+    const String letters = 'abcdefghijklmnopqrstuvwxyz';
+    const int base = letters.length - 1;
+    // set number to zero to let access to "a" index instead directly
+    // to "b" if item number is "1"
+    number--;
+    if(number < 0) number = 0;
+    String result = '';
+
+    while (number >= 0) {
+      result = letters[number % base] + result;
+      number = (number ~/ base) - 1;
+    }
+
+    return result;
   }
 }

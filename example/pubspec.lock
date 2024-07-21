@@ -425,7 +425,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.1.11"
+    version: "2.1.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -684,6 +684,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  numerus:
+    dependency: transitive
+    description:
+      name: numerus
+      sha256: "49cd96fe774dd1f574fc9117ed67e8a2b06a612f723e87ef3119456a7729d837"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   path:
     dependency: transitive
     description:

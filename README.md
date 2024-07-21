@@ -25,7 +25,7 @@ Some options that can be configured:
 
 ```yaml
 dependencies:
-  flutter_quill_to_pdf: ^2.1.11
+  flutter_quill_to_pdf: ^2.1.2
 ```
 
 ### Import package
@@ -126,7 +126,7 @@ await pdfConverter.createDocumentFile(path: filepath, isWeb: kIsWeb,...other opt
 - Embed image
 - Embed video (Just the URL of the Video will be pasted as a text)
 - Header
-- List
+- List (Multilevel List too)
 - Indent
 
 ## No supported
