@@ -1,3 +1,11 @@
+# 2.1.1
+
+* Fix: `Image` embed `block` attributes are ignored
+* Fix: bad indent multiplier
+* Fix: late initialization of 'widgets' variable on `getListBlock`
+* Fix: double is not subtype of 'String' on `css.dart`
+* Fix: line-height amount is incorrect
+
 # 2.1.0
 
 * Chore: now `onRequestFonts` are optional
