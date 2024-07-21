@@ -1,4 +1,4 @@
-# 2.1.2
+# 2.2.0
 
 * Feat: Support for multilevel `List`
 * Fix: `dart:html` package doesn't let build project example
