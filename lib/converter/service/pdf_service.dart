@@ -223,11 +223,11 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
             if ((line.data as Map)['image'] == null) continue;
             if (onDetectImageBlock != null) {
               final pw.Widget widget = onDetectImageBlock!.call(line, paragraph.blockAttributes);
-              spansToWrap.add(pw.WidgetSpan(child: widget));
+              inlineSpansToMerge.add(pw.WidgetSpan(child: widget));
               continue;
             }
             final pw.Widget widget = await getImageBlock.call(line);
-            spansToWrap.add(pw.WidgetSpan(child: widget));
+            inlineSpansToMerge.add(pw.WidgetSpan(child: widget));
             continue;
           } else if (line.attributes != null) {
             if (onDetectInlineRichTextStyles != null) {

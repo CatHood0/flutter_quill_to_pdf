@@ -1,6 +1,7 @@
 # 2.2.2
 
 * Fix: duplicate content
+* Fix: Paragraph with images are ignored
 
 # 2.2.1
 
