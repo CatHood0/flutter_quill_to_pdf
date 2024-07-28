@@ -196,54 +196,22 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         final Line line = paragraph.lines.elementAt(l);
         if (paragraph.type == ParagraphType.block || blockAttributes != null) {
           if ((line.data is Map)) {
-            if (spansToWrap.isNotEmpty && blockAttributes != null) {
-              // if found a paragraph with a embed between the lines, then must separate in two different lists
-              // and apply first the before content with the block attributes and after clean those before lines to avoid
-              // duplicate content
-              _applyBlockAttributes(spansToWrap, blockAttributes);
-              spansToWrap.clear();
-            }
-            if (onDetectImageBlock != null) {
-              contentPerPage.add(onDetectImageBlock!.call(line, paragraph.blockAttributes));
+            if ((line.data as Map)['video'] != null) {
+              spansToWrap.add(pw.TextSpan(text: '\n${(line.data as Map<String, dynamic>)['video']}\n'));
               continue;
             }
-            contentPerPage.add(await getImageBlock.call(line));
+            //avoid any another embed that is not a image
+            if ((line.data as Map)['image'] == null) continue;
+            if (onDetectImageBlock != null) {
+              final pw.Widget widget = onDetectImageBlock!.call(line, paragraph.blockAttributes);
+              spansToWrap.add(pw.WidgetSpan(child: widget));
+              continue;
+            }
+            final pw.Widget widget = await getImageBlock.call(line);
+            spansToWrap.add(pw.WidgetSpan(child: widget));
             continue;
           }
-          pw.TextStyle? style = null;
-          bool addFontSize = true;
-          final double? lineHeight = blockAttributes?['line-height'];
-          if (blockAttributes?['header'] != null) {
-            final int headerLevel = blockAttributes!['header'];
-            final double currentFontSize = headerLevel.resolveHeaderLevel();
-            style = defaultTextStyle.copyWith(fontSize: currentFontSize);
-            style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
-            addFontSize = false;
-          } else if (blockAttributes?['code-block'] != null) {
-            final pw.TextStyle defaultCodeBlockStyle = pw.TextStyle(
-              fontSize: 12,
-              font: codeBlockFont ?? pw.Font.courier(),
-              fontFallback: <pw.Font>[
-                pw.Font.courierBold(),
-                pw.Font.courierBoldOblique(),
-                pw.Font.courierOblique(),
-                pw.Font.symbol()
-              ],
-              letterSpacing: 1.5,
-              lineSpacing: 1.1,
-              wordSpacing: 0.5,
-              color: PdfColor.fromHex("#808080"),
-            );
-            style = codeBlockTextStyle ?? defaultCodeBlockStyle;
-            style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
-          } else if (blockAttributes?['blockquote'] != null) {
-            final pw.TextStyle defaultStyle = pw.TextStyle(color: PdfColor.fromHex("#808080"), lineSpacing: 6.5);
-            final pw.TextStyle blockquoteStyle = blockQuoteTextStyle ?? defaultStyle;
-            style = blockquoteStyle;
-            style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
-          } else {
-            style = defaultTextStyle.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
-          }
+          final (pw.TextStyle style, bool addFontSize) = _getInlineTextStyle(blockAttributes);
           if (line.attributes?['link'] != null) {
             if (onDetectLink != null) {
               spansToWrap.addAll(onDetectLink!.call(line, paragraph.blockAttributes));
@@ -257,7 +225,22 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           }
           spansToWrap.addAll(await getRichTextInlineStyles.call(line, style, false, addFontSize));
         } else if (paragraph.type == ParagraphType.inline || blockAttributes == null) {
-          if (line.attributes != null) {
+          if (line.data is Map) {
+            if ((line.data as Map)['video'] != null) {
+              inlineSpansToMerge.add(pw.TextSpan(text: '\n${(line.data as Map<String, dynamic>)['video']}\n'));
+              continue;
+            }
+            //avoid any another embed that is not a image
+            if ((line.data as Map)['image'] == null) continue;
+            if (onDetectImageBlock != null) {
+              final pw.Widget widget = onDetectImageBlock!.call(line, paragraph.blockAttributes);
+              spansToWrap.add(pw.WidgetSpan(child: widget));
+              continue;
+            }
+            final pw.Widget widget = await getImageBlock.call(line);
+            spansToWrap.add(pw.WidgetSpan(child: widget));
+            continue;
+          } else if (line.attributes != null) {
             if (onDetectInlineRichTextStyles != null) {
               inlineSpansToMerge.addAll(onDetectInlineRichTextStyles!.call(line, paragraph.blockAttributes));
             }
@@ -278,32 +261,75 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           blockAttributes,
         );
       }
-      if (blockAttributes == null && inlineSpansToMerge.isNotEmpty) {
-        final double spacing = (inlineSpansToMerge.firstOrNull?.style?.lineSpacing ?? 1.0);
-        contentPerPage.add(
-          pw.Padding(
-            padding: pw.EdgeInsets.only(bottom: spacing.resolvePaddingByLineHeight()),
-            child: pw.RichText(
-              softWrap: true,
-              overflow: pw.TextOverflow.span,
-              text: pw.TextSpan(
-                children: inlineSpansToMerge,
-              ),
-            ),
-          ),
-        );
-      }
+      _applyInlineParagraph(contentPerPage, inlineSpansToMerge);
     }
     return contentPerPage;
+  }
+
+  void _applyInlineParagraph(List<pw.Widget> contentPerPage, List<pw.InlineSpan> inlineSpansToMerge) {
+    if (inlineSpansToMerge.isEmpty) return;
+    final double spacing = (inlineSpansToMerge.firstOrNull?.style?.lineSpacing ?? 1.0);
+    contentPerPage.add(
+      pw.Padding(
+        padding: pw.EdgeInsets.only(bottom: spacing.resolvePaddingByLineHeight()),
+        child: pw.RichText(
+          softWrap: true,
+          overflow: pw.TextOverflow.span,
+          text: pw.TextSpan(
+            children: inlineSpansToMerge,
+          ),
+        ),
+      ),
+    );
+  }
+
+  (pw.TextStyle, bool) _getInlineTextStyle(Map<String, dynamic>? blockAttributes) {
+    bool addFontSize = true;
+    final double? lineHeight = blockAttributes?['line-height'];
+    if (blockAttributes?['header'] != null) {
+      final int headerLevel = blockAttributes!['header'];
+      final double currentFontSize = headerLevel.resolveHeaderLevel();
+      pw.TextStyle style = defaultTextStyle.copyWith(fontSize: currentFontSize);
+      style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+      addFontSize = false;
+      return (style, addFontSize);
+    } else if (blockAttributes?['code-block'] != null) {
+      final pw.TextStyle defaultCodeBlockStyle = pw.TextStyle(
+        fontSize: 12,
+        font: pw.Font.courier(),
+        fontFallback: <pw.Font>[
+          pw.Font.courierBold(),
+          pw.Font.courierBoldOblique(),
+          pw.Font.courierOblique(),
+          pw.Font.symbol()
+        ],
+        letterSpacing: 1.5,
+        lineSpacing: 1.1,
+        wordSpacing: 0.5,
+        color: PdfColor.fromHex("#808080"),
+      );
+      pw.TextStyle style = defaultCodeBlockStyle;
+      style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+      return (style, addFontSize);
+    } else if (blockAttributes?['blockquote'] != null) {
+      final pw.TextStyle defaultStyle = pw.TextStyle(color: PdfColor.fromHex("#808080"), lineSpacing: 6.5);
+      final pw.TextStyle blockquoteStyle = defaultStyle;
+      pw.TextStyle style = blockquoteStyle;
+      style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+      return (style, addFontSize);
+    } else {
+      final pw.TextStyle style = defaultTextStyle.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+      return (style, addFontSize);
+    }
   }
 
   void verifyBlock(Map<String, dynamic>? blockAttributes) {
     final int? indent = blockAttributes?['indent'];
     if (blockAttributes?['list'] != null) {
       if (indent != null) {
-        // validate if the last indent is different that the current one 
-        //  
-        // if it is, then must reload the specific index counter to avoid generate 
+        // validate if the last indent is different that the current one
+        //
+        // if it is, then must reload the specific index counter to avoid generate
         // a bad index for the current item
         if (lastListIndent != indent) {
           if (indent == 1) numberIndent1List = 0;
