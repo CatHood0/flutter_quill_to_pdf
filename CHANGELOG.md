@@ -1,3 +1,7 @@
+# 2.2.1
+
+* Fix: if there are images together a `Paragraph` these will be displayed badly on the `PDF`
+
 # 2.2.0
 
 * Feat: Support for multilevel `List`
