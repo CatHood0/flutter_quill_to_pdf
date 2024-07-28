@@ -1,3 +1,7 @@
+# 2.2.2
+
+* Fix: duplicate content
+
 # 2.2.1
 
 * Fix: if there are images together a `Paragraph` these will be displayed badly on the `PDF`

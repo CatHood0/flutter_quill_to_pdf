@@ -25,7 +25,7 @@ Some options that can be configured:
 
 ```yaml
 dependencies:
-  flutter_quill_to_pdf: ^2.2.1
+  flutter_quill_to_pdf: ^2.2.2
 ```
 
 ### Import package

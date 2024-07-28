@@ -161,19 +161,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       //verify if paragraph is just a simple new line
       if (paragraph.lines.length == 1 && paragraph.lines.firstOrNull?.data == '\n' && blockAttributes == null) {
         final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(paragraph.lines.first, defaultTextStyle);
-        final double spacing = (spans.firstOrNull?.style?.lineSpacing ?? 1.0);
-        contentPerPage.add(
-          pw.Padding(
-            padding: pw.EdgeInsets.symmetric(vertical: spacing.resolvePaddingByLineHeight()),
-            child: pw.RichText(
-              softWrap: true,
-              overflow: pw.TextOverflow.span,
-              text: pw.TextSpan(
-                children: spans,
-              ),
-            ),
-          ),
-        );
+        _applyInlineParagraph(contentPerPage, spans);
         continue;
       }
       //verify if the data line is a embed
@@ -222,6 +210,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           }
           if (onDetectInlineRichTextStyles != null) {
             spansToWrap.addAll(onDetectInlineRichTextStyles!.call(line, paragraph.blockAttributes));
+            continue;
           }
           spansToWrap.addAll(await getRichTextInlineStyles.call(line, style, false, addFontSize));
         } else if (paragraph.type == ParagraphType.inline || blockAttributes == null) {
@@ -243,12 +232,14 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           } else if (line.attributes != null) {
             if (onDetectInlineRichTextStyles != null) {
               inlineSpansToMerge.addAll(onDetectInlineRichTextStyles!.call(line, paragraph.blockAttributes));
+              continue;
             }
             inlineSpansToMerge.addAll(await getRichTextInlineStyles.call(line, defaultTextStyle));
             continue;
           }
           if (onDetectCommonText != null) {
             inlineSpansToMerge.addAll(onDetectCommonText!.call(line, paragraph.blockAttributes));
+            continue;
           }
           //if it doesn't have attrs then just put the content
           inlineSpansToMerge.add(pw.TextSpan(text: line.data as String, style: defaultTextStyle));
