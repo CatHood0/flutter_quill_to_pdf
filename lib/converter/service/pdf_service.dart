@@ -177,7 +177,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           contentPerPage.add(onDetectImageBlock!.call(line, paragraph.blockAttributes));
           continue;
         }
-        contentPerPage.add(await getImageBlock.call(line));
+        contentPerPage.add(await getImageBlock.call(line, (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign));
         continue;
       }
       for (int l = 0; l < paragraph.lines.length; l++) {
@@ -195,7 +195,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               spansToWrap.add(pw.WidgetSpan(child: widget));
               continue;
             }
-            final pw.Widget widget = await getImageBlock.call(line);
+            final pw.Widget widget =
+                await getImageBlock.call(line, (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign);
             spansToWrap.add(pw.WidgetSpan(child: widget));
             continue;
           }
@@ -226,7 +227,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               inlineSpansToMerge.add(pw.WidgetSpan(child: widget));
               continue;
             }
-            final pw.Widget widget = await getImageBlock.call(line);
+            final pw.Widget widget =
+                await getImageBlock.call(line, (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign);
             inlineSpansToMerge.add(pw.WidgetSpan(child: widget));
             continue;
           } else if (line.attributes != null) {
