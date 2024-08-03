@@ -102,6 +102,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   //Network image is not supported yet
+  //TODO: implement validation for base64 parsing
   @override
   Future<pw.Widget> getImageBlock(Line line, [pw.Alignment? alignment]) async {
     double? width = null;
@@ -176,8 +177,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final String content = line.data as String;
     final double? lineSpacing = spacing?.resolveLineHeight();
     final pw.Font font = await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? pw.Font.helvetica();
-    final List<pw.Font> fonts =
-        await onRequestFallbacks?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? <pw.Font>[];
+    final List<pw.Font> fonts = await onRequestFallbacks?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? <pw.Font>[];
     // Give just the necessary fallbacks for the founded fontFamily
     final pw.TextStyle decided_style = style?.copyWith(
           font: font,
@@ -303,8 +303,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final String href = line.attributes!['link'];
     final String hrefContent = line.data as String;
     final pw.Font font = await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? pw.Font.helvetica();
-    final List<pw.Font> fonts =
-        await onRequestFallbacks?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? <pw.Font>[];
+    final List<pw.Font> fonts = await onRequestFallbacks?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? <pw.Font>[];
     spans.add(
       pw.TextSpan(
         annotation: pw.AnnotationLink(href),
@@ -405,56 +404,36 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     int indentLevel, [
     pw.TextStyle? style,
   ]) async {
-    pw.WidgetSpan? widgets = null;
+    pw.InlineSpan? widgets = null;
     final double? spacing = (spansToWrap.firstOrNull?.style?.lineSpacing);
     if (listType != 'uncheked' && listType != 'checked') {
       final String typeList = listType == 'ordered' ? _getListIdentifier(indentLevel) : '•';
       //replace with bullet widget by error with fonts callback
-      widgets = pw.WidgetSpan(
-        child: pw.Container(
-          padding: pw.EdgeInsets.only(
-              left: indentLevel > 0 ? indentLevel * 12.5 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
-          child: pw.RichText(
-            softWrap: true,
-            textAlign: align.resolvePdfTextAlign,
-            overflow: pw.TextOverflow.span,
-            text: pw.TextSpan(
-              text: '$typeList ',
-              children: <pw.InlineSpan>[
-                pw.TextSpan(children: spansToWrap),
-              ],
-            ),
-          ),
-        ),
+      widgets = pw.TextSpan(
+        text: '$typeList ',
+        style: defaultTextStyle,
+        children: <pw.InlineSpan>[
+          pw.TextSpan(children: spansToWrap),
+        ],
       );
     }
     if (listType == 'checked' || listType == 'unchecked') {
-      widgets = pw.WidgetSpan(
-        child: pw.Container(
-          padding: pw.EdgeInsets.only(
-              left: indentLevel > 0 ? indentLevel * 12.5 : 15, bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5),
-          child: pw.Row(
-            children: <pw.Widget>[
-              pw.Checkbox(
-                activeColor: PdfColors.blue400,
-                name: 'check ${Random.secure().nextInt(9999999) + 50}',
-                value: listType == 'checked' ? true : false,
-              ),
-              pw.Expanded(
-                child: pw.RichText(
-                  textAlign: align.resolvePdfTextAlign,
-                  softWrap: true,
-                  overflow: pw.TextOverflow.span,
-                  text: pw.TextSpan(
-                    children: <pw.InlineSpan>[
-                      pw.TextSpan(children: <pw.InlineSpan>[...spansToWrap])
-                    ],
-                  ),
-                ),
-              ),
+      widgets = pw.TextSpan(
+        children: <pw.InlineSpan>[
+          pw.WidgetSpan(
+            child: pw.Checkbox(
+              activeColor: PdfColors.blue400,
+              name: 'check ${Random.secure().nextInt(9999999) + 50}',
+              value: listType == 'checked' ? true : false,
+            ),
+          ),
+          pw.TextSpan(
+            children: <pw.InlineSpan>[
+              const pw.TextSpan(text: ' '),
+              pw.TextSpan(children: <pw.InlineSpan>[...spansToWrap])
             ],
           ),
-        ),
+        ],
       );
     }
     return pw.Container(
@@ -463,9 +442,11 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5,
       ),
       child: pw.RichText(
+        textAlign: align.resolvePdfTextAlign,
         softWrap: true,
         overflow: pw.TextOverflow.span,
         text: pw.TextSpan(
+          style: defaultTextStyle,
           children: <pw.InlineSpan>[
             widgets!,
           ],
@@ -491,7 +472,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     // set number to zero to let access to "a" index instead directly
     // to "b" if item number is "1"
     number--;
-    if(number < 0) number = 0;
+    if (number < 0) number = 0;
     String result = '';
 
     while (number >= 0) {
