@@ -1,3 +1,8 @@
+# 2.2.3
+
+* Fix: `List` block doesn't span to the next page if needed
+* Fix: `Image` block doesn't appears with any `Alignment`
+
 # 2.2.2
 
 * Fix: duplicate content

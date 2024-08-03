@@ -17,15 +17,15 @@ Some options that can be configured:
 <details>
     <summary>Tap to show/hide screenshots</summary>
     <br>
-<img src="./example/assets/delta_to_convert.jpg" width="250" alt="Delta in editor">
-<img src="./example/assets/delta_converted.jpg" width="350" alt="Delta converted in PDF">
+<img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_to_convert.jpg" width="250" alt="Delta in editor">
+<img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_converted.jpg" width="350" alt="Delta converted in PDF">
 </details>
 
 ### Add dependencies
 
 ```yaml
 dependencies:
-  flutter_quill_to_pdf: ^2.2.2
+  flutter_quill_to_pdf: ^2.2.3
 ```
 
 ### Import package
@@ -123,7 +123,7 @@ await pdfConverter.createDocumentFile(path: filepath, isWeb: kIsWeb,...other opt
 - Code block
 - Blockquote
 - Align
-- Embed image
+- Embed image (base 64 doesn't work yet)
 - Embed video (Just the URL of the Video will be pasted as a text)
 - Header
 - List (Multilevel List too)
