@@ -1,3 +1,5 @@
+import 'package:pdf/widgets.dart';
+
 ///Converter is a parent that's [provides the essential rules]
 ///for generate and create a document pdf file for that project
 sealed class Converter<Doc, Type> {
@@ -13,6 +15,12 @@ sealed class Converter<Doc, Type> {
 
   ///This functions generates the [document]
   Future<Type> generateDoc();
+
+  ///This functions generates the [document]
+  Future<Widget> generateWidget({
+    double? maxWidth,
+    double? maxHeight,
+  });
 }
 
 ///Use this class if you want to create your own PDF configurator implementation instead Converter

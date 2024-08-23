@@ -170,6 +170,69 @@ class PDFConverter {
     ];
   }
 
+  // create a pw.Widget that can can be used to draw on a PDF
+  Future<pw.Widget?> generateWidget({
+    qpdf.DeltaAttributesOptions? deltaOptionalAttr,
+    double? maxWidth,
+    double? maxHeight,
+    bool overrideAttributesPassedByUser = false,
+    void Function(dynamic error)? onException,
+    bool shouldProcessDeltas = true,
+  }) async {
+    deltaOptionalAttr ??= qpdf.DeltaAttributesOptions.common();
+    final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
+      params: params,
+      fonts: globalFontsFallbacks,
+      onRequestBoldFont: onRequestBoldFont,
+      onRequestBothFont: onRequestBoldItalicFont,
+      customTheme: themeData,
+      customBuilders: customBuilders,
+      blockQuoteBackgroundColor: blockQuoteBackgroundColor,
+      blockQuoteDividerColor: blockQuoteDividerColor,
+      codeBlockBackgroundColor: codeBlockBackgroundColor,
+      codeBlockFont: codeBlockFont,
+      codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
+      codeBlockTextStyle: codeBlockTextStyle,
+      blockQuoteTextStyle: blockQuoteTextStyle,
+      onRequestFallbacks: onRequestFallbackFont,
+      onDetectAlignedParagraph: onDetectAlignedParagraph,
+      onDetectCommonText: onDetectCommonText,
+      onDetectBlockquote: onDetectBlockquote,
+      onDetectCodeBlock: onDetectCodeBlock,
+      blockQuotePaddingLeft: blockQuotePaddingLeft,
+      blockQuotePaddingRight: blockQuotePaddingRight,
+      blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
+      onDetectHeaderBlock: onDetectHeaderBlock,
+      onDetectImageBlock: onDetectImageBlock,
+      onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
+      onDetectInlinesMarkdown: onDetectInlinesMarkdown,
+      onDetectLink: onDetectLink,
+      onDetectList: onDetectList,
+      onRequestFont: onRequestFont,
+      backM: !shouldProcessDeltas
+          ? backMatterDelta
+          : processDelta(backMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
+      frontM: !shouldProcessDeltas
+          ? frontMatterDelta
+          : processDelta(frontMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
+      onRequestItalicFont: onRequestItalicFont,
+      customConverters: customConverters,
+      document: !shouldProcessDeltas
+          ? document
+          : processDelta(
+              document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
+    );
+    try {
+      return await converter.generateWidget(
+          maxWidth: maxWidth, maxHeight: maxHeight);
+    } catch (e) {
+      onException?.call(e);
+      rethrow;
+    }
+  }
+
   ///Creates the PDF document an return this one
   Future<pw.Document?> createDocument({
     qpdf.DeltaAttributesOptions? deltaOptionalAttr,
