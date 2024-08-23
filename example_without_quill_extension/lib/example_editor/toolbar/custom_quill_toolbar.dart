@@ -1,7 +1,6 @@
 import 'package:example/example_editor/buttons/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 // import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 
@@ -196,7 +195,7 @@ class CustomQuillToolbar extends StatelessWidget {
       controller: controller,
       axis: Axis.horizontal,
       headerStyleType: HeaderStyleType.buttons,
-      embedButtons: FlutterQuillEmbeds.toolbarButtons(videoButtonOptions: null),
+      // embedButtons: FlutterQuillEmbeds.toolbarButtons(videoButtonOptions: null),
       toolbarSize: toolbarSize,
       fontFamilyValues: fontFamilies,
       multiRowsDisplay: false,

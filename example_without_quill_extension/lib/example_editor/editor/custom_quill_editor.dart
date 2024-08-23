@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 // import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
@@ -32,9 +31,9 @@ class CustomQuillEditor extends HookWidget {
     return QuillEditor.basic(
       focusNode: node,
       scrollController: scrollController,
+      controller: controller,
       configurations: QuillEditorConfigurations(
-        embedBuilders: FlutterQuillEmbeds.editorBuilders(),
-        controller: controller,
+        // embedBuilders: FlutterQuillEmbeds.editorBuilders(),
         textCapitalization: TextCapitalization.sentences,
         detectWordBoundary: true,
         placeholder: 'Write something',
