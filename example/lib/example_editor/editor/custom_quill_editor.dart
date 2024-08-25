@@ -74,7 +74,8 @@ class CustomQuillEditor extends HookWidget {
           }
           if (attribute.key.equals('header')) {
             return TextStyle(
-              fontSize: (attribute.value as num).resolveHeaderLevel().toDouble(),
+              fontSize:
+                  (attribute.value as num).resolveHeaderLevel().toDouble(),
               color: Colors.black,
             );
           }
@@ -82,18 +83,19 @@ class CustomQuillEditor extends HookWidget {
           return TextStyle(fontFamily: defaultFontFamily, height: 1.0);
         },
         customStyles: DefaultStyles(
-          h1: const DefaultTextBlockStyle(TextStyle(), VerticalSpacing(10, 1),
-              VerticalSpacing(5, 0), BoxDecoration()),
-          h2: const DefaultTextBlockStyle(TextStyle(), VerticalSpacing(7, 1),
-              VerticalSpacing(5, 0), BoxDecoration()),
-          h3: const DefaultTextBlockStyle(TextStyle(), VerticalSpacing(4, 1),
-              VerticalSpacing(5, 0), BoxDecoration()),
+          h1: const DefaultTextBlockStyle(TextStyle(), HorizontalSpacing(0, 0),
+              VerticalSpacing(10, 1), VerticalSpacing(5, 0), BoxDecoration()),
+          h2: const DefaultTextBlockStyle(TextStyle(), HorizontalSpacing(0, 0),
+              VerticalSpacing(7, 1), VerticalSpacing(5, 0), BoxDecoration()),
+          h3: const DefaultTextBlockStyle(TextStyle(), HorizontalSpacing(0, 0),
+              VerticalSpacing(4, 1), VerticalSpacing(5, 0), BoxDecoration()),
           indent: DefaultTextBlockStyle(
             TextStyle(
                 color: Theme.of(context).textTheme.displayMedium!.color,
                 fontSize: 16,
                 fontFamily: defaultFontFamily,
                 height: 1.15),
+            const HorizontalSpacing(0, 0),
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(),
@@ -104,6 +106,7 @@ class CustomQuillEditor extends HookWidget {
                 fontSize: 16,
                 fontFamily: defaultFontFamily,
                 height: 1.15),
+            const HorizontalSpacing(0, 0),
             const VerticalSpacing(5, 0),
             const VerticalSpacing(0, 0),
             null,
@@ -115,6 +118,7 @@ class CustomQuillEditor extends HookWidget {
                 fontSize: 16,
                 height: 1.15,
                 decoration: TextDecoration.none),
+            const HorizontalSpacing(0, 0),
             const VerticalSpacing(0, 0),
             const VerticalSpacing(0, 0),
             null,
@@ -124,6 +128,7 @@ class CustomQuillEditor extends HookWidget {
                   fontSize: 11,
                   fontFamily: 'monospace',
                   color: Color.fromARGB(255, 117, 117, 117)),
+              const HorizontalSpacing(0, 0),
               const VerticalSpacing(5, 5),
               const VerticalSpacing(5, 5),
               BoxDecoration(
@@ -135,6 +140,7 @@ class CustomQuillEditor extends HookWidget {
                 height: 1.15,
                 fontFamily: defaultFontFamily,
                 color: Colors.grey),
+            const HorizontalSpacing(0, 0),
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(
@@ -153,6 +159,7 @@ class CustomQuillEditor extends HookWidget {
                 height: 1.15,
                 fontSize: 16,
                 fontFamily: defaultFontFamily),
+            const HorizontalSpacing(0, 0),
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(),
@@ -163,6 +170,7 @@ class CustomQuillEditor extends HookWidget {
                 height: 1.15,
                 fontSize: 16,
                 fontFamily: defaultFontFamily),
+            const HorizontalSpacing(0, 0),
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(),

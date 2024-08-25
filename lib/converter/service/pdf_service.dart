@@ -123,6 +123,25 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }
 
   @override
+  Future<pw.Widget> generateWidget({
+    double? maxWidth,
+    double? maxHeight,
+  }) async {
+    final Document? document = RichTextParser().parseDelta(this.document);
+    final List<pw.Widget> widgets = await blockGenerators(document!);
+    final pw.Widget content = pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: widgets,
+    );
+    pw.Container widget = pw.Container(
+      width: maxWidth,
+      height: maxHeight,
+      child: content,
+    );
+    return widget;
+  }
+
+  @override
   Future<List<Map<String, dynamic>>> generatePages({required List<Delta> documents}) async {
     LinkedHashSet<Map<String, dynamic>> docMap = LinkedHashSet<Map<String, dynamic>>();
     int i = 0;
