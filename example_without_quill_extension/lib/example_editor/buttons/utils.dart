@@ -1,4 +1,9 @@
-const List<String> default_editor_spacing = <String>['1.0', '1.15', '1.5', '2.0'];
+const List<String> default_editor_spacing = <String>[
+  '1.0',
+  '1.15',
+  '1.5',
+  '2.0'
+];
 
 const Map<String, String> fontSizes = <String, String>{
   "Tiny": "small",

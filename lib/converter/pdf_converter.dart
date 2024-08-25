@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
-import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart' as ep;
+import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart'
+    as ep;
 import 'package:pdf/pdf.dart' show PdfColor;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' as qpdf;
@@ -68,30 +69,35 @@ class PDFConverter {
 
   final qpdf.PDFWidgetBuilder<ep.Line, pw.Widget>? onDetectImageBlock;
 
-  /// When a rich text styles are detected, this builder is called 
-  final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectInlineRichTextStyles;
+  /// When a rich text styles are detected, this builder is called
+  final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>?
+      onDetectInlineRichTextStyles;
 
-  /// When a header block is detected, this builder is called 
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectHeaderBlock;
+  /// When a header block is detected, this builder is called
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>?
+      onDetectHeaderBlock;
 
-  /// When a aligned block is detected, this builder is called 
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectAlignedParagraph;
+  /// When a aligned block is detected, this builder is called
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>?
+      onDetectAlignedParagraph;
 
-  /// When a non rich text line is detected, this builder is called 
+  /// When a non rich text line is detected, this builder is called
   /// Tipically this happens when the insertion has not inline attributes
   final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectCommonText;
 
-  /// When a link line is detected, this builder is called 
+  /// When a link line is detected, this builder is called
   final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectLink;
 
-  /// When a list block is detected, this builder is called 
+  /// When a list block is detected, this builder is called
   final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectList;
 
-  /// When a code block is detected, this builder is called 
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectCodeBlock;
+  /// When a code block is detected, this builder is called
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>?
+      onDetectCodeBlock;
 
-  /// When a block quote is detected, this builder is called 
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectBlockquote;
+  /// When a block quote is detected, this builder is called
+  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>?
+      onDetectBlockquote;
 
   final Future<List<pw.Font>?> Function(String)? onRequestFallbackFont;
   late final List<pw.Font> globalFontsFallbacks;
@@ -130,10 +136,14 @@ class PDFConverter {
     this.onDetectList,
   })  : assert(pageFormat.height > 30, 'Page size height isn\'t valid'),
         assert(pageFormat.width > 30, 'Page size width isn\'t valid'),
-        assert(pageFormat.marginBottom >= 0.0, 'Margin to bottom with value ${pageFormat.marginBottom}'),
-        assert(pageFormat.marginLeft >= 0.0, 'Margin to left with value ${pageFormat.marginLeft}'),
-        assert(pageFormat.marginRight >= 0.0, 'Margin to right with value ${pageFormat.marginRight}'),
-        assert(pageFormat.marginTop >= 0.0, 'Margin to tp with value ${pageFormat.marginTop}') {
+        assert(pageFormat.marginBottom >= 0.0,
+            'Margin to bottom with value ${pageFormat.marginBottom}'),
+        assert(pageFormat.marginLeft >= 0.0,
+            'Margin to left with value ${pageFormat.marginLeft}'),
+        assert(pageFormat.marginRight >= 0.0,
+            'Margin to right with value ${pageFormat.marginRight}'),
+        assert(pageFormat.marginTop >= 0.0,
+            'Margin to tp with value ${pageFormat.marginTop}') {
     globalFontsFallbacks = <pw.Font>[
       ...fallbacks,
       pw.Font.helvetica(),
@@ -250,13 +260,17 @@ class PDFConverter {
       onRequestFont: onRequestFont,
       backM: !shouldProcessDeltas
           ? backMatterDelta
-          : processDelta(backMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
+          : processDelta(backMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
       frontM: !shouldProcessDeltas
           ? frontMatterDelta
-          : processDelta(frontMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
+          : processDelta(frontMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
       onRequestItalicFont: onRequestItalicFont,
-      document:
-          !shouldProcessDeltas ? document : processDelta(document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
+      document: !shouldProcessDeltas
+          ? document
+          : processDelta(
+              document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
     );
     try {
       return await converter.generateDoc();
@@ -311,13 +325,17 @@ class PDFConverter {
       onDetectList: onDetectList,
       backM: !shouldProcessDeltas
           ? backMatterDelta
-          : processDelta(backMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
+          : processDelta(backMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
       frontM: !shouldProcessDeltas
           ? frontMatterDelta
-          : processDelta(frontMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
+          : processDelta(frontMatterDelta, deltaOptionalAttr,
+              overrideAttributesPassedByUser),
       onRequestItalicFont: onRequestItalicFont,
-      document:
-          !shouldProcessDeltas ? document : processDelta(document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
+      document: !shouldProcessDeltas
+          ? document
+          : processDelta(
+              document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
     );
     try {
       final pw.Document doc = await converter.generateDoc();
@@ -325,8 +343,10 @@ class PDFConverter {
       if (isWeb) {
         List<int> fileInts = List<int>.from(bytes);
         web.AnchorElement()
-          ..href = "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}"
-          ..setAttribute("download", "${DateTime.now().millisecondsSinceEpoch}.pdf")
+          ..href =
+              "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}"
+          ..setAttribute(
+              "download", "${DateTime.now().millisecondsSinceEpoch}.pdf")
           ..click();
         onSucessWrite?.call('');
         return;
@@ -338,12 +358,15 @@ class PDFConverter {
     }
   }
 
-  static Delta? processDelta(Delta? delta, qpdf.DeltaAttributesOptions options, bool overrideAttributesPassedByUser) {
+  static Delta? processDelta(Delta? delta, qpdf.DeltaAttributesOptions options,
+      bool overrideAttributesPassedByUser) {
     if (delta == null) return null;
     if (delta.isEmpty) return delta;
     final String json = qpdf
         .applyAttributesIfNeeded(
-            json: jsonEncode(delta.toJson()), attr: options, overrideAttributes: overrideAttributesPassedByUser)
+            json: jsonEncode(delta.toJson()),
+            attr: options,
+            overrideAttributes: overrideAttributesPassedByUser)
         .fixCommonErrorInsertsInRawDelta
         .withBrackets;
     return Delta.fromJson(jsonDecode(json));

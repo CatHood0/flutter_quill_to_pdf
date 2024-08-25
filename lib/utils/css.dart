@@ -16,7 +16,7 @@
 /// ```
 Map<String, dynamic> parseCssStyles(String? style, String align) {
   Map<String, dynamic> attributes = <String, dynamic>{};
-  if(style == null || style.isEmpty) return attributes;
+  if (style == null || style.isEmpty) return attributes;
 
   final List<String> styles = style.split(';');
   for (String style in styles) {

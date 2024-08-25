@@ -40,9 +40,11 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final Future<pw.Font> Function(String fontFamily)? onRequestItalicFont;
   final Future<pw.Font> Function(String fontFamily)? onRequestBothFont;
   final PDFWidgetBuilder<Line, pw.Widget>? onDetectImageBlock;
-  final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectInlineRichTextStyles;
+  final PDFWidgetBuilder<Line, List<pw.InlineSpan>>?
+      onDetectInlineRichTextStyles;
   final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectHeaderBlock;
-  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectAlignedParagraph;
+  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>?
+      onDetectAlignedParagraph;
   final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectCommonText;
 
   final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectLink;
@@ -60,7 +62,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final double? blockQuotePaddingLeft;
   final double? blockQuotePaddingRight;
   final Future<List<pw.Font>?> Function(String fontFamily)? onRequestFallbacks;
-  final int defaultFontSize = Constant.DEFAULT_FONT_SIZE; //avoid spans without font sizes not appears in the document
+  final int defaultFontSize = Constant
+      .DEFAULT_FONT_SIZE; //avoid spans without font sizes not appears in the document
   late final double pageWidth, pageHeight;
   PdfConfigurator({
     this.onRequestBoldFont,
@@ -102,7 +105,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     double? width = null;
     double? height = null;
     final String path = (line.data as Map<String, dynamic>)['image'];
-    final Map<String, dynamic> attributes = parseCssStyles(line.attributes?['style'] ?? '', 'left');
+    final Map<String, dynamic> attributes =
+        parseCssStyles(line.attributes?['style'] ?? '', 'left');
     if (attributes.isNotEmpty) {
       width = attributes['width'] ?? pageWidth;
       height = attributes['height'];
@@ -133,7 +137,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       text: pw.WidgetSpan(
         child: pw.Container(
           alignment: alignment,
-          constraints: height == null ? const pw.BoxConstraints(maxHeight: 450) : null,
+          constraints:
+              height == null ? const pw.BoxConstraints(maxHeight: 450) : null,
           child: pw.Image(
             pw.MemoryImage((await file.readAsBytes())),
             dpi: 230,
@@ -147,10 +152,13 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
 
   @override
   Future<List<pw.InlineSpan>> getRichTextInlineStyles(Line line,
-      [pw.TextStyle? style, bool returnContentIfNeedIt = false, bool addFontSize = true]) async {
+      [pw.TextStyle? style,
+      bool returnContentIfNeedIt = false,
+      bool addFontSize = true]) async {
     final List<pw.InlineSpan> spans = <pw.InlineSpan>[];
     final PdfColor? textColor = pdfColorString(line.attributes?['color']);
-    final PdfColor? backgroundTextColor = pdfColorString(line.attributes?['background']);
+    final PdfColor? backgroundTextColor =
+        pdfColorString(line.attributes?['background']);
     final double? spacing = line.attributes?['line-height'];
     final String? fontFamily = line.attributes?['font'];
     final String? fontSizeMatch = line.attributes?['size'];
@@ -159,7 +167,9 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       if (fontSizeMatch == 'small') fontSizeHelper = 8;
       if (fontSizeMatch == 'large') fontSizeHelper = 15.5;
       if (fontSizeMatch == 'huge') fontSizeHelper = 18.5;
-      if (fontSizeMatch != 'huge' && fontSizeMatch != 'large' && fontSizeMatch != 'small') {
+      if (fontSizeMatch != 'huge' &&
+          fontSizeMatch != 'large' &&
+          fontSizeMatch != 'small') {
         fontSizeHelper = double.parse(fontSizeMatch);
       }
     }
@@ -170,8 +180,12 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final double? fontSize = !addFontSize ? null : fontSizeHelper;
     final String content = line.data as String;
     final double? lineSpacing = spacing?.resolveLineHeight();
-    final pw.Font font = await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? pw.Font.helvetica();
-    final List<pw.Font> fonts = await onRequestFallbacks?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? <pw.Font>[];
+    final pw.Font font =
+        await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ??
+            pw.Font.helvetica();
+    final List<pw.Font> fonts = await onRequestFallbacks
+            ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ??
+        <pw.Font>[];
     // Give just the necessary fallbacks for the founded fontFamily
     final pw.TextStyle decided_style = style?.copyWith(
           font: font,
@@ -183,11 +197,15 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           ]),
           decorationStyle: pw.TextDecorationStyle.solid,
           decorationColor: textColor ?? backgroundTextColor,
-          fontBold: await onRequestBoldFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontItalic: await onRequestItalicFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontBoldItalic: await onRequestBothFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBold: await onRequestBoldFont
+              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontItalic: await onRequestItalicFont
+              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBoldItalic: await onRequestBothFont
+              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
           fontFallback: fonts,
-          fontSize: !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
+          fontSize:
+              !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
           lineSpacing: lineSpacing,
           color: textColor,
           background: pw.BoxDecoration(color: backgroundTextColor),
@@ -200,25 +218,33 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           ]),
           decorationStyle: pw.TextDecorationStyle.solid,
           decorationColor: textColor ?? backgroundTextColor,
-          fontBold: await onRequestBoldFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontItalic: await onRequestItalicFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontBoldItalic: await onRequestBothFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBold: await onRequestBoldFont
+              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontItalic: await onRequestItalicFont
+              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBoldItalic: await onRequestBothFont
+              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
           fontFallback: fonts,
-          fontSize: !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
+          fontSize:
+              !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
           lineSpacing: lineSpacing,
           color: textColor,
           background: pw.BoxDecoration(color: backgroundTextColor),
         );
     spans.add(pw.TextSpan(text: content, style: decided_style));
     if (returnContentIfNeedIt && spans.isEmpty) {
-      return <pw.TextSpan>[pw.TextSpan(text: line.data.toString(), style: style ?? decided_style)];
+      return <pw.TextSpan>[
+        pw.TextSpan(text: line.data.toString(), style: style ?? decided_style)
+      ];
     }
     return spans;
   }
 
   @override
-  Future<pw.Widget> getBlockQuote(List<pw.InlineSpan> spansToWrap, [pw.TextStyle? style]) async {
-    final pw.TextStyle defaultStyle = pw.TextStyle(color: PdfColor.fromHex("#808080"), lineSpacing: 6.5);
+  Future<pw.Widget> getBlockQuote(List<pw.InlineSpan> spansToWrap,
+      [pw.TextStyle? style]) async {
+    final pw.TextStyle defaultStyle =
+        pw.TextStyle(color: PdfColor.fromHex("#808080"), lineSpacing: 6.5);
     final pw.TextStyle blockquoteStyle = blockQuoteTextStyle ?? defaultStyle;
     final pw.Container widget = pw.Container(
       width: pageWidth,
@@ -245,7 +271,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   @override
-  Future<pw.Widget> getCodeBlock(List<pw.InlineSpan> spansToWrap, [pw.TextStyle? style]) async {
+  Future<pw.Widget> getCodeBlock(List<pw.InlineSpan> spansToWrap,
+      [pw.TextStyle? style]) async {
     final pw.TextStyle defaultCodeBlockStyle = pw.TextStyle(
       fontSize: 12,
       font: codeBlockFont ?? pw.Font.courier(),
@@ -260,7 +287,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       wordSpacing: 0.5,
       color: PdfColor.fromHex("#808080"),
     );
-    final pw.TextStyle codeBlockStyle = codeBlockTextStyle ?? defaultCodeBlockStyle;
+    final pw.TextStyle codeBlockStyle =
+        codeBlockTextStyle ?? defaultCodeBlockStyle;
     final pw.Widget widget = pw.Container(
       width: pageWidth,
       color: this.codeBlockBackgroundColor ?? PdfColor.fromHex('#fbfbf9'),
@@ -271,7 +299,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         text: pw.TextSpan(
           style: codeBlockStyle,
           children: <pw.InlineSpan>[
-            pw.TextSpan(text: "$numCodeLine", style: codeBlockNumLinesTextStyle),
+            pw.TextSpan(
+                text: "$numCodeLine", style: codeBlockNumLinesTextStyle),
             const pw.TextSpan(text: "  "),
             ...spansToWrap,
           ],
@@ -282,13 +311,15 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   @override
-  Future<List<pw.TextSpan>> getLinkStyle(Line line, [pw.TextStyle? style, bool addFontSize = true]) async {
+  Future<List<pw.TextSpan>> getLinkStyle(Line line,
+      [pw.TextStyle? style, bool addFontSize = true]) async {
     final List<pw.TextSpan> spans = <pw.TextSpan>[];
     final double? fontSize = double.tryParse(line.attributes?['size']);
     final double? lineHeight = line.attributes?['line-height'];
     final String? fontFamily = line.attributes?['font'];
     final PdfColor? textColor = pdfColorString(line.attributes?['color']);
-    final PdfColor? backgroundTextColor = pdfColorString(line.attributes?['background']);
+    final PdfColor? backgroundTextColor =
+        pdfColorString(line.attributes?['background']);
     final double? lineSpacing = lineHeight?.resolveLineHeight();
     final bool bold = line.attributes?['bold'] ?? false;
     final bool italic = line.attributes?['italic'] ?? false;
@@ -296,15 +327,21 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final bool underline = line.attributes?['underline'] ?? false;
     final String href = line.attributes!['link'];
     final String hrefContent = line.data as String;
-    final pw.Font font = await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? pw.Font.helvetica();
-    final List<pw.Font> fonts = await onRequestFallbacks?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ?? <pw.Font>[];
+    final pw.Font font =
+        await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ??
+            pw.Font.helvetica();
+    final List<pw.Font> fonts = await onRequestFallbacks
+            ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ??
+        <pw.Font>[];
     spans.add(
       pw.TextSpan(
         annotation: pw.AnnotationLink(href),
         text: hrefContent,
         style: (style ?? defaultTextStyle).copyWith(
           color: textColor ?? defaultLinkColor,
-          background: backgroundTextColor == null ? null : pw.BoxDecoration(color: backgroundTextColor),
+          background: backgroundTextColor == null
+              ? null
+              : pw.BoxDecoration(color: backgroundTextColor),
           fontStyle: italic ? pw.FontStyle.italic : null,
           fontWeight: bold ? pw.FontWeight.bold : null,
           decoration: pw.TextDecoration.combine(<pw.TextDecoration>[
@@ -314,11 +351,15 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           decorationStyle: pw.TextDecorationStyle.solid,
           decorationColor: defaultLinkColor,
           font: font,
-          fontBold: await onRequestBoldFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontItalic: await onRequestItalicFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontBoldItalic: await onRequestBothFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBold: await onRequestBoldFont
+              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontItalic: await onRequestItalicFont
+              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
+          fontBoldItalic: await onRequestBothFont
+              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
           fontFallback: fonts,
-          fontSize: !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
+          fontSize:
+              !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
           lineSpacing: lineSpacing,
         ),
       ),
@@ -327,13 +368,15 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   @override
-  Future<pw.Widget> getHeaderBlock(List<pw.InlineSpan> spansToWrap, int headerLevel, int indentLevel,
+  Future<pw.Widget> getHeaderBlock(
+      List<pw.InlineSpan> spansToWrap, int headerLevel, int indentLevel,
       [pw.TextStyle? style]) async {
     final double defaultFontSize = headerLevel.resolveHeaderLevel();
-    final pw.TextStyle textStyle =
-        style?.copyWith(fontSize: defaultFontSize) ?? defaultTextStyle.copyWith(fontSize: defaultFontSize);
+    final pw.TextStyle textStyle = style?.copyWith(fontSize: defaultFontSize) ??
+        defaultTextStyle.copyWith(fontSize: defaultFontSize);
     return pw.Container(
-        padding: pw.EdgeInsets.only(left: indentLevel.toDouble() * 7, top: 3, bottom: 3.5),
+        padding: pw.EdgeInsets.only(
+            left: indentLevel.toDouble() * 7, top: 3, bottom: 3.5),
         child: pw.RichText(
           softWrap: true,
           overflow: pw.TextOverflow.span,
@@ -357,7 +400,10 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final pw.TextAlign textAlign = alignment.resolvePdfTextAlign;
     final double spacing = (spansToWrap.firstOrNull?.style?.lineSpacing ?? 1.0);
     return pw.Container(
-      padding: pw.EdgeInsets.only(left: indentLevel * 12.5, top: 3, bottom: spacing.resolvePaddingByLineHeight()),
+      padding: pw.EdgeInsets.only(
+          left: indentLevel * 12.5,
+          top: 3,
+          bottom: spacing.resolvePaddingByLineHeight()),
       alignment: al,
       child: pw.RichText(
         textAlign: textAlign,
@@ -378,7 +424,9 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final double spacing = (spansToWrap.firstOrNull?.style?.lineSpacing ?? 1.0);
     return pw.Container(
       alignment: align.resolvePdfBlockAlign,
-      padding: pw.EdgeInsets.only(left: indentLevel * 12.5, bottom: spacing.resolvePaddingByLineHeight()),
+      padding: pw.EdgeInsets.only(
+          left: indentLevel * 12.5,
+          bottom: spacing.resolvePaddingByLineHeight()),
       child: pw.RichText(
         textAlign: align.resolvePdfTextAlign,
         softWrap: true,
@@ -401,7 +449,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     pw.InlineSpan? widgets = null;
     final double? spacing = (spansToWrap.firstOrNull?.style?.lineSpacing);
     if (listType != 'uncheked' && listType != 'checked') {
-      final String typeList = listType == 'ordered' ? _getListIdentifier(indentLevel) : '•';
+      final String typeList =
+          listType == 'ordered' ? _getListIdentifier(indentLevel) : '•';
       //replace with bullet widget by error with fonts callback
       widgets = pw.TextSpan(
         text: '$typeList ',

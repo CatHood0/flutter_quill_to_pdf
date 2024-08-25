@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter quill to pdf Demo',
       theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 108, 189, 255)),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromARGB(255, 108, 189, 255)),
           useMaterial3: true,
           fontFamily: 'Noto Sans'),
       home: const MyHomePage(),
@@ -54,8 +55,9 @@ class _MyHomePageState extends State<MyHomePage> {
     marginLeft: 0,
     marginRight: 0,
   );
-  final QuillController _quillController =
-      QuillController(document: Document(), selection: const TextSelection.collapsed(offset: 0));
+  final QuillController _quillController = QuillController(
+      document: Document(),
+      selection: const TextSelection.collapsed(offset: 0));
   final FocusNode _editorNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<bool> _shouldShowToolbar = ValueNotifier<bool>(false);
@@ -87,7 +89,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         loadingColor: Color.fromARGB(255, 108, 189, 255),
                       );
                     });
-                final String? result = await FilePicker.platform.getDirectoryPath();
+                final String? result =
+                    await FilePicker.platform.getDirectoryPath();
                 if (result == null) {
                   Navigator.pop(context);
                   return;
@@ -99,23 +102,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   document: _quillController.document.toDelta(),
                   fallbacks: [...loader.allFonts()],
                   onRequestBoldFont: (String fontFamily) async {
-                    return loader.getFontByName(fontFamily: fontFamily, bold: true);
+                    return loader.getFontByName(
+                        fontFamily: fontFamily, bold: true);
                   },
                   onRequestBoldItalicFont: (String fontFamily) async {
-                    return loader.getFontByName(fontFamily: fontFamily, bold: true, italic: true);
+                    return loader.getFontByName(
+                        fontFamily: fontFamily, bold: true, italic: true);
                   },
                   onRequestFallbackFont: (String fontFamily) async {
                     return null;
                   },
                   onRequestItalicFont: (String fontFamily) async {
-                    return loader.getFontByName(fontFamily: fontFamily, italic: true);
+                    return loader.getFontByName(
+                        fontFamily: fontFamily, italic: true);
                   },
                   onRequestFont: (String fontFamily) async {
                     return loader.getFontByName(fontFamily: fontFamily);
                   },
                   pageFormat: params,
                 );
-                
+
                 final pwWidgetWidth = min(params.width, params.height) * 0.2;
                 final pwWidgetHeight = min(params.width, params.height) * 0.2;
                 final pw.Widget? pwWidget = await pdfConverter.generateWidget(
@@ -145,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     build: (pw.Context context) {
                       return pw.Stack(children: [
                         // add a blue background
-                        pw.Expanded( 
+                        pw.Expanded(
                           child: pw.Rectangle(
                             fillColor: PdfColor.fromHex("#5AACFE"),
                           ),
@@ -175,7 +181,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 _shouldShowToolbar.value = false;
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Generated document at path: ${file.path}')),
+                  SnackBar(
+                      content:
+                          Text('Generated document at path: ${file.path}')),
                 );
               },
               icon: const Icon(
@@ -186,7 +194,11 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         title: const Text(
           'PDF Demo',
-          style: TextStyle(fontFamily: 'Noto Sans', fontSize: 24.5, fontWeight: FontWeight.w900, color: Colors.white),
+          style: TextStyle(
+              fontFamily: 'Noto Sans',
+              fontSize: 24.5,
+              fontWeight: FontWeight.w900,
+              color: Colors.white),
         ),
       ),
       body: Stack(
@@ -204,7 +216,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: _scrollController,
                 notificationPredicate: (ScrollNotification notification) {
                   if (mounted && firstEntry) {
-                    firstEntry = false; //avoid issue with column (Ln225,Col49) that mnakes false scroll
+                    firstEntry =
+                        false; //avoid issue with column (Ln225,Col49) that mnakes false scroll
                     setState(() {});
                   }
                   return notification.depth == 0;
@@ -215,7 +228,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: <Widget>[
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 0),
                         child: CustomQuillEditor(
                           node: _editorNode,
                           controller: _quillController,
@@ -224,7 +238,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           onChange: (Document document) {
                             if (mounted) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (!_shouldShowToolbar.value) _shouldShowToolbar.value = true;
+                                if (!_shouldShowToolbar.value)
+                                  _shouldShowToolbar.value = true;
                               });
                             }
                           },
@@ -299,7 +314,9 @@ class LoadingWithAnimtedWidget extends StatelessWidget {
                   infinite: infinite,
                   duration: duration,
                   text: text,
-                  style: style ?? const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+                  style: style ??
+                      const TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255)),
                   verticalPadding: verticalTextPadding,
                 ),
               ],

@@ -99,10 +99,13 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       version: PdfVersion.pdf_1_5,
     );
     final PdfPageFormat pdfPageFormat = PdfPageFormat(_width, _height,
-        marginBottom: _marginBottom, marginLeft: _marginLeft, marginRight: _marginRight, marginTop: _marginTop);
+        marginBottom: _marginBottom,
+        marginLeft: _marginLeft,
+        marginRight: _marginRight,
+        marginTop: _marginTop);
     // front matter
-    final List<Map<String, dynamic>> docWidgets =
-        await generatePages(documents: <Delta>[frontM ?? Delta(), document, backM ?? Delta()]);
+    final List<Map<String, dynamic>> docWidgets = await generatePages(
+        documents: <Delta>[frontM ?? Delta(), document, backM ?? Delta()]);
     for (int i = 0; i < docWidgets.length; i++) {
       final Map<String, dynamic> map = docWidgets.elementAt(i);
       final List<pw.Widget> widgets = map['content'] as List<pw.Widget>;
@@ -140,8 +143,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> generatePages({required List<Delta> documents}) async {
-    LinkedHashSet<Map<String, dynamic>> docMap = LinkedHashSet<Map<String, dynamic>>();
+  Future<List<Map<String, dynamic>>> generatePages(
+      {required List<Delta> documents}) async {
+    LinkedHashSet<Map<String, dynamic>> docMap =
+        LinkedHashSet<Map<String, dynamic>>();
     int i = 0;
     int totalDocuments = documents.length;
     while (i < totalDocuments) {
@@ -168,7 +173,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       bool goToNextParagraph = false;
       for (CustomWidget customBuilder in super.customBuilders) {
         if (customBuilder.predicate(paragraph)) {
-          contentPerPage.add(customBuilder.widgetCallback(paragraph, paragraph.blockAttributes));
+          contentPerPage.add(customBuilder.widgetCallback(
+              paragraph, paragraph.blockAttributes));
           goToNextParagraph = true;
           break;
         }
@@ -176,25 +182,33 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       if (goToNextParagraph) continue;
       verifyBlock(blockAttributes);
       //verify if paragraph is just a simple new line
-      if (paragraph.lines.length == 1 && paragraph.lines.firstOrNull?.data == '\n' && blockAttributes == null) {
-        final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(paragraph.lines.first, defaultTextStyle);
+      if (paragraph.lines.length == 1 &&
+          paragraph.lines.firstOrNull?.data == '\n' &&
+          blockAttributes == null) {
+        final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(
+            paragraph.lines.first, defaultTextStyle);
         _applyInlineParagraph(contentPerPage, spans);
         continue;
       }
       //verify if the data line is a embed
-      if (paragraph.type == ParagraphType.embed && paragraph.lines.firstOrNull?.data is Map) {
+      if (paragraph.type == ParagraphType.embed &&
+          paragraph.lines.firstOrNull?.data is Map) {
         final Line line = paragraph.lines.first;
         if ((line.data as Map<String, dynamic>)['video'] != null) {
-          contentPerPage.add(pw.RichText(text: pw.TextSpan(text: (line.data as Map<String, dynamic>)['video'])));
+          contentPerPage.add(pw.RichText(
+              text: pw.TextSpan(
+                  text: (line.data as Map<String, dynamic>)['video'])));
           continue;
         }
         //avoid any another embed that is not a image
         if ((line.data as Map<String, dynamic>)['image'] == null) continue;
         if (onDetectImageBlock != null) {
-          contentPerPage.add(onDetectImageBlock!.call(line, paragraph.blockAttributes));
+          contentPerPage
+              .add(onDetectImageBlock!.call(line, paragraph.blockAttributes));
           continue;
         }
-        contentPerPage.add(await getImageBlock.call(line, (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign));
+        contentPerPage.add(await getImageBlock.call(line,
+            (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign));
         continue;
       }
       for (int l = 0; l < paragraph.lines.length; l++) {
@@ -202,66 +216,80 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         if (paragraph.type == ParagraphType.block || blockAttributes != null) {
           if ((line.data is Map)) {
             if ((line.data as Map)['video'] != null) {
-              spansToWrap.add(pw.TextSpan(text: '\n${(line.data as Map<String, dynamic>)['video']}\n'));
+              spansToWrap.add(pw.TextSpan(
+                  text: '\n${(line.data as Map<String, dynamic>)['video']}\n'));
               continue;
             }
             //avoid any another embed that is not a image
             if ((line.data as Map)['image'] == null) continue;
             if (onDetectImageBlock != null) {
-              final pw.Widget widget = onDetectImageBlock!.call(line, paragraph.blockAttributes);
+              final pw.Widget widget =
+                  onDetectImageBlock!.call(line, paragraph.blockAttributes);
               spansToWrap.add(pw.WidgetSpan(child: widget));
               continue;
             }
-            final pw.Widget widget =
-                await getImageBlock.call(line, (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign);
+            final pw.Widget widget = await getImageBlock.call(line,
+                (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign);
             spansToWrap.add(pw.WidgetSpan(child: widget));
             continue;
           }
-          final (pw.TextStyle style, bool addFontSize) = _getInlineTextStyle(blockAttributes);
+          final (pw.TextStyle style, bool addFontSize) =
+              _getInlineTextStyle(blockAttributes);
           if (line.attributes?['link'] != null) {
             if (onDetectLink != null) {
-              spansToWrap.addAll(onDetectLink!.call(line, paragraph.blockAttributes));
+              spansToWrap
+                  .addAll(onDetectLink!.call(line, paragraph.blockAttributes));
               continue;
             }
-            spansToWrap.addAll(await getLinkStyle.call(line, style, addFontSize));
+            spansToWrap
+                .addAll(await getLinkStyle.call(line, style, addFontSize));
             continue;
           }
           if (onDetectInlineRichTextStyles != null) {
-            spansToWrap.addAll(onDetectInlineRichTextStyles!.call(line, paragraph.blockAttributes));
+            spansToWrap.addAll(onDetectInlineRichTextStyles!
+                .call(line, paragraph.blockAttributes));
             continue;
           }
-          spansToWrap.addAll(await getRichTextInlineStyles.call(line, style, false, addFontSize));
-        } else if (paragraph.type == ParagraphType.inline || blockAttributes == null) {
+          spansToWrap.addAll(await getRichTextInlineStyles.call(
+              line, style, false, addFontSize));
+        } else if (paragraph.type == ParagraphType.inline ||
+            blockAttributes == null) {
           if (line.data is Map) {
             if ((line.data as Map)['video'] != null) {
-              inlineSpansToMerge.add(pw.TextSpan(text: '\n${(line.data as Map<String, dynamic>)['video']}\n'));
+              inlineSpansToMerge.add(pw.TextSpan(
+                  text: '\n${(line.data as Map<String, dynamic>)['video']}\n'));
               continue;
             }
             //avoid any another embed that is not a image
             if ((line.data as Map)['image'] == null) continue;
             if (onDetectImageBlock != null) {
-              final pw.Widget widget = onDetectImageBlock!.call(line, paragraph.blockAttributes);
+              final pw.Widget widget =
+                  onDetectImageBlock!.call(line, paragraph.blockAttributes);
               inlineSpansToMerge.add(pw.WidgetSpan(child: widget));
               continue;
             }
-            final pw.Widget widget =
-                await getImageBlock.call(line, (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign);
+            final pw.Widget widget = await getImageBlock.call(line,
+                (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign);
             inlineSpansToMerge.add(pw.WidgetSpan(child: widget));
             continue;
           } else if (line.attributes != null) {
             if (onDetectInlineRichTextStyles != null) {
-              inlineSpansToMerge.addAll(onDetectInlineRichTextStyles!.call(line, paragraph.blockAttributes));
+              inlineSpansToMerge.addAll(onDetectInlineRichTextStyles!
+                  .call(line, paragraph.blockAttributes));
               continue;
             }
-            inlineSpansToMerge.addAll(await getRichTextInlineStyles.call(line, defaultTextStyle));
+            inlineSpansToMerge.addAll(
+                await getRichTextInlineStyles.call(line, defaultTextStyle));
             continue;
           }
           if (onDetectCommonText != null) {
-            inlineSpansToMerge.addAll(onDetectCommonText!.call(line, paragraph.blockAttributes));
+            inlineSpansToMerge.addAll(
+                onDetectCommonText!.call(line, paragraph.blockAttributes));
             continue;
           }
           //if it doesn't have attrs then just put the content
-          inlineSpansToMerge.add(pw.TextSpan(text: line.data as String, style: defaultTextStyle));
+          inlineSpansToMerge.add(
+              pw.TextSpan(text: line.data as String, style: defaultTextStyle));
         }
       }
       //then put the block styles
@@ -276,12 +304,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     return contentPerPage;
   }
 
-  void _applyInlineParagraph(List<pw.Widget> contentPerPage, List<pw.InlineSpan> inlineSpansToMerge) {
+  void _applyInlineParagraph(
+      List<pw.Widget> contentPerPage, List<pw.InlineSpan> inlineSpansToMerge) {
     if (inlineSpansToMerge.isEmpty) return;
-    final double spacing = (inlineSpansToMerge.firstOrNull?.style?.lineSpacing ?? 1.0);
+    final double spacing =
+        (inlineSpansToMerge.firstOrNull?.style?.lineSpacing ?? 1.0);
     contentPerPage.add(
       pw.Padding(
-        padding: pw.EdgeInsets.only(bottom: spacing.resolvePaddingByLineHeight()),
+        padding:
+            pw.EdgeInsets.only(bottom: spacing.resolvePaddingByLineHeight()),
         child: pw.RichText(
           softWrap: true,
           overflow: pw.TextOverflow.span,
@@ -293,7 +324,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     );
   }
 
-  (pw.TextStyle, bool) _getInlineTextStyle(Map<String, dynamic>? blockAttributes) {
+  (pw.TextStyle, bool) _getInlineTextStyle(
+      Map<String, dynamic>? blockAttributes) {
     bool addFontSize = true;
     final double? lineHeight = blockAttributes?['line-height'];
     if (blockAttributes?['header'] != null) {
@@ -322,13 +354,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
       return (style, addFontSize);
     } else if (blockAttributes?['blockquote'] != null) {
-      final pw.TextStyle defaultStyle = pw.TextStyle(color: PdfColor.fromHex("#808080"), lineSpacing: 6.5);
+      final pw.TextStyle defaultStyle =
+          pw.TextStyle(color: PdfColor.fromHex("#808080"), lineSpacing: 6.5);
       final pw.TextStyle blockquoteStyle = defaultStyle;
       pw.TextStyle style = blockquoteStyle;
       style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
       return (style, addFontSize);
     } else {
-      final pw.TextStyle style = defaultTextStyle.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+      final pw.TextStyle style = defaultTextStyle.copyWith(
+          lineSpacing: lineHeight?.resolveLineHeight());
       return (style, addFontSize);
     }
   }
@@ -370,7 +404,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     blockAttributes?['code-block'] != null ? numCodeLine++ : numCodeLine = 0;
   }
 
-  void _applyBlockAttributes(List<pw.InlineSpan> currentSpans, Map<String, dynamic> blockAttributes) async {
+  void _applyBlockAttributes(List<pw.InlineSpan> currentSpans,
+      Map<String, dynamic> blockAttributes) async {
     final int? header = blockAttributes['header'];
     final String? align = blockAttributes['align'];
     final String? listType = blockAttributes['list'];
@@ -384,19 +419,23 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
     if (header != null) {
       if (onDetectHeaderBlock != null) {
-        contentPerPage.add(onDetectHeaderBlock!.call(currentSpans, blockAttributes));
+        contentPerPage
+            .add(onDetectHeaderBlock!.call(currentSpans, blockAttributes));
         return;
       }
       if (align != null) {
-        contentPerPage.add(await getAlignedHeaderBlock(currentSpans, header, align, indentLevel));
+        contentPerPage.add(await getAlignedHeaderBlock(
+            currentSpans, header, align, indentLevel));
         return;
       }
-      contentPerPage.add(await getHeaderBlock(currentSpans, header, indentLevel));
+      contentPerPage
+          .add(await getHeaderBlock(currentSpans, header, indentLevel));
       return;
     }
     if (codeblock != null) {
       if (onDetectCodeBlock != null) {
-        contentPerPage.add(onDetectCodeBlock!.call(currentSpans, blockAttributes));
+        contentPerPage
+            .add(onDetectCodeBlock!.call(currentSpans, blockAttributes));
         return;
       }
       contentPerPage.add(await getCodeBlock(currentSpans));
@@ -404,7 +443,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
     if (blockquote != null) {
       if (onDetectBlockquote != null) {
-        contentPerPage.add(onDetectBlockquote!.call(currentSpans, blockAttributes));
+        contentPerPage
+            .add(onDetectBlockquote!.call(currentSpans, blockAttributes));
         return;
       }
       contentPerPage.add(await getBlockQuote(currentSpans));
@@ -415,22 +455,28 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         contentPerPage.add(onDetectList!.call(currentSpans, blockAttributes));
         return;
       }
-      contentPerPage.add(await getListBlock(currentSpans, listType, align ?? 'left', indentLevel));
+      contentPerPage.add(await getListBlock(
+          currentSpans, listType, align ?? 'left', indentLevel));
       return;
     }
     if (align != null) {
       if (onDetectAlignedParagraph != null) {
-        contentPerPage.add(onDetectAlignedParagraph!.call(currentSpans, blockAttributes));
+        contentPerPage
+            .add(onDetectAlignedParagraph!.call(currentSpans, blockAttributes));
         return;
       }
-      contentPerPage.add(await getAlignedParagraphBlock(currentSpans, align, indentLevel));
+      contentPerPage.add(
+          await getAlignedParagraphBlock(currentSpans, align, indentLevel));
       return;
     }
     if (indent != null) {
-      final double spacing = (currentSpans.firstOrNull?.style?.lineSpacing ?? 1.0);
+      final double spacing =
+          (currentSpans.firstOrNull?.style?.lineSpacing ?? 1.0);
       contentPerPage.add(pw.Container(
         alignment: align?.resolvePdfBlockAlign,
-        padding: pw.EdgeInsets.only(left: indentLevel * 12.5, bottom: spacing.resolvePaddingByLineHeight()),
+        padding: pw.EdgeInsets.only(
+            left: indentLevel * 12.5,
+            bottom: spacing.resolvePaddingByLineHeight()),
         child: pw.RichText(
           textAlign: align.resolvePdfTextAlign,
           softWrap: true,
@@ -445,12 +491,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     if (lineHeight != null) {
       contentPerPage.add(
         pw.Padding(
-          padding: pw.EdgeInsets.only(bottom: lineHeight.resolveLineHeight().resolvePaddingByLineHeight()),
+          padding: pw.EdgeInsets.only(
+              bottom:
+                  lineHeight.resolveLineHeight().resolvePaddingByLineHeight()),
           child: pw.RichText(
             softWrap: true,
             overflow: pw.TextOverflow.span,
             text: pw.TextSpan(
-              style: defaultTextStyle.copyWith(lineSpacing: lineHeight.resolveLineHeight()),
+              style: defaultTextStyle.copyWith(
+                  lineSpacing: lineHeight.resolveLineHeight()),
               children: currentSpans,
             ),
           ),

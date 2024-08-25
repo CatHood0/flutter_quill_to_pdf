@@ -9,5 +9,5 @@ class CustomWidget {
   CustomWidget({
     required this.predicate,
     required this.widgetCallback,
-  }); 
+  });
 }
