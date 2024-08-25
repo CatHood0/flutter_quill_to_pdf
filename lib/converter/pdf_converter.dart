@@ -18,11 +18,7 @@ class PDFConverter {
   ///This [delta] is used after the main content
   final Delta? backMatterDelta;
 
-  final qpdf.PDFPageFormat params;
-
-  ///[CustomConverter] allow devs to use [custom] regex patterns to detect and [create] custom widgets
-  @Deprecated('This option is not longer used by the converter and will be removed on future releases')
-  final List<qpdf.CustomConverter> customConverters;
+  final qpdf.PDFPageFormat pageFormat;
 
   ///[CustomPDFWidget] allow devs to use builders to create custom widgets
   final List<qpdf.CustomWidget> customBuilders;
@@ -38,18 +34,6 @@ class PDFConverter {
 
   ///A simple [request] font when converter detect a font
   final Future<pw.Font> Function(String)? onRequestBoldItalicFont;
-
-  ///Used by PDF converter to transform [delta to html].
-  ///if you use your own delta implementation, use this to avoid [conflicts]
-  @Deprecated(
-      'customDeltaToHTMLConverter is no longer used since this implementation was changed and will be removed on future releases')
-  final String Function(Delta)? customDeltaToHTMLConverter;
-
-  ///Used by PDF converter to transform [formatted html to markdown]
-  ///By default, [markdown] contains [html] into it
-  @Deprecated(
-      'customHTMLToMarkdownConverter is no longer used since this implementation was changed and will be removed on future releases')
-  final String Function(String)? customHTMLToMarkdownConverter;
 
   ///If you need to [customize] the [theme] of the [pdf document], override this param
   final pw.ThemeData? themeData;
@@ -84,39 +68,39 @@ class PDFConverter {
 
   final qpdf.PDFWidgetBuilder<ep.Line, pw.Widget>? onDetectImageBlock;
 
-  ///Detect Rich text styles like: size, spacing, font family
+  /// When a rich text styles are detected, this builder is called 
   final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectInlineRichTextStyles;
 
-  ///Detect simple: # header
+  /// When a header block is detected, this builder is called 
   final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectHeaderBlock;
 
+  /// When a aligned block is detected, this builder is called 
   final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectAlignedParagraph;
 
+  /// When a non rich text line is detected, this builder is called 
+  /// Tipically this happens when the insertion has not inline attributes
   final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectCommonText;
 
-  @Deprecated('onDetectInlinesMarkdown is no longer used and will be removed on future releases')
-  final qpdf.CustomPDFWidget? onDetectInlinesMarkdown;
-
+  /// When a link line is detected, this builder is called 
   final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectLink;
-  //Detect markdown list: * bullet, 1. ordered, [x] check list (still has errors in render or in detect indent)
+
+  /// When a list block is detected, this builder is called 
   final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectList;
 
-  /// Detect html code tag <pre>some code</pre> and it could be multiline
+  /// When a code block is detected, this builder is called 
   final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectCodeBlock;
 
-  /// Detect html blockquote tag <blockquote>text in blockquote</blockquote> and it could be multiline
+  /// When a block quote is detected, this builder is called 
   final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectBlockquote;
 
-  ///If this [request] is null, list is [empty] or is list [null], will be used another by default
   final Future<List<pw.Font>?> Function(String)? onRequestFallbackFont;
   late final List<pw.Font> globalFontsFallbacks;
 
   PDFConverter({
-    required this.params,
+    required this.pageFormat,
     required this.document,
-    required this.frontMatterDelta,
-    required this.backMatterDelta,
-    this.customConverters = const <qpdf.CustomConverter>[],
+    this.frontMatterDelta,
+    this.backMatterDelta,
     this.customBuilders = const <qpdf.CustomWidget>[],
     this.onRequestBoldFont,
     this.onRequestBoldItalicFont,
@@ -135,8 +119,6 @@ class PDFConverter {
     this.codeBlockFont,
     this.codeBlockTextStyle,
     this.themeData,
-    this.customDeltaToHTMLConverter,
-    this.customHTMLToMarkdownConverter,
     this.onDetectBlockquote,
     this.onDetectCodeBlock,
     this.onDetectAlignedParagraph,
@@ -144,15 +126,14 @@ class PDFConverter {
     this.onDetectHeaderBlock,
     this.onDetectImageBlock,
     this.onDetectInlineRichTextStyles,
-    this.onDetectInlinesMarkdown,
     this.onDetectLink,
     this.onDetectList,
-  })  : assert(params.height > 30, 'Page size height isn\'t valid'),
-        assert(params.width > 30, 'Page size width isn\'t valid'),
-        assert(params.marginBottom >= 0.0, 'Margin to bottom with value ${params.marginBottom}'),
-        assert(params.marginLeft >= 0.0, 'Margin to left with value ${params.marginLeft}'),
-        assert(params.marginRight >= 0.0, 'Margin to right with value ${params.marginRight}'),
-        assert(params.marginTop >= 0.0, 'Margin to tp with value ${params.marginTop}') {
+  })  : assert(pageFormat.height > 30, 'Page size height isn\'t valid'),
+        assert(pageFormat.width > 30, 'Page size width isn\'t valid'),
+        assert(pageFormat.marginBottom >= 0.0, 'Margin to bottom with value ${pageFormat.marginBottom}'),
+        assert(pageFormat.marginLeft >= 0.0, 'Margin to left with value ${pageFormat.marginLeft}'),
+        assert(pageFormat.marginRight >= 0.0, 'Margin to right with value ${pageFormat.marginRight}'),
+        assert(pageFormat.marginTop >= 0.0, 'Margin to tp with value ${pageFormat.marginTop}') {
     globalFontsFallbacks = <pw.Font>[
       ...fallbacks,
       pw.Font.helvetica(),
@@ -181,7 +162,7 @@ class PDFConverter {
   }) async {
     deltaOptionalAttr ??= qpdf.DeltaAttributesOptions.common();
     final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
-      params: params,
+      pageFormat: pageFormat,
       fonts: globalFontsFallbacks,
       onRequestBoldFont: onRequestBoldFont,
       onRequestBothFont: onRequestBoldItalicFont,
@@ -205,7 +186,6 @@ class PDFConverter {
       onDetectHeaderBlock: onDetectHeaderBlock,
       onDetectImageBlock: onDetectImageBlock,
       onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
-      onDetectInlinesMarkdown: onDetectInlinesMarkdown,
       onDetectLink: onDetectLink,
       onDetectList: onDetectList,
       onRequestFont: onRequestFont,
@@ -218,7 +198,6 @@ class PDFConverter {
           : processDelta(frontMatterDelta, deltaOptionalAttr,
               overrideAttributesPassedByUser),
       onRequestItalicFont: onRequestItalicFont,
-      customConverters: customConverters,
       document: !shouldProcessDeltas
           ? document
           : processDelta(
@@ -242,7 +221,7 @@ class PDFConverter {
   }) async {
     deltaOptionalAttr ??= qpdf.DeltaAttributesOptions.common();
     final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
-      params: params,
+      pageFormat: pageFormat,
       fonts: globalFontsFallbacks,
       onRequestBoldFont: onRequestBoldFont,
       onRequestBothFont: onRequestBoldItalicFont,
@@ -266,7 +245,6 @@ class PDFConverter {
       onDetectHeaderBlock: onDetectHeaderBlock,
       onDetectImageBlock: onDetectImageBlock,
       onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
-      onDetectInlinesMarkdown: onDetectInlinesMarkdown,
       onDetectLink: onDetectLink,
       onDetectList: onDetectList,
       onRequestFont: onRequestFont,
@@ -277,7 +255,6 @@ class PDFConverter {
           ? frontMatterDelta
           : processDelta(frontMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
       onRequestItalicFont: onRequestItalicFont,
-      customConverters: customConverters,
       document:
           !shouldProcessDeltas ? document : processDelta(document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
     );
@@ -305,7 +282,7 @@ class PDFConverter {
   }) async {
     deltaOptionalAttr ??= qpdf.DeltaAttributesOptions.common();
     final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
-      params: params,
+      pageFormat: pageFormat,
       fonts: globalFontsFallbacks,
       customBuilders: customBuilders,
       onRequestBoldFont: onRequestBoldFont,
@@ -330,7 +307,6 @@ class PDFConverter {
       blockQuotePaddingRight: blockQuotePaddingRight,
       blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
       onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
-      onDetectInlinesMarkdown: onDetectInlinesMarkdown,
       onDetectLink: onDetectLink,
       onDetectList: onDetectList,
       backM: !shouldProcessDeltas
@@ -340,7 +316,6 @@ class PDFConverter {
           ? frontMatterDelta
           : processDelta(frontMatterDelta, deltaOptionalAttr, overrideAttributesPassedByUser),
       onRequestItalicFont: onRequestItalicFont,
-      customConverters: customConverters,
       document:
           !shouldProcessDeltas ? document : processDelta(document, deltaOptionalAttr, overrideAttributesPassedByUser)!,
     );

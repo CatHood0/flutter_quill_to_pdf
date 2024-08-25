@@ -34,8 +34,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   int numCodeLine = 0;
   final Delta? frontM;
   final Delta? backM;
-  @Deprecated('This option is not longer used by the converter and will be removed on future releases')
-  final List<CustomConverter> customConverters;
   final List<CustomWidget> customBuilders;
   final Future<pw.Font> Function(String fontFamily)? onRequestFont;
   final Future<pw.Font> Function(String fontFamily)? onRequestBoldFont;
@@ -47,8 +45,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectAlignedParagraph;
   final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectCommonText;
 
-  @Deprecated('onDetectInlinesMarkdown is no longer used and will be removed on future releases')
-  final CustomPDFWidget? onDetectInlinesMarkdown;
   final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectLink;
   final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectList;
   final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectCodeBlock;
@@ -72,7 +68,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     this.onRequestFallbacks,
     this.onRequestFont,
     this.onRequestItalicFont,
-    required this.customConverters,
     required this.customBuilders,
     required super.document,
     this.blockQuotePaddingLeft,
@@ -90,7 +85,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     this.onDetectAlignedParagraph,
     this.onDetectCommonText,
     this.onDetectHeaderBlock,
-    this.onDetectInlinesMarkdown,
     this.onDetectLink,
     this.onDetectList,
     this.onDetectInlineRichTextStyles,

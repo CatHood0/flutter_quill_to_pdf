@@ -1,3 +1,14 @@
+# 2.2.4
+
+* Chore: removed deprecated instances
+* Chore: removed outdated comments
+* Feat: support for generate widgets instead whole pdf document - giving you full control of the PDF by @Paul-creator in https://github.com/CatHood0/flutter_quill_to_pdf/pull/11
+
+## New Contributors
+* @Paul-creator made their first contribution in https://github.com/CatHood0/flutter_quill_to_pdf/pull/11
+
+**Full Changelog**: https://github.com/CatHood0/flutter_quill_to_pdf/compare/V-2.2.3...V-2.3.0
+
 # 2.2.3
 
 * Fix: `List` block doesn't span to the next page if needed

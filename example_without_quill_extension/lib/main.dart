@@ -96,7 +96,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 PDFConverter pdfConverter = PDFConverter(
                   backMatterDelta: null,
                   frontMatterDelta: null,
-                  customConverters: [],
                   document: _quillController.document.toDelta(),
                   fallbacks: [...loader.allFonts()],
                   onRequestBoldFont: (String fontFamily) async {
@@ -114,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onRequestFont: (String fontFamily) async {
                     return loader.getFontByName(fontFamily: fontFamily);
                   },
-                  params: params,
+                  pageFormat: params,
                 );
                 
                 final pwWidgetWidth = min(params.width, params.height) * 0.2;

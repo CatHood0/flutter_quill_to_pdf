@@ -15,10 +15,10 @@ dependencies:
 
   flutter_quill_to_pdf:
     path: ../
-  pdf: ^3.10.8
+  pdf: ^3.11.1
   flutter_hooks: ^0.20.5
-  flutter_quill: ^10.0.2
-  file_picker: ^8.0.3
+  flutter_quill: ^10.4.5
+  file_picker: ^8.1.2
   animated_text_kit:
   html2md:
 

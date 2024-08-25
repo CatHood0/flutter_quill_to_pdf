@@ -25,7 +25,7 @@ Some options that can be configured:
 
 ```yaml
 dependencies:
-  flutter_quill_to_pdf: ^2.2.3
+  flutter_quill_to_pdf: ^2.2.4
 ```
 
 ### Import package
@@ -89,7 +89,7 @@ PDFConverter pdfConverter = PDFConverter(
         // this is optional
        ...your local font implementation
     },
-    params: pageFormat,
+    pageFormat: pageFormat,
 );
 ```
 
@@ -175,7 +175,7 @@ await file.writeAsBytes(await document.save());
 - Link
 - Color
 - Background Color
-- Line-height (custom attribute used from this package)
+- Line-height
 - Code block
 - Blockquote
 - Align
@@ -187,6 +187,7 @@ await file.writeAsBytes(await document.save());
 
 ## No supported
 
+- Direction
 - Superscript/Subscript (Not planned since is not supported by pdf package)
 - Embed formula (Not planned)
 

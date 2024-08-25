@@ -19,14 +19,13 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   final List<pw.Widget> contentPerPage = <pw.Widget>[];
 
   PdfService({
-    required PDFPageFormat params,
+    required PDFPageFormat pageFormat,
     required List<pw.Font> fonts,
     super.onRequestBoldFont,
     super.onRequestBothFont,
     super.onRequestFallbacks,
     super.onRequestFont,
     super.onRequestItalicFont,
-    required super.customConverters,
     required super.customBuilders,
     required super.document,
     pw.ThemeData? customTheme,
@@ -47,7 +46,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.onDetectHeaderBlock,
     super.onDetectImageBlock,
     super.onDetectInlineRichTextStyles,
-    super.onDetectInlinesMarkdown,
     super.onDetectLink,
     super.onDetectList,
     super.backM,
@@ -59,14 +57,14 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       lineSpacing: 1.0,
       fontFallback: <pw.Font>[..._fonts],
     );
-    _marginLeft = params.marginLeft;
-    _marginBottom = params.marginBottom;
-    _marginTop = params.marginTop;
-    _marginRight = params.marginRight;
-    _width = params.width;
-    _height = params.height;
-    pageWidth = params.width;
-    pageHeight = params.height;
+    _marginLeft = pageFormat.marginLeft;
+    _marginBottom = pageFormat.marginBottom;
+    _marginTop = pageFormat.marginTop;
+    _marginRight = pageFormat.marginRight;
+    _width = pageFormat.width;
+    _height = pageFormat.height;
+    pageWidth = pageFormat.width;
+    pageHeight = pageFormat.height;
     defaultTheme = customTheme ??
         pw.ThemeData(
           softWrap: true,
@@ -100,7 +98,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       pageMode: PdfPageMode.outlines,
       version: PdfVersion.pdf_1_5,
     );
-    final PdfPageFormat pageFormat = PdfPageFormat(_width, _height,
+    final PdfPageFormat pdfPageFormat = PdfPageFormat(_width, _height,
         marginBottom: _marginBottom, marginLeft: _marginLeft, marginRight: _marginRight, marginTop: _marginTop);
     // front matter
     final List<Map<String, dynamic>> docWidgets =
@@ -111,7 +109,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       pdf.addPage(
         pw.MultiPage(
           theme: defaultTheme,
-          pageFormat: pageFormat,
+          pageFormat: pdfPageFormat,
           maxPages: 99999999,
           build: (pw.Context context) {
             return <pw.Widget>[...widgets];

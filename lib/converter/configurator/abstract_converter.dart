@@ -16,7 +16,9 @@ sealed class Converter<Doc, Type> {
   ///This functions generates the [document]
   Future<Type> generateDoc();
 
-  ///This functions generates the [document]
+  /// Use [generateWidget] to create whole widgets that are
+  /// commonly pasted into a document, giving you full control  
+  /// of the new widgets generated
   Future<Widget> generateWidget({
     double? maxWidth,
     double? maxHeight,
