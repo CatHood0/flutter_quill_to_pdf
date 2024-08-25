@@ -7,7 +7,7 @@
 ## New Contributors
 * @Paul-creator made their first contribution in https://github.com/CatHood0/flutter_quill_to_pdf/pull/11
 
-**Full Changelog**: https://github.com/CatHood0/flutter_quill_to_pdf/compare/V-2.2.3...V-2.3.0
+**Full Changelog**: https://github.com/CatHood0/flutter_quill_to_pdf/compare/V-2.2.3...V-2.2.4
 
 # 2.2.3
 

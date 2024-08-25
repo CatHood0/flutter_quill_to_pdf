@@ -129,7 +129,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     double? maxHeight,
   }) async {
     final Document? document = RichTextParser().parseDelta(this.document);
-    final List<pw.Widget> widgets = await blockGenerators(document!);
+    if(document == null){
+      throw StateError('The Delta passed is not valid to be parsed. Please, first ensure the Delta to have not empty content.');
+    }
+    final List<pw.Widget> widgets = await blockGenerators(document);
     final pw.Widget content = pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: widgets,
