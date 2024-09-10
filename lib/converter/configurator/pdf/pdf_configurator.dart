@@ -446,21 +446,26 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     int indentLevel, [
     pw.TextStyle? style,
   ]) async {
-    pw.InlineSpan? widgets = null;
+    pw.InlineSpan? widgets;
     final double? spacing = (spansToWrap.firstOrNull?.style?.lineSpacing);
-    if (listType != 'uncheked' && listType != 'checked') {
+
+    // Get the style from the first span to wrap
+    final pw.TextStyle? firstSpanStyle =
+        spansToWrap.isNotEmpty ? spansToWrap.first.style : null;
+
+    if (listType != 'unchecked' && listType != 'checked') {
       final String typeList =
           listType == 'ordered' ? _getListIdentifier(indentLevel) : '•';
-      //replace with bullet widget by error with fonts callback
+
+      // Apply the first span's style to the list marker
       widgets = pw.TextSpan(
         text: '$typeList ',
-        style: defaultTextStyle,
+        style: firstSpanStyle ?? defaultTextStyle,
         children: <pw.InlineSpan>[
           pw.TextSpan(children: spansToWrap),
         ],
       );
-    }
-    if (listType == 'checked' || listType == 'unchecked') {
+    } else if (listType == 'checked' || listType == 'unchecked') {
       widgets = pw.TextSpan(
         children: <pw.InlineSpan>[
           pw.WidgetSpan(
@@ -479,6 +484,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         ],
       );
     }
+
     return pw.Container(
       padding: pw.EdgeInsets.only(
         left: indentLevel > 0 ? indentLevel * 12.5 : 15,

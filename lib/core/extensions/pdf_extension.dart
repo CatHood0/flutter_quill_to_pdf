@@ -28,10 +28,22 @@ extension PdfDoubleExtension on double {
   }
 }
 
+PdfColor hexToColor(String hexString) {
+  final String hex = hexString.replaceAll('#', '');
+
+  // Parse the hex string to an integer and add alpha if missing
+  final int color = int.parse(
+    hex,
+    radix: 16,
+  );
+
+  return PdfColor.fromInt(color);
+}
+
 PdfColor? pdfColorString(String? colorString) {
   if (colorString == null || colorString.isTotallyEmpty) return null;
   if (colorString.startsWith('#')) {
-    return PdfColor.fromHex(colorString);
+    return hexToColor(colorString);
   }
   if (colorString.startsWith('0x')) {
     return PdfColor.fromInt(int.parse(colorString));
