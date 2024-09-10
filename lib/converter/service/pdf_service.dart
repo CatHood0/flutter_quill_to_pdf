@@ -16,11 +16,13 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   late final double _marginRight;
   late final double _width;
   late final double _height;
+  final pw.TextDirection textDirection;
   final List<pw.Widget> contentPerPage = <pw.Widget>[];
 
   PdfService({
     required PDFPageFormat pageFormat,
     required List<pw.Font> fonts,
+    this.textDirection = pw.TextDirection.ltr,
     super.onRequestBoldFont,
     super.onRequestBothFont,
     super.onRequestFallbacks,
@@ -104,11 +106,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         marginRight: _marginRight,
         marginTop: _marginTop);
     // front matter
-    final List<Map<String, dynamic>> docWidgets = await generatePages(
+    final List<List<pw.Widget>> docWidgets = await generatePages(
         documents: <Delta>[frontM ?? Delta(), document, backM ?? Delta()]);
     for (int i = 0; i < docWidgets.length; i++) {
-      final Map<String, dynamic> map = docWidgets.elementAt(i);
-      final List<pw.Widget> widgets = map['content'] as List<pw.Widget>;
+      final List<pw.Widget> widgets = docWidgets.elementAt(i);
       pdf.addPage(
         pw.MultiPage(
           theme: defaultTheme,
@@ -129,8 +130,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     double? maxHeight,
   }) async {
     final Document? document = RichTextParser().parseDelta(this.document);
-    if(document == null){
-      throw StateError('The Delta passed is not valid to be parsed. Please, first ensure the Delta to have not empty content.');
+    if (document == null) {
+      throw StateError(
+          'The Delta passed is not valid to be parsed. Please, first ensure the Delta to have not empty content.');
     }
     final List<pw.Widget> widgets = await blockGenerators(document);
     final pw.Widget content = pw.Column(
@@ -146,23 +148,21 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> generatePages(
-      {required List<Delta> documents}) async {
-    LinkedHashSet<Map<String, dynamic>> docMap =
-        LinkedHashSet<Map<String, dynamic>>();
+  Future<List<List<pw.Widget>>> generatePages({
+    required List<Delta> documents,
+  }) async {
+    LinkedHashSet<List<pw.Widget>> docMap = LinkedHashSet<List<pw.Widget>>();
     int i = 0;
     int totalDocuments = documents.length;
     while (i < totalDocuments) {
       final Delta doc = documents.elementAt(i);
       if (doc.isNotEmpty) {
         final Document? document = RichTextParser().parseDelta(doc);
-        docMap.add(<String, dynamic>{
-          'content': List<pw.Widget>.from(await blockGenerators(document!)),
-        });
+        docMap.add(List<pw.Widget>.from(await blockGenerators(document!)));
       }
       i++;
     }
-    return List<Map<String, dynamic>>.from(docMap);
+    return List<List<pw.Widget>>.from(docMap);
   }
 
   @override
@@ -319,6 +319,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         child: pw.RichText(
           softWrap: true,
           overflow: pw.TextOverflow.span,
+          textDirection: textDirection,
           text: pw.TextSpan(
             children: inlineSpansToMerge,
           ),
@@ -410,6 +411,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   void _applyBlockAttributes(List<pw.InlineSpan> currentSpans,
       Map<String, dynamic> blockAttributes) async {
     final int? header = blockAttributes['header'];
+    final String? direction = blockAttributes['direction'];
     final String? align = blockAttributes['align'];
     final String? listType = blockAttributes['list'];
     final int? indent = blockAttributes['indent'];
@@ -420,56 +422,81 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     if (indentLevel > 0) {
       indentLevel++;
     }
+    final pw.TextDirection textDirectionToUse =
+        direction == 'rtl' ? pw.TextDirection.rtl : textDirection;
     if (header != null) {
       if (onDetectHeaderBlock != null) {
-        contentPerPage
-            .add(onDetectHeaderBlock!.call(currentSpans, blockAttributes));
+        final pw.Widget customBlock =
+            onDetectHeaderBlock!.call(currentSpans, blockAttributes);
+        contentPerPage.add(pw.Directionality(
+            textDirection: textDirectionToUse, child: customBlock));
         return;
       }
       if (align != null) {
-        contentPerPage.add(await getAlignedHeaderBlock(
-            currentSpans, header, align, indentLevel));
+        final pw.Widget alignedBlock = await getAlignedHeaderBlock(
+            currentSpans, header, align, indentLevel);
+        contentPerPage.add(pw.Directionality(
+            textDirection: textDirectionToUse, child: alignedBlock));
         return;
       }
-      contentPerPage
-          .add(await getHeaderBlock(currentSpans, header, indentLevel));
+      final pw.Widget headerBlock =
+          await getHeaderBlock(currentSpans, header, indentLevel);
+      contentPerPage.add(pw.Directionality(
+          textDirection: textDirectionToUse, child: headerBlock));
       return;
     }
     if (codeblock != null) {
       if (onDetectCodeBlock != null) {
-        contentPerPage
-            .add(onDetectCodeBlock!.call(currentSpans, blockAttributes));
+        final pw.Widget customBlock =
+            onDetectCodeBlock!.call(currentSpans, blockAttributes);
+        contentPerPage.add(pw.Directionality(
+            textDirection: textDirectionToUse, child: customBlock));
         return;
       }
-      contentPerPage.add(await getCodeBlock(currentSpans));
+      final pw.Widget codeBlock = await getCodeBlock(currentSpans);
+      contentPerPage.add(pw.Directionality(
+          textDirection: textDirectionToUse, child: codeBlock));
       return;
     }
     if (blockquote != null) {
       if (onDetectBlockquote != null) {
-        contentPerPage
-            .add(onDetectBlockquote!.call(currentSpans, blockAttributes));
+        final pw.Widget customBlock =
+            onDetectBlockquote!.call(currentSpans, blockAttributes);
+        contentPerPage.add(pw.Directionality(
+            textDirection: textDirectionToUse, child: customBlock));
         return;
       }
-      contentPerPage.add(await getBlockQuote(currentSpans));
+      final pw.Widget blockquoteBlock = await getBlockQuote(currentSpans);
+      contentPerPage.add(pw.Directionality(
+          textDirection: textDirectionToUse, child: blockquoteBlock));
       return;
     }
     if (listType != null) {
       if (onDetectList != null) {
-        contentPerPage.add(onDetectList!.call(currentSpans, blockAttributes));
+        final pw.Widget customBlock =
+            onDetectList!.call(currentSpans, blockAttributes);
+        contentPerPage.add(pw.Directionality(
+            textDirection: textDirectionToUse, child: customBlock));
         return;
       }
-      contentPerPage.add(await getListBlock(
-          currentSpans, listType, align ?? 'left', indentLevel));
+      final pw.Widget listBlock = await getListBlock(
+          currentSpans, listType, align ?? 'left', indentLevel);
+      contentPerPage.add(pw.Directionality(
+          textDirection: textDirectionToUse, child: listBlock));
       return;
     }
     if (align != null) {
       if (onDetectAlignedParagraph != null) {
-        contentPerPage
-            .add(onDetectAlignedParagraph!.call(currentSpans, blockAttributes));
+        final pw.Widget customBlock =
+            onDetectAlignedParagraph!.call(currentSpans, blockAttributes);
+        contentPerPage.add(pw.Directionality(
+            textDirection: textDirectionToUse, child: customBlock));
         return;
       }
-      contentPerPage.add(
-          await getAlignedParagraphBlock(currentSpans, align, indentLevel));
+      final pw.Widget alignedParagraphBlock =
+          await getAlignedParagraphBlock(currentSpans, align, indentLevel);
+      contentPerPage.add(pw.Directionality(
+          textDirection: textDirectionToUse, child: alignedParagraphBlock));
       return;
     }
     if (indent != null) {
@@ -478,11 +505,17 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       contentPerPage.add(pw.Container(
         alignment: align?.resolvePdfBlockAlign,
         padding: pw.EdgeInsets.only(
-            left: indentLevel * 12.5,
+            left: textDirectionToUse == pw.TextDirection.rtl
+                ? 0
+                : indentLevel * 12.5,
+            right: textDirectionToUse == pw.TextDirection.rtl
+                ? indentLevel * 12.5
+                : 0,
             bottom: spacing.resolvePaddingByLineHeight()),
         child: pw.RichText(
           textAlign: align.resolvePdfTextAlign,
           softWrap: true,
+          textDirection: textDirectionToUse,
           overflow: pw.TextOverflow.span,
           text: pw.TextSpan(
             children: currentSpans,
@@ -500,6 +533,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           child: pw.RichText(
             softWrap: true,
             overflow: pw.TextOverflow.span,
+            textDirection: textDirectionToUse,
             text: pw.TextSpan(
               style: defaultTextStyle.copyWith(
                   lineSpacing: lineHeight.resolveLineHeight()),

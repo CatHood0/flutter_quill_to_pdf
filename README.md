@@ -8,18 +8,15 @@ Some options that can be configured:
 - We can use custom fonts. Using `onRequestFont` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package _Just works automatically with the default library implementation_
 - `CustomWidget`, which helps you create custom `PDF` widgets using the `Paragraph` implementation from `flutter_quill_delta_easy_parser`.
 - Optional front matter and back matter
+- We can set a default directionality for the PDF widgets using `textDirection` from `PDFConverter`
 - Page format using `PDFPageFormat` class
 - `PDFWidgetBuilder` functions in `PDFConverter` that let us customize the detected style, and create a custom pdf widget implementation
 - `ThemeData` optional theme data that let us changes the theme for to pdf document
 
 > By default, the delta is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes (if it is not null), making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
 
-<details>
-    <summary>Tap to show/hide screenshots</summary>
-    <br>
-<img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_to_convert.jpg" width="250" alt="Delta in editor">
-<img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_converted.jpg" width="350" alt="Delta converted in PDF">
-</details>
+![Delta in editor](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_to_convert.jpg)
+![Delta converted in PDF](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_converted.jpg)
 
 ### Add dependencies
 
@@ -67,6 +64,7 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 PDFConverter pdfConverter = PDFConverter(
     backMatterDelta: null,
     frontMatterDelta: null,
+    textDirection: Directionality.of(context), // set a default Direction to your pdf widgets
     document: QuillController.basic().document.toDelta(),
     fallbacks: [...your global fonts],
     onRequestBoldFont: (String fontFamily) async {
@@ -177,6 +175,7 @@ await file.writeAsBytes(await document.save());
 - Background Color
 - Line-height
 - Code block
+* Direction
 - Blockquote
 - Align
 - Embed image (base 64 doesn't work yet)
@@ -187,7 +186,6 @@ await file.writeAsBytes(await document.save());
 
 ## No supported
 
-- Direction
 - Superscript/Subscript (Not planned since is not supported by pdf package)
 - Embed formula (Not planned)
 
