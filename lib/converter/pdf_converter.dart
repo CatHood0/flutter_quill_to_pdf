@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart'
     as ep;
+import 'package:flutter_quill_to_pdf/utils/extensions.dart';
 import 'package:pdf/pdf.dart' show PdfColor;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' as qpdf;
@@ -20,6 +22,10 @@ class PDFConverter {
   final Delta? backMatterDelta;
 
   final qpdf.PDFPageFormat pageFormat;
+
+  /// This will set the default direction for all the document
+  /// or the common widgets if them doesn't have direction attribute
+  final TextDirection textDirection;
 
   ///[CustomPDFWidget] allow devs to use builders to create custom widgets
   final List<qpdf.CustomWidget> customBuilders;
@@ -105,6 +111,7 @@ class PDFConverter {
   PDFConverter({
     required this.pageFormat,
     required this.document,
+    this.textDirection = TextDirection.ltr,
     this.frontMatterDelta,
     this.backMatterDelta,
     this.customBuilders = const <qpdf.CustomWidget>[],
@@ -173,6 +180,7 @@ class PDFConverter {
     deltaOptionalAttr ??= qpdf.DeltaAttributesOptions.common();
     final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
       pageFormat: pageFormat,
+      textDirection: textDirection.toPdf(),
       fonts: globalFontsFallbacks,
       onRequestBoldFont: onRequestBoldFont,
       onRequestBothFont: onRequestBoldItalicFont,
@@ -236,6 +244,7 @@ class PDFConverter {
       onRequestBoldFont: onRequestBoldFont,
       onRequestBothFont: onRequestBoldItalicFont,
       customTheme: themeData,
+      textDirection: textDirection.toPdf(),
       customBuilders: customBuilders,
       blockQuoteBackgroundColor: blockQuoteBackgroundColor,
       blockQuoteDividerColor: blockQuoteDividerColor,
@@ -313,6 +322,7 @@ class PDFConverter {
       codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
       codeBlockTextStyle: codeBlockTextStyle,
       blockQuoteTextStyle: blockQuoteTextStyle,
+      textDirection: textDirection.toPdf(),
       onDetectBlockquote: onDetectBlockquote,
       onDetectCodeBlock: onDetectCodeBlock,
       onDetectHeaderBlock: onDetectHeaderBlock,
