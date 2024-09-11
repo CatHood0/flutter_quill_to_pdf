@@ -178,7 +178,7 @@ await file.writeAsBytes(await document.save());
 * Direction
 - Blockquote
 - Align
-- Embed image (base 64 doesn't work yet)
+- Embed image (Base64, URL and Storage Paths)
 - Embed video (Just the URL of the Video will be pasted as a text)
 - Header
 - List (Multilevel List too)

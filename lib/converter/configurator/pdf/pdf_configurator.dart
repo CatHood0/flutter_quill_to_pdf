@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
@@ -104,7 +106,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   Future<pw.Widget> getImageBlock(Line line, [pw.Alignment? alignment]) async {
     double? width = null;
     double? height = null;
-    final String path = (line.data as Map<String, dynamic>)['image'];
+    final String data = (line.data as Map<String, dynamic>)['image'];
     final Map<String, dynamic> attributes =
         parseCssStyles(line.attributes?['style'] ?? '', 'left');
     if (attributes.isNotEmpty) {
@@ -112,8 +114,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       height = attributes['height'];
     }
     late final File? file;
-    if (Constant.IMAGE_FROM_NETWORK_URL.hasMatch(path)) {
-      final String url = path;
+    if (Constant.IMAGE_FROM_NETWORK_URL.hasMatch(data)) {
+      final String url = data;
       final String pathStorage =
           '${(await getApplicationCacheDirectory()).path}/image (${Random.secure().nextInt(99999) + 50})';
       try {
@@ -122,9 +124,21 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       } on DioException {
         rethrow;
       }
+    } else if (Constant.IMAGE_LOCAL_STORAGE_PATH_PATTERN.hasMatch(data)) {
+      file = File(data);
+    } else {
+      final Uint8List bytes = base64Decode(data);
+      final String pathStorage =
+          '${(await getApplicationCacheDirectory()).path}/image (${Random.secure().nextInt(99999) + 50})';
+      try {
+        file = File(pathStorage);
+        file.writeAsBytes(bytes);
+      } on DioException {
+        rethrow;
+      }
     }
-    file = File(path);
-    if ((await file.exists()) == false) {
+
+    if (!(await file.exists())) {
       return pw.SizedBox.shrink();
     }
     // verify if exceded height using page format params
