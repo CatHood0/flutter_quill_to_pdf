@@ -1,3 +1,11 @@
+# 2.2.5
+
+* Fix: Color bugs and list block with its leading sizes calculation by @Paul-creator in https://github.com/CatHood0/flutter_quill_to_pdf/pull/12
+* Feat: Support for base64 encoded images
+* Feat: added directionality support by @CatHood0 in https://github.com/CatHood0/flutter_quill_to_pdf/pull/13
+
+**Full Changelog**: https://github.com/CatHood0/flutter_quill_to_pdf/compare/V-2.2.4...V-2.2.5
+
 # 2.2.4
 
 * Chore: removed deprecated instances
