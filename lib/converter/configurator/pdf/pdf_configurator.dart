@@ -3,16 +3,18 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+
 import 'package:collection/collection.dart';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
+import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import 'package:numerus/roman/roman.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart' show PdfColor, PdfColors;
+import 'package:pdf/pdf.dart' show PdfColor, PdfColors, PdfPageFormat;
 import 'package:pdf/widgets.dart' as pw;
-import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
+
 import '../../../utils/css.dart';
 import 'attribute_functions.dart';
 import 'document_functions.dart';
@@ -468,17 +470,35 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         spansToWrap.isNotEmpty ? spansToWrap.first.style : null;
 
     if (listType != 'unchecked' && listType != 'checked') {
-      final String typeList =
-          listType == 'ordered' ? _getListIdentifier(indentLevel) : '•';
-
       // Apply the first span's style to the list marker
-      widgets = pw.TextSpan(
-        text: '$typeList ',
-        style: firstSpanStyle ?? defaultTextStyle,
-        children: <pw.InlineSpan>[
-          pw.TextSpan(children: spansToWrap),
-        ],
-      );
+      if (listType == 'ordered') {
+        widgets = pw.TextSpan(
+          text: '${_getListIdentifier(indentLevel)} ',
+          style: firstSpanStyle ?? defaultTextStyle,
+          children: <pw.InlineSpan>[
+            pw.TextSpan(children: spansToWrap),
+          ],
+        );
+      } else if (listType == 'bullet') {
+        widgets = pw.TextSpan(
+          children: <pw.InlineSpan>[
+            pw.WidgetSpan(
+              child: pw.Container(
+                width: 2.0 * PdfPageFormat.mm,
+                height: 2.0 * PdfPageFormat.mm,
+                decoration: const pw.BoxDecoration(
+                    color: PdfColors.black, shape: pw.BoxShape.circle),
+              ),
+            ),
+            pw.TextSpan(
+              children: <pw.InlineSpan>[
+                const pw.TextSpan(text: ' '),
+                pw.TextSpan(children: <pw.InlineSpan>[...spansToWrap])
+              ],
+            ),
+          ],
+        );
+      }
     } else if (listType == 'checked' || listType == 'unchecked') {
       widgets = pw.TextSpan(
         children: <pw.InlineSpan>[
