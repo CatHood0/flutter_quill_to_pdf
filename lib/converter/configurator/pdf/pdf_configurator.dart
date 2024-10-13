@@ -484,8 +484,10 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           children: <pw.InlineSpan>[
             pw.WidgetSpan(
               child: pw.Container(
-                width: 2.0 * PdfPageFormat.mm,
-                height: 2.0 * PdfPageFormat.mm,
+                width: 1.0 * PdfPageFormat.mm,
+                height: 1.0 * PdfPageFormat.mm,
+                margin:
+                    const pw.EdgeInsets.only(bottom: 1.0 * PdfPageFormat.mm),
                 decoration: const pw.BoxDecoration(
                     color: PdfColors.black, shape: pw.BoxShape.circle),
               ),
