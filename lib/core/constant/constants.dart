@@ -8,7 +8,7 @@ class Constant {
   static final RegExp newLinesInsertions = RegExp(r'^¶+');
   // only valid for mobile devices
   static final RegExp IMAGE_LOCAL_STORAGE_PATH_PATTERN =
-      RegExp(r'^((\/[a-zA-Z0-9-_]+)+|\/)(\..+?)?$');
+      RegExp(r'^((\/[a-zA-Z0-9-_]+)+|\/)(\..+)?$');
   static final RegExp IMAGE_FROM_NETWORK_URL = RegExp(
       r'^http(s)?(?:(?<scheme>[^:\/?#]+):)?(?:\/\/(?<authority>[^\/?#]*))?(?<path>[^?#]*\/)?(?<file>[^?#]*\.(?<extension>[Jj][Pp][Ee]?[Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]))(?:\?(?<query>[^#]*))?(?:#(?<fragment>.*))?$');
 }

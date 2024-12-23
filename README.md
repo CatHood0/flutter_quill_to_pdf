@@ -5,7 +5,7 @@ This package allow us create PDF's using `Deltas` from `Quill`.
 Some options that can be configured:
 
 - `DeltaAttributesOptions` (this attributes will be applied to whole delta)
-- We can use custom fonts. Using `onRequestFont` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package _Just works automatically with the default library implementation_
+- We can use custom fonts. Using `onRequestFont` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package. 
 - `CustomWidget`, which helps you create custom `PDF` widgets using the `Paragraph` implementation from `flutter_quill_delta_easy_parser`.
 - Optional front matter and back matter
 - We can set a default directionality for the PDF widgets using `textDirection` from `PDFConverter`
@@ -31,7 +31,7 @@ dependencies:
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
 ```
 
-### Personalize the settings of the page (height, width and margins)
+### Personalize the settings of the page (`height`, `width` and `margins`)
 
 We can use two types differents constructors of the same `PDFPageFormat` class
 
@@ -58,36 +58,31 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 );
 ```
 
-### Using PDFConverter to create finally our document
+### Using `PDFConverter` to create finally our document
 
 ```dart
 PDFConverter pdfConverter = PDFConverter(
     backMatterDelta: null,
     frontMatterDelta: null,
     textDirection: Directionality.of(context), // set a default Direction to your pdf widgets
-    document: QuillController.basic().document.toDelta(),
+    document: _quillController.document.toDelta(),
+    pageFormat: pageFormat,
     fallbacks: [...your global fonts],
     onRequestBoldFont: (String fontFamily) async {
-        // this is optional
        ...your local font implementation
     },
     onRequestBoldItalicFont: (String fontFamily) async {
-        // this is optional
        ...your local font implementation
     },
     onRequestFallbackFont: (String fontFamily) async {
-        // this is optional
        ...your local font implementation
     },
     onRequestItalicFont: (String fontFamily) async {
-        // this is optional
        ...your local font implementation
     },
     onRequestFont: (String fontFamily) async {
-        // this is optional
        ...your local font implementation
     },
-    pageFormat: pageFormat,
 );
 ```
 
@@ -106,7 +101,7 @@ final pw.Document? document = await pdfConverter.createDocument();
 await pdfConverter.createDocumentFile(path: filepath, isWeb: kIsWeb,...other optional params);
 ```
 
-#### `generateWidget` _returns a Widget that you can use to draw on a PDF - giving you full control of the PDF_
+#### `generateWidget` _returns a Widget that gives to you full control of the PDF_
 
 ```dart
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
@@ -175,7 +170,7 @@ await file.writeAsBytes(await document.save());
 - Background Color
 - Line-height
 - Code block
-* Direction
+- Direction
 - Blockquote
 - Align
 - Embed image (Base64, URL and Storage Paths)

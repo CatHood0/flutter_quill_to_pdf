@@ -1,3 +1,7 @@
+# 2.2.6
+
+* Fix: IMAGE_LOCAL_STORAGE_PATH_PATTERN was improved to detect more cases
+
 # 2.2.5
 
 * Fix: Color bugs and list block with its leading sizes calculation by @Paul-creator in https://github.com/CatHood0/flutter_quill_to_pdf/pull/12
