@@ -1,6 +1,10 @@
+# 2.2.7
+
+* Chore: deprecated all `onRequestFont` before `2.2.7` and replaced them with `onRequestFontFamily`
+
 # 2.2.6
 
-* Fix: IMAGE_LOCAL_STORAGE_PATH_PATTERN was improved to detect more cases
+* Fix: `IMAGE_LOCAL_STORAGE_PATH_PATTERN` was improved to detect more cases
 
 # 2.2.5
 

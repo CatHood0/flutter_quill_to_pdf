@@ -5,6 +5,8 @@ import 'dart:ui';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart'
     as ep;
+import 'package:flutter_quill_to_pdf/core/request/font_family_request.dart';
+import 'package:flutter_quill_to_pdf/core/response/font_family_response.dart';
 import 'package:flutter_quill_to_pdf/utils/extensions.dart';
 import 'package:pdf/pdf.dart' show PdfColor;
 import 'package:pdf/widgets.dart' as pw;
@@ -30,17 +32,33 @@ class PDFConverter {
   ///[CustomPDFWidget] allow devs to use builders to create custom widgets
   final List<qpdf.CustomWidget> customBuilders;
 
-  ///A simple [request] font when converter detect a font
+  ///A font when converter detect a font
+  final FontFamilyResponse Function(FontFamilyRequest familyRequest)?
+      onRequestFontFamily;
+
+  ///A simple [rqeuest] font when converter detect a font
+  @Deprecated(
+      'onRequestFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
   final Future<pw.Font> Function(String)? onRequestFont;
 
   ///A simple [request] font when converter detect a font
+  @Deprecated(
+      'onRequestBoldFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
   final Future<pw.Font> Function(String)? onRequestBoldFont;
 
   ///A simple [request] font when converter detect a font
+  @Deprecated(
+      'onRequestItalicFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
   final Future<pw.Font> Function(String)? onRequestItalicFont;
 
   ///A simple [request] font when converter detect a font
+  @Deprecated(
+      'onRequestBoldItalicFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
   final Future<pw.Font> Function(String)? onRequestBoldItalicFont;
+
+  @Deprecated(
+      'onRequestFallbackFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
+  final Future<List<pw.Font>?> Function(String)? onRequestFallbackFont;
 
   ///If you need to [customize] the [theme] of the [pdf document], override this param
   final pw.ThemeData? themeData;
@@ -105,7 +123,6 @@ class PDFConverter {
   final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>?
       onDetectBlockquote;
 
-  final Future<List<pw.Font>?> Function(String)? onRequestFallbackFont;
   late final List<pw.Font> globalFontsFallbacks;
 
   PDFConverter({
@@ -115,11 +132,22 @@ class PDFConverter {
     this.frontMatterDelta,
     this.backMatterDelta,
     this.customBuilders = const <qpdf.CustomWidget>[],
-    this.onRequestBoldFont,
-    this.onRequestBoldItalicFont,
-    this.onRequestFallbackFont,
+    @Deprecated(
+        'onRequestFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
     this.onRequestFont,
+    this.onRequestFontFamily,
+    @Deprecated(
+        'onRequestBoldFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
+    this.onRequestBoldFont,
+    @Deprecated(
+        'onRequestItalicFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
     this.onRequestItalicFont,
+    @Deprecated(
+        'onRequestFallbackFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
+    this.onRequestFallbackFont,
+    @Deprecated(
+        'onRequestBoldItalicFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
+    this.onRequestBoldItalicFont,
     required List<pw.Font> fallbacks,
     this.blockQuotePaddingLeft,
     this.blockQuotePaddingRight,
@@ -181,9 +209,8 @@ class PDFConverter {
     final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
       pageFormat: pageFormat,
       textDirection: textDirection.toPdf(),
+      onRequestFontFamily: onRequestFontFamily,
       fonts: globalFontsFallbacks,
-      onRequestBoldFont: onRequestBoldFont,
-      onRequestBothFont: onRequestBoldItalicFont,
       customTheme: themeData,
       customBuilders: customBuilders,
       blockQuoteBackgroundColor: blockQuoteBackgroundColor,
@@ -193,7 +220,6 @@ class PDFConverter {
       codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
       codeBlockTextStyle: codeBlockTextStyle,
       blockQuoteTextStyle: blockQuoteTextStyle,
-      onRequestFallbacks: onRequestFallbackFont,
       onDetectAlignedParagraph: onDetectAlignedParagraph,
       onDetectCommonText: onDetectCommonText,
       onDetectBlockquote: onDetectBlockquote,
@@ -206,7 +232,6 @@ class PDFConverter {
       onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
       onDetectLink: onDetectLink,
       onDetectList: onDetectList,
-      onRequestFont: onRequestFont,
       backM: !shouldProcessDeltas
           ? backMatterDelta
           : processDelta(backMatterDelta, deltaOptionalAttr,
@@ -215,7 +240,6 @@ class PDFConverter {
           ? frontMatterDelta
           : processDelta(frontMatterDelta, deltaOptionalAttr,
               overrideAttributesPassedByUser),
-      onRequestItalicFont: onRequestItalicFont,
       document: !shouldProcessDeltas
           ? document
           : processDelta(
@@ -241,8 +265,6 @@ class PDFConverter {
     final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
       pageFormat: pageFormat,
       fonts: globalFontsFallbacks,
-      onRequestBoldFont: onRequestBoldFont,
-      onRequestBothFont: onRequestBoldItalicFont,
       customTheme: themeData,
       textDirection: textDirection.toPdf(),
       customBuilders: customBuilders,
@@ -253,7 +275,6 @@ class PDFConverter {
       codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
       codeBlockTextStyle: codeBlockTextStyle,
       blockQuoteTextStyle: blockQuoteTextStyle,
-      onRequestFallbacks: onRequestFallbackFont,
       onDetectAlignedParagraph: onDetectAlignedParagraph,
       onDetectCommonText: onDetectCommonText,
       onDetectBlockquote: onDetectBlockquote,
@@ -266,7 +287,7 @@ class PDFConverter {
       onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
       onDetectLink: onDetectLink,
       onDetectList: onDetectList,
-      onRequestFont: onRequestFont,
+      onRequestFontFamily: onRequestFontFamily,
       backM: !shouldProcessDeltas
           ? backMatterDelta
           : processDelta(backMatterDelta, deltaOptionalAttr,
@@ -275,7 +296,6 @@ class PDFConverter {
           ? frontMatterDelta
           : processDelta(frontMatterDelta, deltaOptionalAttr,
               overrideAttributesPassedByUser),
-      onRequestItalicFont: onRequestItalicFont,
       document: !shouldProcessDeltas
           ? document
           : processDelta(
@@ -308,10 +328,7 @@ class PDFConverter {
       pageFormat: pageFormat,
       fonts: globalFontsFallbacks,
       customBuilders: customBuilders,
-      onRequestBoldFont: onRequestBoldFont,
-      onRequestBothFont: onRequestBoldItalicFont,
-      onRequestFallbacks: onRequestFallbackFont,
-      onRequestFont: onRequestFont,
+      onRequestFontFamily: onRequestFontFamily,
       onDetectAlignedParagraph: onDetectAlignedParagraph,
       onDetectCommonText: onDetectCommonText,
       customTheme: themeData,
@@ -341,7 +358,6 @@ class PDFConverter {
           ? frontMatterDelta
           : processDelta(frontMatterDelta, deltaOptionalAttr,
               overrideAttributesPassedByUser),
-      onRequestItalicFont: onRequestItalicFont,
       document: !shouldProcessDeltas
           ? document
           : processDelta(

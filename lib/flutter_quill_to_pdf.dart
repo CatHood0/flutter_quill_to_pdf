@@ -7,6 +7,9 @@ export 'package:flutter_quill_to_pdf/converter/service/pdf_service.dart';
 export 'package:flutter_quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
 export 'package:flutter_quill_to_pdf/converter/configurator/converter_option/custom_converter.dart';
 export 'package:flutter_quill_to_pdf/converter/delta_processor/delta_processor.dart';
+//core
+export 'package:flutter_quill_to_pdf/core/request/font_family_request.dart';
+export 'package:flutter_quill_to_pdf/core/response/font_family_response.dart';
 //converter options
 export 'package:flutter_quill_to_pdf/converter/configurator/converter_option/pdf_page_format.dart';
 export 'package:flutter_quill_to_pdf/converter/configurator/abstract_converter.dart';

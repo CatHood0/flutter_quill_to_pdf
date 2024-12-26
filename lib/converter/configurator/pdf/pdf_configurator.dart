@@ -37,10 +37,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final Delta? frontM;
   final Delta? backM;
   final List<CustomWidget> customBuilders;
-  final Future<pw.Font> Function(String fontFamily)? onRequestFont;
-  final Future<pw.Font> Function(String fontFamily)? onRequestBoldFont;
-  final Future<pw.Font> Function(String fontFamily)? onRequestItalicFont;
-  final Future<pw.Font> Function(String fontFamily)? onRequestBothFont;
+  final FontFamilyResponse Function(FontFamilyRequest familyRequest)?
+      onRequestFontFamily;
   final PDFWidgetBuilder<Line, pw.Widget>? onDetectImageBlock;
   final PDFWidgetBuilder<Line, List<pw.InlineSpan>>?
       onDetectInlineRichTextStyles;
@@ -63,16 +61,11 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final double? blockQuotethicknessDividerColor;
   final double? blockQuotePaddingLeft;
   final double? blockQuotePaddingRight;
-  final Future<List<pw.Font>?> Function(String fontFamily)? onRequestFallbacks;
   final int defaultFontSize = Constant
       .DEFAULT_FONT_SIZE; //avoid spans without font sizes not appears in the document
   late final double pageWidth, pageHeight;
   PdfConfigurator({
-    this.onRequestBoldFont,
-    this.onRequestBothFont,
-    this.onRequestFallbacks,
-    this.onRequestFont,
-    this.onRequestItalicFont,
+    this.onRequestFontFamily,
     required this.customBuilders,
     required super.document,
     this.blockQuotePaddingLeft,
@@ -194,15 +187,18 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final double? fontSize = !addFontSize ? null : fontSizeHelper;
     final String content = line.data as String;
     final double? lineSpacing = spacing?.resolveLineHeight();
-    final pw.Font font =
-        await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ??
-            pw.Font.helvetica();
-    final List<pw.Font> fonts = await onRequestFallbacks
-            ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ??
-        <pw.Font>[];
+    final FontFamilyResponse fontResponse =
+        onRequestFontFamily?.call(FontFamilyRequest(
+              family: fontFamily ?? Constant.DEFAULT_FONT_FAMILY,
+              isBold: bold,
+              isItalic: italic,
+              isUnderline: underline,
+              isStrike: strike,
+            )) ??
+            FontFamilyResponse.helvetica();
     // Give just the necessary fallbacks for the founded fontFamily
     final pw.TextStyle decided_style = style?.copyWith(
-          font: font,
+          font: fontResponse.fontNormalV,
           fontStyle: italic ? pw.FontStyle.italic : null,
           fontWeight: bold ? pw.FontWeight.bold : null,
           decoration: pw.TextDecoration.combine(<pw.TextDecoration>[
@@ -211,13 +207,10 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           ]),
           decorationStyle: pw.TextDecorationStyle.solid,
           decorationColor: textColor ?? backgroundTextColor,
-          fontBold: await onRequestBoldFont
-              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontItalic: await onRequestItalicFont
-              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontBoldItalic: await onRequestBothFont
-              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontFallback: fonts,
+          fontBold: fontResponse.boldFontV,
+          fontItalic: fontResponse.italicFontV,
+          fontBoldItalic: fontResponse.boldItalicFontV,
+          fontFallback: fontResponse.fallbacks,
           fontSize:
               !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
           lineSpacing: lineSpacing,
@@ -225,20 +218,17 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           background: pw.BoxDecoration(color: backgroundTextColor),
         ) ??
         defaultTextStyle.copyWith(
-          font: font,
+          font: fontResponse.fontNormalV,
           decoration: pw.TextDecoration.combine(<pw.TextDecoration>[
             if (strike) pw.TextDecoration.lineThrough,
             if (underline) pw.TextDecoration.underline,
           ]),
           decorationStyle: pw.TextDecorationStyle.solid,
           decorationColor: textColor ?? backgroundTextColor,
-          fontBold: await onRequestBoldFont
-              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontItalic: await onRequestItalicFont
-              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontBoldItalic: await onRequestBothFont
-              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontFallback: fonts,
+          fontBold: fontResponse.boldFontV,
+          fontItalic: fontResponse.italicFontV,
+          fontBoldItalic: fontResponse.boldItalicFontV,
+          fontFallback: fontResponse.fallbacks,
           fontSize:
               !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
           lineSpacing: lineSpacing,
@@ -341,12 +331,15 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final bool underline = line.attributes?['underline'] ?? false;
     final String href = line.attributes!['link'];
     final String hrefContent = line.data as String;
-    final pw.Font font =
-        await onRequestFont?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ??
-            pw.Font.helvetica();
-    final List<pw.Font> fonts = await onRequestFallbacks
-            ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY) ??
-        <pw.Font>[];
+    final FontFamilyResponse fontResponse =
+        onRequestFontFamily?.call(FontFamilyRequest(
+              family: fontFamily ?? Constant.DEFAULT_FONT_FAMILY,
+              isBold: bold,
+              isItalic: italic,
+              isUnderline: underline,
+              isStrike: strike,
+            )) ??
+            FontFamilyResponse.helvetica();
     spans.add(
       pw.TextSpan(
         annotation: pw.AnnotationLink(href),
@@ -364,14 +357,11 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           ]),
           decorationStyle: pw.TextDecorationStyle.solid,
           decorationColor: defaultLinkColor,
-          font: font,
-          fontBold: await onRequestBoldFont
-              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontItalic: await onRequestItalicFont
-              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontBoldItalic: await onRequestBothFont
-              ?.call(fontFamily ?? Constant.DEFAULT_FONT_FAMILY),
-          fontFallback: fonts,
+          font: fontResponse.fontNormalV,
+          fontBold: fontResponse.boldFontV,
+          fontItalic: fontResponse.italicFontV,
+          fontBoldItalic: fontResponse.boldItalicFontV,
+          fontFallback: fontResponse.fallbacks,
           fontSize:
               !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
           lineSpacing: lineSpacing,

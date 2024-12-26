@@ -61,27 +61,21 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 ### Using `PDFConverter` to create finally our document
 
 ```dart
-PDFConverter pdfConverter = PDFConverter(
+final pdfConverter = PDFConverter(
     backMatterDelta: null,
     frontMatterDelta: null,
     textDirection: Directionality.of(context), // set a default Direction to your pdf widgets
     document: _quillController.document.toDelta(),
     pageFormat: pageFormat,
     fallbacks: [...your global fonts],
-    onRequestBoldFont: (String fontFamily) async {
-       ...your local font implementation
-    },
-    onRequestBoldItalicFont: (String fontFamily) async {
-       ...your local font implementation
-    },
-    onRequestFallbackFont: (String fontFamily) async {
-       ...your local font implementation
-    },
-    onRequestItalicFont: (String fontFamily) async {
-       ...your local font implementation
-    },
-    onRequestFont: (String fontFamily) async {
-       ...your local font implementation
+    onRequestFontFamily: (FontFamilyRequest familyRequest) {
+        return FontFamilyResponse(
+          fontNormalV: <anyFontThatYouWant>, 
+          boldFontV: familyRequest.isBold ? <yourBoldFontFamily> : null,
+          italicFontV: familyRequest.isItalic ? <yourItalicFontFamily> : null,
+          boldItalicFontV: familyRequest.isItalic && familyRequest.isBold ? <yourBoldItalicFontFamily> : null,
+          fallbacks: const <pw.Font>[],
+        );
     },
 );
 ```
@@ -98,7 +92,7 @@ final pw.Document? document = await pdfConverter.createDocument();
 
 ```dart
 // [isWeb] is used to know how save automatically the PDF generated
-await pdfConverter.createDocumentFile(path: filepath, isWeb: kIsWeb,...other optional params);
+await pdfConverter.createDocumentFile(path: filepath, isWeb: kIsWeb, <...other optional params>);
 ```
 
 #### `generateWidget` _returns a Widget that gives to you full control of the PDF_
