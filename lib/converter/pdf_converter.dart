@@ -36,30 +36,6 @@ class PDFConverter {
   final FontFamilyResponse Function(FontFamilyRequest familyRequest)?
       onRequestFontFamily;
 
-  ///A simple [rqeuest] font when converter detect a font
-  @Deprecated(
-      'onRequestFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-  final Future<pw.Font> Function(String)? onRequestFont;
-
-  ///A simple [request] font when converter detect a font
-  @Deprecated(
-      'onRequestBoldFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-  final Future<pw.Font> Function(String)? onRequestBoldFont;
-
-  ///A simple [request] font when converter detect a font
-  @Deprecated(
-      'onRequestItalicFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-  final Future<pw.Font> Function(String)? onRequestItalicFont;
-
-  ///A simple [request] font when converter detect a font
-  @Deprecated(
-      'onRequestBoldItalicFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-  final Future<pw.Font> Function(String)? onRequestBoldItalicFont;
-
-  @Deprecated(
-      'onRequestFallbackFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-  final Future<List<pw.Font>?> Function(String)? onRequestFallbackFont;
-
   ///If you need to [customize] the [theme] of the [pdf document], override this param
   final pw.ThemeData? themeData;
 
@@ -132,22 +108,7 @@ class PDFConverter {
     this.frontMatterDelta,
     this.backMatterDelta,
     this.customBuilders = const <qpdf.CustomWidget>[],
-    @Deprecated(
-        'onRequestFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-    this.onRequestFont,
     this.onRequestFontFamily,
-    @Deprecated(
-        'onRequestBoldFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-    this.onRequestBoldFont,
-    @Deprecated(
-        'onRequestItalicFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-    this.onRequestItalicFont,
-    @Deprecated(
-        'onRequestFallbackFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-    this.onRequestFallbackFont,
-    @Deprecated(
-        'onRequestBoldItalicFont is no longer used since 2.2.6 and will be removed in future releases. Use onRequestFontFamily instead')
-    this.onRequestBoldItalicFont,
     required List<pw.Font> fallbacks,
     this.blockQuotePaddingLeft,
     this.blockQuotePaddingRight,
