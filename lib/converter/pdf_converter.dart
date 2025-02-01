@@ -372,7 +372,7 @@ class PDFConverter {
           ..href =
               "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}"
           ..setAttribute(
-              "download", "${DateTime.now().millisecondsSinceEpoch}.pdf")
+              "download", File(path).uri.pathSegments.last)
           ..click();
         onSucessWrite?.call('');
         return;
