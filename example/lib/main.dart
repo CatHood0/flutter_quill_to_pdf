@@ -3,6 +3,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:example/example_editor/editor/custom_quill_editor.dart';
 import 'package:example/fonts_loader/fonts_loader.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -89,6 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 PDFConverter pdfConverter = PDFConverter(
                   backMatterDelta: null,
                   frontMatterDelta: null,
+                  isWeb: kIsWeb,
                   document: _quillController.document.toDelta(),
                   fallbacks: [...loader.allFonts()],
                   onRequestFontFamily: (FontFamilyRequest familyRequest) {

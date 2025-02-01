@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
+import 'package:meta/meta.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -18,11 +19,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   late final double _height;
   final pw.TextDirection textDirection;
   final List<pw.Widget> contentPerPage = <pw.Widget>[];
+  @experimental
+  final pw.Page Function(List<pw.Widget> children, pw.ThemeData theme, PdfPageFormat pageFormat)? pageBuilder;
 
   PdfService({
     required PDFPageFormat pageFormat,
     required List<pw.Font> fonts,
+    this.pageBuilder,
     this.textDirection = pw.TextDirection.ltr,
+    super.isWeb,
     super.onRequestFontFamily,
     required super.customBuilders,
     required super.document,
@@ -106,8 +111,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         documents: <Delta>[frontM ?? Delta(), document, backM ?? Delta()]);
     for (int i = 0; i < docWidgets.length; i++) {
       final List<pw.Widget> widgets = docWidgets.elementAt(i);
+      final pw.Page? pageBuilded = pageBuilder?.call(widgets, defaultTheme, pdfPageFormat);
       pdf.addPage(
-        pw.MultiPage(
+       pageBuilded ?? pw.MultiPage(
           theme: defaultTheme,
           pageFormat: pdfPageFormat,
           maxPages: 99999999,

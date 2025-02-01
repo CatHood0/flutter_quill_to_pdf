@@ -1,3 +1,10 @@
+# 2.2.8
+
+* Fix: rendering images in web and file generating (thanks to **johannesvedder** for his contributation).
+* Feat: support for create custom pages
+* Chore: added doc comment for `generateWidget` method
+
+
 # 2.2.7
 
 * Chore: deprecated all `onRequestFont` before `2.2.7` and replaced them with `onRequestFontFamily`

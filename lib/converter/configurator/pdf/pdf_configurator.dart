@@ -16,7 +16,6 @@ import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import '../../../utils/css.dart';
 import 'attribute_functions.dart';
 import 'document_functions.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
@@ -66,8 +65,10 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final int defaultFontSize = Constant
       .DEFAULT_FONT_SIZE; //avoid spans without font sizes not appears in the document
   late final double pageWidth, pageHeight;
+  final bool isWeb;
   PdfConfigurator({
     this.onRequestFontFamily,
+    this.isWeb = false,
     required this.customBuilders,
     required super.document,
     this.blockQuotePaddingLeft,
@@ -112,7 +113,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     File? file;
     Uint8List? imageBytes;
 
-    if (kIsWeb) {
+    if (isWeb) {
       imageBytes = await _fetchBlobAsBytes(data);
     } else if (Constant.IMAGE_FROM_NETWORK_URL.hasMatch(data)) {
       final String pathStorage =
@@ -137,7 +138,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       }
     }
 
-    if (kIsWeb ? (imageBytes == null || imageBytes.isEmpty) 
+    if (isWeb ? (imageBytes == null || imageBytes.isEmpty) 
         : (file == null || !(await file.exists()))) {
       return pw.SizedBox.shrink();
     }
@@ -155,7 +156,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           constraints:
               height == null ? const pw.BoxConstraints(maxHeight: 450) : null,
           child: pw.Image(
-            pw.MemoryImage(kIsWeb ? imageBytes! : (await file!.readAsBytes()) ),
+            pw.MemoryImage(isWeb ? imageBytes! : (await file!.readAsBytes()) ),
             dpi: 230,
             height: height,
             width: width,

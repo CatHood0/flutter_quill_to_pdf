@@ -11,6 +11,7 @@ Some options that can be configured:
 - We can set a default directionality for the PDF widgets using `textDirection` from `PDFConverter`
 - Page format using `PDFPageFormat` class
 - `PDFWidgetBuilder` functions in `PDFConverter` that let us customize the detected style, and create a custom pdf widget implementation
+- `PageBuilder` function in `PDFConverter` let us create dinamically pdf pages as we want. 
 - `ThemeData` optional theme data that let us changes the theme for to pdf document
 
 > By default, the delta is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes (if it is not null), making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
@@ -65,6 +66,8 @@ final pdfConverter = PDFConverter(
     backMatterDelta: null,
     frontMatterDelta: null,
     textDirection: Directionality.of(context), // set a default Direction to your pdf widgets
+    // if you support web platform, you will need to pass this param, since fetching images in web works differently
+    isWeb: kIsWeb,
     document: _quillController.document.toDelta(),
     pageFormat: pageFormat,
     fallbacks: [...your global fonts],
@@ -91,8 +94,7 @@ final pw.Document? document = await pdfConverter.createDocument();
 #### `createDocumentFile` _makes the same of the before one, write in the selected file path_
 
 ```dart
-// [isWeb] is used to know how save automatically the PDF generated
-await pdfConverter.createDocumentFile(path: filepath, isWeb: kIsWeb, <...other optional params>);
+await pdfConverter.createDocumentFile(path: filepath, <...other optional params>);
 ```
 
 #### `generateWidget` _returns a Widget that gives to you full control of the PDF_
@@ -167,10 +169,13 @@ await file.writeAsBytes(await document.save());
 - Direction
 - Blockquote
 - Align
-- Embed image (Base64, URL and Storage Paths)
+- Embed image (Base64, URL, and Storage Paths)
 - Embed video (Just the URL of the Video will be pasted as a text)
 - Header
 - List (Multilevel List too)
+  1. Ordered List 
+  *  Bullet List
+  - [x] CheckBox List
 - Indent
 
 ## No supported
