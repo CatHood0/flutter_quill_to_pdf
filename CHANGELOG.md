@@ -1,3 +1,11 @@
+# 2.2.9
+
+* Fix: replace bullet unicode text to bullet point widget by @ToddZeil in https://github.com/CatHood0/flutter_quill_to_pdf/pull/15
+
+## New Contributors
+
+* @ToddZeil made their first contribution in https://github.com/CatHood0/flutter_quill_to_pdf/pull/15
+
 # 2.2.8
 
 * Fix: rendering images in web and file generating (thanks to **johannesvedder** for his contributation).
