@@ -104,7 +104,7 @@ class PDFConverter {
   late final List<pw.Font> globalFontsFallbacks;
 
   /// [isWeb] is used to know is the current platform is web since the way of the fetch images files
-  /// is different from the other platforms 
+  /// is different from the other platforms
   @experimental
   final bool isWeb;
 
@@ -286,8 +286,7 @@ class PDFConverter {
         web.AnchorElement()
           ..href =
               "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}"
-          ..setAttribute(
-              "download", File(path).uri.pathSegments.last)
+          ..setAttribute("download", File(path).uri.pathSegments.last)
           ..click();
         onSucessWrite?.call('');
         return;
@@ -313,7 +312,7 @@ class PDFConverter {
     return Delta.fromJson(jsonDecode(json));
   }
 
-  /// Return a container with the widgets generated from the Document passed 
+  /// Return a container with the widgets generated from the Document passed
   Future<pw.Widget?> generateWidget({
     qpdf.DeltaAttributesOptions? deltaOptionalAttr,
     double? maxWidth,
@@ -371,5 +370,4 @@ class PDFConverter {
       rethrow;
     }
   }
-
 }

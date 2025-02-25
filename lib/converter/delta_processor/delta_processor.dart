@@ -1,14 +1,10 @@
-// ignore_for_file: always_specify_types
-
 import 'dart:convert';
 import 'package:dart_quill_delta/dart_quill_delta.dart' as fq;
-import 'package:dart_quill_delta/dart_quill_delta.dart' as ops;
-import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/map_extension.dart';
 import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/core/internal/delta_denormalizer.dart';
 import 'package:flutter_quill_to_pdf/utils/utils.dart';
-
 import '../../core/constant/constants.dart';
 
 int _index = 0;
@@ -23,16 +19,16 @@ String applyAttributesIfNeeded({
   _index = 0;
   _buffer.clear();
   if (json.isEmpty) return json;
-  fq.Delta delta = fq.Delta.fromJson(jsonDecode(json)).fullDenormalizer();
+  fq.Delta delta = fq.Delta.fromJson(jsonDecode(json)).denormalize();
   while (_index < delta.length) {
     final int nextIndex = _index + 1;
-    final ops.Operation operation = delta.elementAt(_index);
+    final fq.Operation operation = delta.elementAt(_index);
     if (operation.data is! String) {
       _buffer.write(',${jsonEncode(operation.toJson())},');
       _index++;
       continue;
     }
-    ops.Operation? nextOp = null;
+    fq.Operation? nextOp = null;
     if (nextIndex < delta.length) nextOp = delta.elementAt(nextIndex);
     if (operation.data is String &&
         !Constant.newLinesInsertions.hasMatch(

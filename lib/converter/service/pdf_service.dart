@@ -20,7 +20,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   final pw.TextDirection textDirection;
   final List<pw.Widget> contentPerPage = <pw.Widget>[];
   @experimental
-  final pw.Page Function(List<pw.Widget> children, pw.ThemeData theme, PdfPageFormat pageFormat)? pageBuilder;
+  final pw.Page Function(List<pw.Widget> children, pw.ThemeData theme,
+      PdfPageFormat pageFormat)? pageBuilder;
 
   PdfService({
     required PDFPageFormat pageFormat,
@@ -111,16 +112,18 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         documents: <Delta>[frontM ?? Delta(), document, backM ?? Delta()]);
     for (int i = 0; i < docWidgets.length; i++) {
       final List<pw.Widget> widgets = docWidgets.elementAt(i);
-      final pw.Page? pageBuilded = pageBuilder?.call(widgets, defaultTheme, pdfPageFormat);
+      final pw.Page? pageBuilded =
+          pageBuilder?.call(widgets, defaultTheme, pdfPageFormat);
       pdf.addPage(
-       pageBuilded ?? pw.MultiPage(
-          theme: defaultTheme,
-          pageFormat: pdfPageFormat,
-          maxPages: 99999999,
-          build: (pw.Context context) {
-            return <pw.Widget>[...widgets];
-          },
-        ),
+        pageBuilded ??
+            pw.MultiPage(
+              theme: defaultTheme,
+              pageFormat: pdfPageFormat,
+              maxPages: 99999999,
+              build: (pw.Context context) {
+                return <pw.Widget>[...widgets];
+              },
+            ),
       );
     }
     return pdf;

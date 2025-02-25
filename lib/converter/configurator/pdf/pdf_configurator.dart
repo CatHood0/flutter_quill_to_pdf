@@ -140,7 +140,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       }
     }
 
-    if (isWeb ? (imageBytes == null || imageBytes.isEmpty) 
+    if (isWeb
+        ? (imageBytes == null || imageBytes.isEmpty)
         : (file == null || !(await file.exists()))) {
       return pw.SizedBox.shrink();
     }
@@ -158,7 +159,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           constraints:
               height == null ? const pw.BoxConstraints(maxHeight: 450) : null,
           child: pw.Image(
-            pw.MemoryImage(isWeb ? imageBytes! : (await file!.readAsBytes()) ),
+            pw.MemoryImage(isWeb ? imageBytes! : (await file!.readAsBytes())),
             dpi: 230,
             height: height,
             width: width,
@@ -169,7 +170,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   }
 
   Future<Uint8List> _fetchBlobAsBytes(String blobUrl) async {
-    final  http.Response response = await http.get(Uri.parse(blobUrl));
+    final http.Response response = await http.get(Uri.parse(blobUrl));
     if (response.statusCode == 200) {
       return response.bodyBytes;
     } else {
