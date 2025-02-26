@@ -4,7 +4,6 @@ This package allow us create PDF's using `Deltas` from `Quill`.
 
 Some options that can be configured:
 
-- `DeltaAttributesOptions` (this attributes will be applied to whole delta)
 - We can use custom fonts. Using `onRequestFont` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package. 
 - `CustomWidget`, which helps you create custom `PDF` widgets using the `Paragraph` implementation from `flutter_quill_delta_easy_parser`.
 - Optional front matter and back matter
@@ -13,8 +12,6 @@ Some options that can be configured:
 - `PDFWidgetBuilder` functions in `PDFConverter` that let us customize the detected style, and create a custom pdf widget implementation
 - `PageBuilder` function in `PDFConverter` let us create dinamically pdf pages as we want. 
 - `ThemeData` optional theme data that let us changes the theme for to pdf document
-
-> By default, the delta is processed by a local implementation that uses `DeltaAttributesOptions` to apply custom attributes (if it is not null), making it easier to add an attribute to the entire delta. If you want to create your own implementation or simply use a default delta, use `PDFConverter(...params).createDocument(shouldProcessDeltas: false)`.
 
 ![Delta in editor](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_to_convert.jpg)
 ![Delta converted in PDF](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_converted.jpg)
@@ -180,7 +177,7 @@ await file.writeAsBytes(await document.save());
 
 ## No supported
 
-- Superscript/Subscript (Not planned since is not supported by pdf package)
-- Embed formula (Not planned)
+- Superscript/Subscript (status: being planned)
+- Embed formula (status: being planned)
 
 You can contribute reporting issues or requesting to add new features on [flutter_quill_to_pdf](https://github.com/CatHood0/flutter_quill_to_pdf)

@@ -1,14 +1,16 @@
 import 'dart:io';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:example/example_editor/editor/custom_quill_editor.dart';
+import 'package:example/example_editor/utils/constants.dart';
 import 'package:example/fonts_loader/fonts_loader.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
+import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
-import 'example_editor/toolbar/custom_quill_toolbar.dart';
 
 /// This is the default loader for the fonts created to the example
 /// see this class [here](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/lib/fonts_loader/fonts_loader.dart)
@@ -27,10 +29,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter quill to pdf Demo',
       theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(255, 108, 189, 255)),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 108, 189, 255)),
           useMaterial3: true,
           fontFamily: 'Noto Sans'),
+      localizationsDelegates: [
+        FlutterQuillLocalizations.delegate,
+      ],
       home: const MyHomePage(),
     );
   }
@@ -46,9 +50,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool firstEntry = false;
   final PDFPageFormat params = PDFPageFormat.a4;
-  final QuillController _quillController = QuillController(
-      document: Document(),
-      selection: const TextSelection.collapsed(offset: 0));
+  final QuillController _quillController =
+      QuillController(document: Document(), selection: const TextSelection.collapsed(offset: 0));
   final FocusNode _editorNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<bool> _shouldShowToolbar = ValueNotifier<bool>(false);
@@ -72,21 +75,31 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
               onPressed: () async {
                 showDialog(
-                    context: context,
-                    builder: (context) {
-                      return const LoadingWithAnimtedWidget(
-                        text: 'Creating document...',
-                        infinite: true,
-                        loadingColor: Color.fromARGB(255, 108, 189, 255),
-                      );
-                    });
-                final String? result =
-                    await FilePicker.platform.getDirectoryPath();
+                  context: context,
+                  builder: (context) {
+                    return const LoadingWithAnimtedWidget(
+                      text: 'Creating document...',
+                      infinite: true,
+                      loadingColor: Color.fromARGB(255, 108, 189, 255),
+                    );
+                  },
+                );
+                final FileSaveLocation? result = await getSaveLocation(
+                  suggestedName: 'document_pdf',
+                  acceptedTypeGroups: [
+                    XTypeGroup(
+                      label: 'Pdf',
+                      extensions: ['pdf'],
+                      mimeTypes: ['application/pdf'],
+                      uniformTypeIdentifiers: ['com.adobe.pdf'],
+                    ),
+                  ],
+                );
                 if (result == null) {
                   Navigator.pop(context);
                   return;
                 }
-                File file = File('$result/document_demo_quill_to_pdf.pdf');
+                final File file = File(result.path);
                 PDFConverter pdfConverter = PDFConverter(
                   backMatterDelta: null,
                   frontMatterDelta: null,
@@ -94,8 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   document: _quillController.document.toDelta(),
                   fallbacks: [...loader.allFonts()],
                   onRequestFontFamily: (FontFamilyRequest familyRequest) {
-                    final normalFont =
-                        loader.getFontByName(fontFamily: familyRequest.family);
+                    final normalFont = loader.getFontByName(fontFamily: familyRequest.family);
                     final boldFont = loader.getFontByName(
                       fontFamily: familyRequest.family,
                       bold: familyRequest.isBold,
@@ -123,27 +135,29 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   pageFormat: params,
                 );
-                final pw.Document? document =
-                    await pdfConverter.createDocument();
+                final pw.Document? document = await pdfConverter.createDocument();
                 if (document == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text(
-                            'The file cannot be generated by an unknown error')),
+                    const SnackBar(content: Text('The file cannot be generated by an unknown error')),
                   );
                   _editorNode.unfocus();
                   _shouldShowToolbar.value = false;
                   Navigator.pop(context);
                   return;
                 }
-                await file.writeAsBytes(await document.save());
+                final XFile textFile = XFile.fromData(
+                  await document.save(),
+                  mimeType: Platform.isMacOS || Platform.isIOS
+                      ? result.activeFilter?.uniformTypeIdentifiers?.single ?? 'com.adobe.pdf'
+                      : result.activeFilter?.mimeTypes?.single ?? 'application/pdf',
+                  name: 'document_demo_flutter_quill_to_pdf.pdf',
+                );
+                await textFile.saveTo(result.path);
                 _editorNode.unfocus();
                 _shouldShowToolbar.value = false;
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content:
-                          Text('Generated document at path: ${file.path}')),
+                  SnackBar(content: Text('Generated document at path: ${file.path}')),
                 );
               },
               icon: const Icon(
@@ -154,11 +168,8 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         title: const Text(
           'PDF Demo',
-          style: TextStyle(
-              fontFamily: 'Noto Sans',
-              fontSize: 24.5,
-              fontWeight: FontWeight.w900,
-              color: Colors.white),
+          style:
+              TextStyle(fontFamily: 'Noto Sans', fontSize: 24.5, fontWeight: FontWeight.w900, color: Colors.white),
         ),
       ),
       body: Stack(
@@ -176,8 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: _scrollController,
                 notificationPredicate: (ScrollNotification notification) {
                   if (mounted && firstEntry) {
-                    firstEntry =
-                        false; //avoid issue with column (Ln225,Col49) that mnakes false scroll
+                    firstEntry = false; //avoid issue with column (Ln225,Col49) that mnakes false scroll
                     setState(() {});
                   }
                   return notification.depth == 0;
@@ -186,37 +196,79 @@ class _MyHomePageState extends State<MyHomePage> {
                 radius: const Radius.circular(10),
                 child: Column(
                   children: <Widget>[
+                    if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+                      QuillSimpleToolbar(
+                        controller: _quillController,
+                        config: QuillSimpleToolbarConfig(
+                          toolbarSize: 55,
+                          linkStyleType: LinkStyleType.original,
+                          headerStyleType: HeaderStyleType.buttons,
+                          multiRowsDisplay: true,
+                          showLineHeightButton: true,
+                          buttonOptions: const QuillSimpleToolbarButtonOptions(
+                            selectLineHeightStyleDropdownButton:
+                                QuillToolbarSelectLineHeightStyleDropdownButtonOptions(),
+                            fontSize: QuillToolbarFontSizeButtonOptions(
+                              items: fontSizes,
+                              initialValue: 'Normal',
+                              defaultDisplayText: 'Normal',
+                            ),
+                            fontFamily: QuillToolbarFontFamilyButtonOptions(
+                              items: fontFamilies,
+                              defaultDisplayText: 'Arial',
+                              initialValue: 'Arial',
+                            ),
+                          ),
+                          embedButtons: FlutterQuillEmbeds.toolbarButtons(),
+                        ),
+                      ),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 0),
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
                         child: CustomQuillEditor(
                           node: _editorNode,
                           controller: _quillController,
-                          defaultFontFamily: 'Arial',
+                          defaultFontFamily: Constant.DEFAULT_FONT_FAMILY,
                           scrollController: _scrollController,
                           onChange: (Document document) {
                             if (mounted) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (!_shouldShowToolbar.value)
-                                  _shouldShowToolbar.value = true;
+                                if (!_shouldShowToolbar.value) _shouldShowToolbar.value = true;
                               });
                             }
                           },
                         ),
                       ),
                     ),
-                    ValueListenableBuilder<bool>(
-                      valueListenable: _shouldShowToolbar,
-                      builder: (_, bool value, __) => Visibility(
-                        visible: value,
-                        child: CustomQuillToolbar(
-                          defaultFontFamily: 'Arial',
-                          controller: _quillController,
-                          toolbarSize: 55,
+                    if (Platform.isIOS || Platform.isAndroid || Platform.isFuchsia)
+                      ValueListenableBuilder<bool>(
+                        valueListenable: _shouldShowToolbar,
+                        builder: (BuildContext _, bool value, __) => Visibility(
+                          visible: value,
+                          child: QuillSimpleToolbar(
+                            controller: _quillController,
+                            config: QuillSimpleToolbarConfig(
+                              multiRowsDisplay: false,
+                              toolbarSize: 55,
+                              linkStyleType: LinkStyleType.original,
+                              headerStyleType: HeaderStyleType.buttons,
+                              buttonOptions: const QuillSimpleToolbarButtonOptions(
+                                fontSize: QuillToolbarFontSizeButtonOptions(
+                                  items: fontSizes,
+                                  initialValue: 'Normal',
+                                  defaultDisplayText: 'Normal',
+                                ),
+                                fontFamily: QuillToolbarFontFamilyButtonOptions(
+                                  items: fontFamilies,
+                                  defaultDisplayText: 'Arial',
+                                  initialValue: 'Arial',
+                                ),
+                              ),
+                              embedButtons: FlutterQuillEmbeds.toolbarButtons(),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -274,9 +326,7 @@ class LoadingWithAnimtedWidget extends StatelessWidget {
                   infinite: infinite,
                   duration: duration,
                   text: text,
-                  style: style ??
-                      const TextStyle(
-                          color: Color.fromARGB(255, 255, 255, 255)),
+                  style: style ?? const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
                   verticalPadding: verticalTextPadding,
                 ),
               ],
