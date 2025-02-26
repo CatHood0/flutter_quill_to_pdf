@@ -180,13 +180,16 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final double? spacing = line.attributes?['line-height'];
     final String? fontFamily = line.attributes?['font'];
     final Object? fontSizeMatch = line.attributes?['size'];
-    double fontSizeHelper = defaultTextStyle.fontSize!;
+    double? fontSizeHelper = defaultTextStyle.fontSize;
     if (fontSizeMatch != null) {
       if (fontSizeMatch == 'large') fontSizeHelper = 15.5;
       if (fontSizeMatch == 'huge') fontSizeHelper = 18.5;
       if (fontSizeMatch != 'huge' && fontSizeMatch != 'large' && fontSizeMatch != 'small') {
         if (fontSizeMatch is String) {
           fontSizeHelper = double.tryParse(fontSizeMatch) ?? fontSizeHelper;
+        }
+        if (fontSizeMatch is num) {
+          fontSizeHelper = fontSizeMatch.toDouble();
         }
       }
     }
@@ -198,12 +201,12 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final String content = line.data as String;
     final double? lineSpacing = spacing?.resolveLineHeight();
     final FontFamilyResponse? fontResponse = onRequestFontFamily?.call(FontFamilyRequest(
-          family: fontFamily ?? Constant.DEFAULT_FONT_FAMILY,
-          isBold: bold,
-          isItalic: italic,
-          isUnderline: underline,
-          isStrike: strike,
-        ));
+      family: fontFamily ?? Constant.DEFAULT_FONT_FAMILY,
+      isBold: bold,
+      isItalic: italic,
+      isUnderline: underline,
+      isStrike: strike,
+    ));
     // Give just the necessary fallbacks for the founded fontFamily
     final pw.TextStyle decided_style = style?.copyWith(
           font: fontResponse?.fontNormalV,
@@ -219,7 +222,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           fontItalic: fontResponse?.italicFontV,
           fontBoldItalic: fontResponse?.boldItalicFontV,
           fontFallback: fontResponse?.fallbacks,
-          fontSize: !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
+          fontSize: !addFontSize ? null : fontSize,
           lineSpacing: lineSpacing,
           color: textColor,
           background: pw.BoxDecoration(color: backgroundTextColor),
@@ -236,7 +239,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           fontItalic: fontResponse?.italicFontV,
           fontBoldItalic: fontResponse?.boldItalicFontV,
           fontFallback: fontResponse?.fallbacks,
-          fontSize: !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
+          fontSize: !addFontSize ? null : fontSize,
           lineSpacing: lineSpacing,
           color: textColor,
           background: pw.BoxDecoration(color: backgroundTextColor),
@@ -316,7 +319,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   @override
   Future<List<pw.TextSpan>> getLinkStyle(Line line, [pw.TextStyle? style, bool addFontSize = true]) async {
     final List<pw.TextSpan> spans = <pw.TextSpan>[];
-    final double? fontSize = double.tryParse(line.attributes?['size']);
     final double? lineHeight = line.attributes?['line-height'];
     final String? fontFamily = line.attributes?['font'];
     final PdfColor? textColor = pdfColorString(line.attributes?['color']);
@@ -329,12 +331,27 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final String href = line.attributes!['link'];
     final String hrefContent = line.data as String;
     final FontFamilyResponse? fontResponse = onRequestFontFamily?.call(FontFamilyRequest(
-          family: fontFamily ?? Constant.DEFAULT_FONT_FAMILY,
-          isBold: bold,
-          isItalic: italic,
-          isUnderline: underline,
-          isStrike: strike,
-        ));
+      family: fontFamily ?? Constant.DEFAULT_FONT_FAMILY,
+      isBold: bold,
+      isItalic: italic,
+      isUnderline: underline,
+      isStrike: strike,
+    ));
+
+    double? fontSize = defaultTextStyle.fontSize;
+    final Object? fontSizeMatch = line.attributes?['size'];
+    if (fontSizeMatch != null) {
+      if (fontSizeMatch == 'large') fontSize = 15.5;
+      if (fontSizeMatch == 'huge') fontSize = 18.5;
+      if (fontSizeMatch != 'huge' && fontSizeMatch != 'large' && fontSizeMatch != 'small') {
+        if (fontSizeMatch is String) {
+          fontSize = double.tryParse(fontSizeMatch) ?? fontSize;
+        }
+        if (fontSizeMatch is num) {
+          fontSize = fontSizeMatch.toDouble();
+        }
+      }
+    }
     spans.add(
       pw.TextSpan(
         annotation: pw.AnnotationLink(href),
@@ -355,7 +372,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           fontItalic: fontResponse?.italicFontV,
           fontBoldItalic: fontResponse?.boldItalicFontV,
           fontFallback: fontResponse?.fallbacks,
-          fontSize: !addFontSize ? null : fontSize ?? defaultFontSize.toDouble(),
+          fontSize: !addFontSize ? null : fontSize,
           lineSpacing: lineSpacing,
         ),
       ),
