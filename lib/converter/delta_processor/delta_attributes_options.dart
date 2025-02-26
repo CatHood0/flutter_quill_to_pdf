@@ -2,6 +2,7 @@ import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
 
 ///Contains all custom properties that we want in our delta
 ///Use this with together delta processor to add properties more easily without format all delta
+@Deprecated('DeltaAttributesOptions is no longer used, and will be removed in future releases.')
 class DeltaAttributesOptions {
   //inline
   double fontSize;
