@@ -1,3 +1,12 @@
+# 2.3.0
+
+* Fix: issues related with detecting storage images
+* Fix: issues related with `ThemeData` from PDF not being applied to the pdf document.
+* Chore: deprecated `IMAGE_LOCAL_STORAGE_PATH_PATTERN` since only works for android devices. 
+* Chore: deprecated `DeltaAttributesOptions`, `overrideAttributesPassedByUser`, `deltaOptionalAttr` and `shouldProcessDeltas` in `PDFConverter`, since its implementation is not needed for the current target of the package. 
+* Feat: added `isFromLocalStorage` method to detect is the input passed is a storage path. 
+* Feat: added support for build error images using `onDetectErrorInImage`. 
+
 # 2.2.9
 
 * Fix: replace bullet unicode text to bullet point widget by @ToddZeil in https://github.com/CatHood0/flutter_quill_to_pdf/pull/15
