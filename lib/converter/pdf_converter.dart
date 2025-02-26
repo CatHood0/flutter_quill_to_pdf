@@ -70,6 +70,9 @@ class PDFConverter {
 
   final qpdf.PDFWidgetBuilder<ep.Line, pw.Widget>? onDetectImageBlock;
 
+  /// When an image is being builded and an error is catched, this is called
+  final PDFWidgetErrorBuilder<String, pw.Widget, ep.Line>? onDetectErrorInImage;
+
   /// When a rich text styles are detected, this builder is called
   final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectInlineRichTextStyles;
 
@@ -129,6 +132,7 @@ class PDFConverter {
     this.onDetectCommonText,
     this.onDetectHeaderBlock,
     this.onDetectImageBlock,
+    this.onDetectErrorInImage,
     this.onDetectInlineRichTextStyles,
     this.onDetectLink,
     this.onDetectList,
@@ -191,6 +195,7 @@ class PDFConverter {
       blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
       onDetectHeaderBlock: onDetectHeaderBlock,
       onDetectImageBlock: onDetectImageBlock,
+      onDetectErrorInImage: onDetectErrorInImage,
       onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
       onDetectLink: onDetectLink,
       onDetectList: onDetectList,
@@ -239,6 +244,7 @@ class PDFConverter {
       codeBlockFont: codeBlockFont,
       codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
       codeBlockTextStyle: codeBlockTextStyle,
+      onDetectErrorInImage: onDetectErrorInImage,
       blockQuoteTextStyle: blockQuoteTextStyle,
       textDirection: textDirection.toPdf(),
       onDetectBlockquote: onDetectBlockquote,
@@ -308,6 +314,7 @@ class PDFConverter {
       onDetectCodeBlock: onDetectCodeBlock,
       blockQuotePaddingLeft: blockQuotePaddingLeft,
       blockQuotePaddingRight: blockQuotePaddingRight,
+      onDetectErrorInImage: onDetectErrorInImage,
       blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
       onDetectHeaderBlock: onDetectHeaderBlock,
       onDetectImageBlock: onDetectImageBlock,

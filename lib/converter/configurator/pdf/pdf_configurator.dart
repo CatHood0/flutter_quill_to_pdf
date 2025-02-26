@@ -42,6 +42,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final List<CustomWidget> customBuilders;
   final FontFamilyResponse Function(FontFamilyRequest familyRequest)? onRequestFontFamily;
   final PDFWidgetBuilder<Line, pw.Widget>? onDetectImageBlock;
+  final PDFWidgetErrorBuilder<String, pw.Widget, Line>? onDetectErrorInImage;
   final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectInlineRichTextStyles;
   final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectHeaderBlock;
   final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectAlignedParagraph;
@@ -89,14 +90,13 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     this.onDetectList,
     this.onDetectInlineRichTextStyles,
     this.onDetectImageBlock,
+    this.onDetectErrorInImage,
     this.backM,
     this.frontM,
   }) {
     defaultLinkColor = const PdfColor.fromInt(0x2AAB);
   }
 
-  //Network image is not supported yet
-  //TODO: implement validation for base64 parsing
   @override
   Future<pw.Widget> getImageBlock(Line line, [pw.Alignment? alignment]) async {
     double? width = null;
@@ -111,33 +111,39 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     File? file;
     Uint8List? imageBytes;
 
-    if (isWeb) {
-      imageBytes = await _fetchBlobAsBytes(data);
-    } else if (Constant.IMAGE_FROM_NETWORK_URL.hasMatch(data)) {
-      final String pathStorage =
-          '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
-      try {
-        file = File(pathStorage);
-        await Dio().download(data, pathStorage);
-      } on DioException {
-        return pw.SizedBox.shrink();
-      }
-    } else if (Constant.IMAGE_LOCAL_STORAGE_PATH_PATTERN.hasMatch(data)) {
-      file = File(data);
-    } else {
-      final Uint8List bytes = base64Decode(data);
-      final String pathStorage =
-          '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
-      try {
-        file = File(pathStorage);
-        await file.writeAsBytes(bytes);
-      } on DioException {
-        return pw.SizedBox.shrink();
+    // if the data is a content uri we ignore it, since we have no support for them
+    if (!Constant.contentUriFileDetector.hasMatch(data)) {
+      if (isWeb) {
+        imageBytes = await _fetchBlobAsBytes(data);
+      } else if (Constant.IMAGE_FROM_NETWORK_URL.hasMatch(data)) {
+        final String pathStorage =
+            '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
+        try {
+          file = File(pathStorage);
+          await Dio().download(data, pathStorage);
+        } on DioException {
+          final pw.Widget? errorWidget = onDetectErrorInImage?.call(data, line);
+          return errorWidget ?? pw.SizedBox.shrink();
+        }
+      } else if (Constant.isFromLocalStorage(data)) {
+        file = File(data);
+      } else {
+        final Uint8List bytes = base64Decode(data);
+        final String pathStorage =
+            '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
+        try {
+          file = File(pathStorage);
+          await file.writeAsBytes(bytes);
+        } on DioException {
+          final pw.Widget? errorWidget = onDetectErrorInImage?.call(data, line);
+          return errorWidget ?? pw.SizedBox.shrink();
+        }
       }
     }
 
     if (isWeb ? (imageBytes == null || imageBytes.isEmpty) : (file == null || !(await file.exists()))) {
-      return pw.SizedBox.shrink();
+      final pw.Widget? errorWidget = onDetectErrorInImage?.call(data, line);
+      return errorWidget ?? pw.SizedBox.shrink();
     }
 
     // verify if exceded height using page format params

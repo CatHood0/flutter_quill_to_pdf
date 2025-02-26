@@ -49,6 +49,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.onDetectCommonText,
     super.onDetectHeaderBlock,
     super.onDetectImageBlock,
+    super.onDetectErrorInImage,
     super.onDetectInlineRichTextStyles,
     super.onDetectLink,
     super.onDetectList,
@@ -222,14 +223,14 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       for (int l = 0; l < paragraph.lines.length; l++) {
         final Line line = paragraph.lines.elementAt(l);
         if (paragraph.type == ParagraphType.block || blockAttributes != null) {
-          if ((line.data is Map)) {
-            if ((line.data as Map)['video'] != null) {
+          if ((line.data is Map<String, dynamic>)) {
+            if ((line.data as Map<String, dynamic>)['video'] != null) {
               spansToWrap.add(pw.TextSpan(
                   text: '\n${(line.data as Map<String, dynamic>)['video']}\n'));
               continue;
             }
             //avoid any another embed that is not a image
-            if ((line.data as Map)['image'] == null) continue;
+            if ((line.data as Map<String, dynamic>)['image'] == null) continue;
             if (onDetectImageBlock != null) {
               final pw.Widget widget =
                   onDetectImageBlock!.call(line, paragraph.blockAttributes);
@@ -263,13 +264,13 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         } else if (paragraph.type == ParagraphType.inline ||
             blockAttributes == null) {
           if (line.data is Map) {
-            if ((line.data as Map)['video'] != null) {
+            if ((line.data as Map<String, dynamic>)['video'] != null) {
               inlineSpansToMerge.add(pw.TextSpan(
                   text: '\n${(line.data as Map<String, dynamic>)['video']}\n'));
               continue;
             }
             //avoid any another embed that is not a image
-            if ((line.data as Map)['image'] == null) continue;
+            if ((line.data as Map<String, dynamic>)['image'] == null) continue;
             if (onDetectImageBlock != null) {
               final pw.Widget widget =
                   onDetectImageBlock!.call(line, paragraph.blockAttributes);
