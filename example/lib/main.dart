@@ -7,6 +7,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -55,6 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final FocusNode _editorNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<bool> _shouldShowToolbar = ValueNotifier<bool>(false);
+  Delta? oldDelta;
 
   @override
   void dispose() {
@@ -67,23 +69,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    //Navigator.pop(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 107, 188, 255),
         actions: [
           IconButton(
               onPressed: () async {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return const LoadingWithAnimtedWidget(
-                      text: 'Creating document...',
-                      infinite: true,
-                      loadingColor: Color.fromARGB(255, 108, 189, 255),
-                    );
-                  },
-                );
                 final FileSaveLocation? result = await getSaveLocation(
                   suggestedName: 'document_pdf',
                   acceptedTypeGroups: [
@@ -96,7 +87,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 );
                 if (result == null) {
-                  Navigator.pop(context);
                   return;
                 }
                 final File file = File(result.path);
@@ -142,7 +132,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                   _editorNode.unfocus();
                   _shouldShowToolbar.value = false;
-                  Navigator.pop(context);
                   return;
                 }
                 final XFile textFile = XFile.fromData(
@@ -155,7 +144,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 await textFile.saveTo(result.path);
                 _editorNode.unfocus();
                 _shouldShowToolbar.value = false;
-                Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Generated document at path: ${file.path}')),
                 );
@@ -203,8 +191,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           toolbarSize: 55,
                           linkStyleType: LinkStyleType.original,
                           headerStyleType: HeaderStyleType.buttons,
+                          showAlignmentButtons: true,
                           multiRowsDisplay: true,
                           showLineHeightButton: true,
+                          showDirection: true,
                           buttonOptions: const QuillSimpleToolbarButtonOptions(
                             selectLineHeightStyleDropdownButton:
                                 QuillToolbarSelectLineHeightStyleDropdownButtonOptions(),
@@ -231,6 +221,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           defaultFontFamily: Constant.DEFAULT_FONT_FAMILY,
                           scrollController: _scrollController,
                           onChange: (Document document) {
+                            if(oldDelta == document.toDelta()) return;
+                            oldDelta = document.toDelta();
                             if (mounted) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 if (!_shouldShowToolbar.value) _shouldShowToolbar.value = true;

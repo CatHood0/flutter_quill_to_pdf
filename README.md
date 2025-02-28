@@ -1,27 +1,20 @@
 # Flutter Quill to PDF
 
-This package allow us create PDF's using `Deltas` from `Quill`.
+This package allow us create PDF's using `Deltas` from `Flutter Quill`.
 
-Some options that can be configured:
+## Resources
 
-- We can use custom fonts. Using `onRequestFont` functions in `PDFConverter` we can detect the font family detected, and use a custom implementation to return a `Font` valid to `pdf` package. 
-- `CustomWidget`, which helps you create custom `PDF` widgets using the `Paragraph` implementation from `flutter_quill_delta_easy_parser`.
-- Optional front matter and back matter
-- We can set a default directionality for the PDF widgets using `textDirection` from `PDFConverter`
-- Page format using `PDFPageFormat` class
-- `PDFWidgetBuilder` functions in `PDFConverter` that let us customize the detected style, and create a custom pdf widget implementation
-- `PageBuilder` function in `PDFConverter` let us create dinamically pdf pages as we want. 
-- `ThemeData` optional theme data that let us changes the theme for to pdf document
+[code-block customization]()
+[blockquote customization]()
+[theme customization]()
+[header customization]()
+[custom widgets]()
 
-![Delta in editor](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_to_convert.jpg)
-![Delta converted in PDF](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/assets/delta_converted.jpg)
-
-### Add dependencies
-
-```yaml
-dependencies:
-  flutter_quill_to_pdf: <lastest_version>
-```
+<details>
+    <summary>Show/Hide Screenshots</summary>
+    <img src="assets/demo_to_pdf.png" style="width: 80%; height: 60%"/>
+    <img src="assets/result_demo_to_pdf.png" style="width: 50%; height: 50%"/>
+</details>
 
 ### Import package
 
@@ -122,29 +115,32 @@ final PdfPageFormat pdfPageFormat = PdfPageFormat(
 
 // Add a page to the document with custom layout
 document.addPage(
-    pw.Page(
+  pw.Page(
     pageFormat: pdfPageFormat,
-    build: (pw.Context context) {
+      build: (pw.Context context) {
         return pw.Stack(children: [
-        // Create a full-page blue background
-        pw.Expanded(
+          // Create a full-page blue background
+          pw.Expanded(
             child: pw.Rectangle(
-            fillColor: PdfColor.fromHex("#5AACFE"),
+              fillColor: PdfColor.fromHex("#5AACFE"),
             ),
-        ),
-        // Position the editor content in the top-left corner
-        pw.Positioned(
+          ),
+          // Position the editor content in the top-left corner
+          pw.Positioned(
             top: PdfPageFormat.a4.marginTop,
-            left: PdfPageFormat.a4.marginLeft,
-            child: pwWidget!),
-        // Position a copy of the editor content in the bottom-right corner
-        pw.Positioned(
+              left: PdfPageFormat.a4.marginLeft,
+              child: pwWidget!,
+          ),
+          // Position a copy of the editor content in the bottom-right corner
+          pw.Positioned(
             bottom: PdfPageFormat.a4.marginBottom,
-            right: PdfPageFormat.a4.marginRight,
-            child: pwWidget!),
-        ]);
+              right: PdfPageFormat.a4.marginRight,
+              child: pwWidget!,
+            ),
+        ],
+      );
     },
-    ),
+  ),
 );
 // Save the document to a file
 await file.writeAsBytes(await document.save());
@@ -166,7 +162,7 @@ await file.writeAsBytes(await document.save());
 - Direction
 - Blockquote
 - Align
-- Embed image (Base64, URL, and Storage Paths)
+- Embed image (Base64, URL, and common storage paths)
 - Embed video (Just the URL of the Video will be pasted as a text)
 - Header
 - List (Multilevel List too)

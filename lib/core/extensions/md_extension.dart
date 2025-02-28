@@ -1,16 +1,11 @@
-import '../constant/constants.dart';
-
 extension MdHeaderLevelExtension on num {
-  double resolveHeaderLevel(
-      {List<double> headingSizes = Constant.default_heading_size}) {
-    return this == 1
-        ? headingSizes[0]
-        : this == 2
-            ? headingSizes[1]
-            : this == 3
-                ? headingSizes[2]
-                : this == 4
-                    ? headingSizes[3]
-                    : headingSizes[4];
+  double resolveHeaderLevel({
+    required List<double> headingSizes,
+  }) {
+    final int index = toInt() - 1;
+    if(index >= headingSizes.length) {
+      throw StateError('Heading of level $this is not supported into the passed list: $headingSizes');
+    }
+    return headingSizes[index];
   }
 }

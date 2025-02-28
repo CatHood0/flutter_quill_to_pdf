@@ -327,10 +327,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_quill_delta_easy_parser
-      sha256: "9afdf706f96546fa34f86538650cf15a89eaab57afce0ce3ebe1030ecba8f8ec"
+      sha256: "5d28d8c626cae5b71fe3c8eb7bfa43c6c74737f41b7b7b5e5cd88f80046ec975"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.5"
+    version: "1.0.6"
   flutter_quill_delta_from_html:
     dependency: transitive
     description:
@@ -353,7 +353,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.2.9"
+    version: "2.3.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -364,6 +364,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  highlight:
+    dependency: transitive
+    description:
+      name: highlight
+      sha256: "5353a83ffe3e3eca7df0abfb72dcf3fa66cc56b953728e7113ad4ad88497cf21"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.0"
   html:
     dependency: transitive
     description:
@@ -624,10 +632,10 @@ packages:
     dependency: transitive
     description:
       name: pdf
-      sha256: "28eacad99bffcce2e05bba24e50153890ad0255294f4dd78a17075a2ba5c8416"
+      sha256: "05df53f8791587402493ac97b9869d3824eccbc77d97855f4545cf72df3cae07"
       url: "https://pub.dev"
     source: hosted
-    version: "3.11.3"
+    version: "3.11.1"
   petitparser:
     dependency: transitive
     description:

@@ -1,10 +1,16 @@
 class Constant {
   const Constant._();
+  static final List<String> kDefaultBlocksToAccumulate = List<String>.unmodifiable(
+    <String>[
+      'blockquote',
+      'code-block',
+    ],
+  );
   static const double DEFAULT_LINE_HEIGHT = 1.0;
   static const int DEFAULT_FONT_SIZE = 12;
   static const String DEFAULT_FONT_FAMILY = 'Arial';
   // to encode markdown characters to avoid detection
-  static const List<double> default_heading_size = <double>[37, 30, 24, 18, 12];
+  static const List<double> kDefaultHeadingSizes = <double>[37, 34, 28, 24, 20, 17];
   static final RegExp newLinesInsertions = RegExp(r'^¶+');
   @Deprecated(
       'IMAGE_LOCAL_STORAGE_PATH_PATTERN is no longer used. You can use localStorageImageAndroidPattern or localStorageImageUniversalPattern instead')

@@ -1,11 +1,23 @@
 # 2.3.0
 
-* Fix: issues related with detecting storage images
+* Fix: issues related with detecting storage images.
 * Fix: issues related with `ThemeData` from PDF not being applied to the pdf document.
+* Fix: issues related with the font size of the `ThemeData` not being applied as expected.
+* Fix: wrong default code-block widget.
+* Fix: issue where the default leading of ordered lists is not being computed correctly.
+* Fix: wrong behavior if `textDirection` is passed in `PDFConverter`.
+* Fix: bad rendering of content elements by not make an await for `_applyBlockAttributes()` in `PDFService` class. 
+* Fix(partially): bad rendering of content elements when directionality is RTL. 
+  * Chore(doc): added documentation. 
+* Chore(breaking changes): added `extraArgs` param to all `PDFWidgetBuilder`.
 * Chore: deprecated `IMAGE_LOCAL_STORAGE_PATH_PATTERN` since only works for android devices. 
 * Chore: deprecated `DeltaAttributesOptions`, `overrideAttributesPassedByUser`, `deltaOptionalAttr` and `shouldProcessDeltas` in `PDFConverter`, since its implementation is not needed for the current target of the package. 
 * Feat: added `isFromLocalStorage` method to detect is the input passed is a storage path. 
 * Feat: added support for build error images using `onDetectErrorInImage`. 
+* Feat: added support for build custom leading widgets for lists using `listLeadingBuilder`. 
+* Feat: added support for code-block highlighting using `enableCodeBlockHighlighting` and `isLightMode`. 
+* Feat: added support for custom code-block highlighting using `customCodeHighlightTheme`. Check about [highlight_utils](). 
+* Feat: added support for custom heading sizes using `customHeadingSizes`. 
 
 # 2.2.9
 

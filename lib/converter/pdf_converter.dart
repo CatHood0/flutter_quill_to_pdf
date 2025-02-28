@@ -100,6 +100,22 @@ class PDFConverter {
 
   late final List<pw.Font> globalFontsFallbacks;
 
+  /// This enable the highlight for code-block blocks
+  @experimental
+  final bool enableCodeBlockHighlighting;
+
+  /// isLightCodeBlockTheme is used when enableCodeBlockHighlighting is true
+  /// to decide the correct style for the spans
+  @experimental
+  final bool isLightCodeBlockTheme;
+
+  /// This gives the ability to have our custom code-block highlight theme
+  @experimental
+  final Map<String, pw.TextStyle>? customCodeHighlightTheme;
+  // This let us create custom sizes when a Header is detected
+  @experimental
+  final List<double>? customHeadingSizes;
+
   /// [isWeb] is used to know is the current platform is web since the way of the fetch images files
   /// is different from the other platforms
   @experimental
@@ -108,7 +124,11 @@ class PDFConverter {
   PDFConverter({
     required this.pageFormat,
     required this.document,
-    this.isWeb = false,
+    @experimental this.enableCodeBlockHighlighting = true,
+    @experimental this.customHeadingSizes,
+    @experimental this.isLightCodeBlockTheme = true,
+    @experimental this.customCodeHighlightTheme,
+    @experimental this.isWeb = false,
     this.textDirection = TextDirection.ltr,
     this.frontMatterDelta,
     this.backMatterDelta,
@@ -136,12 +156,7 @@ class PDFConverter {
     this.onDetectInlineRichTextStyles,
     this.onDetectLink,
     this.onDetectList,
-  })  : assert(pageFormat.height > 30, 'Page size height isn\'t valid'),
-        assert(pageFormat.width > 30, 'Page size width isn\'t valid'),
-        assert(pageFormat.marginBottom >= 0.0, 'Margin to bottom with value ${pageFormat.marginBottom}'),
-        assert(pageFormat.marginLeft >= 0.0, 'Margin to left with value ${pageFormat.marginLeft}'),
-        assert(pageFormat.marginRight >= 0.0, 'Margin to right with value ${pageFormat.marginRight}'),
-        assert(pageFormat.marginTop >= 0.0, 'Margin to tp with value ${pageFormat.marginTop}') {
+  }) {
     globalFontsFallbacks = <pw.Font>[
       ...fallbacks,
       pw.Font.helvetica(),
@@ -161,8 +176,7 @@ class PDFConverter {
 
   ///Creates the PDF document an return this one
   Future<pw.Document?> createDocument({
-    @Deprecated(
-        'deltaOptionalAttr is no longer used, and will be removed in future releases.')
+    @Deprecated('deltaOptionalAttr is no longer used, and will be removed in future releases.')
     qpdf.DeltaAttributesOptions? deltaOptionalAttr,
     @Deprecated('overrideAttributes is no longer used and will be removed in future releases.')
     bool overrideAttributesPassedByUser = false,
@@ -175,9 +189,12 @@ class PDFConverter {
       pageFormat: pageFormat,
       fonts: globalFontsFallbacks,
       customTheme: themeData,
-      textDirection: textDirection.toPdf(),
+      directionality: textDirection.toPdf(),
       pageBuilder: pageBuilder,
       isWeb: isWeb,
+      enableCodeBlockHighlighting: enableCodeBlockHighlighting,
+      isLightCodeBlockTheme: isLightCodeBlockTheme,
+      customCodeHighlightTheme: customCodeHighlightTheme,
       customBuilders: customBuilders,
       blockQuoteBackgroundColor: blockQuoteBackgroundColor,
       blockQuoteDividerColor: blockQuoteDividerColor,
@@ -216,8 +233,7 @@ class PDFConverter {
   /// This implementation can throw PathNotFoundException or exceptions based in Storage capabilities
   Future<void> createDocumentFile({
     required String path,
-    @Deprecated(
-        'deltaOptionalAttr is no longer used, and will be removed in future releases')
+    @Deprecated('deltaOptionalAttr is no longer used, and will be removed in future releases')
     qpdf.DeltaAttributesOptions? deltaOptionalAttr,
     @Deprecated('overrideAttributes is no longer used and will be removed in future releases.')
     bool overrideAttributesPassedByUser = false,
@@ -238,6 +254,9 @@ class PDFConverter {
       onDetectAlignedParagraph: onDetectAlignedParagraph,
       onDetectCommonText: onDetectCommonText,
       customTheme: themeData,
+      enableCodeBlockHighlighting: enableCodeBlockHighlighting,
+      isLightCodeBlockTheme: isLightCodeBlockTheme,
+      customCodeHighlightTheme: customCodeHighlightTheme,
       blockQuoteBackgroundColor: blockQuoteBackgroundColor,
       blockQuoteDividerColor: blockQuoteDividerColor,
       codeBlockBackgroundColor: codeBlockBackgroundColor,
@@ -246,7 +265,7 @@ class PDFConverter {
       codeBlockTextStyle: codeBlockTextStyle,
       onDetectErrorInImage: onDetectErrorInImage,
       blockQuoteTextStyle: blockQuoteTextStyle,
-      textDirection: textDirection.toPdf(),
+      directionality: textDirection.toPdf(),
       onDetectBlockquote: onDetectBlockquote,
       onDetectCodeBlock: onDetectCodeBlock,
       onDetectHeaderBlock: onDetectHeaderBlock,
@@ -282,8 +301,7 @@ class PDFConverter {
 
   /// Return a container with the widgets generated from the Document passed
   Future<pw.Widget?> generateWidget({
-    @Deprecated(
-        'deltaOptionalAttr is no longer used, and will be removed in future releases.')
+    @Deprecated('deltaOptionalAttr is no longer used, and will be removed in future releases.')
     qpdf.DeltaAttributesOptions? deltaOptionalAttr,
     @Deprecated('overrideAttributes is no longer used and will be removed in future releases.')
     bool overrideAttributesPassedByUser = false,
@@ -295,7 +313,7 @@ class PDFConverter {
   }) async {
     final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
       pageFormat: pageFormat,
-      textDirection: textDirection.toPdf(),
+      directionality: textDirection.toPdf(),
       onRequestFontFamily: onRequestFontFamily,
       isWeb: isWeb,
       fonts: globalFontsFallbacks,
@@ -304,6 +322,9 @@ class PDFConverter {
       blockQuoteBackgroundColor: blockQuoteBackgroundColor,
       blockQuoteDividerColor: blockQuoteDividerColor,
       codeBlockBackgroundColor: codeBlockBackgroundColor,
+      enableCodeBlockHighlighting: enableCodeBlockHighlighting,
+      isLightCodeBlockTheme: isLightCodeBlockTheme,
+      customCodeHighlightTheme: customCodeHighlightTheme,
       codeBlockFont: codeBlockFont,
       codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
       codeBlockTextStyle: codeBlockTextStyle,

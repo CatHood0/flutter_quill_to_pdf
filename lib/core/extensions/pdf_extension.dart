@@ -40,6 +40,10 @@ PdfColor hexToColor(String hexString) {
   return PdfColor.fromInt(color);
 }
 
+final RegExp _kDefaultRGBRegex = RegExp(
+  r'rgb\((\d+)\s*?,\s*?(\d+)\s*?,\s*?(\d+)\s*?(,?\s*?(\d+)\s*?)\)',
+);
+
 PdfColor? pdfColorString(String? colorString) {
   if (colorString == null || colorString.isTotallyEmpty) return null;
   if (colorString.startsWith('#')) {
@@ -48,9 +52,7 @@ PdfColor? pdfColorString(String? colorString) {
   if (colorString.startsWith('0x')) {
     return PdfColor.fromInt(int.parse(colorString));
   }
-  final RegExp regex =
-      RegExp(r'rgb\((\d+)\s*?,\s*?(\d+)\s*?,\s*?(\d+)\s*?(,?\s*?(\d+)\s*?)\)');
-  final RegExpMatch? match = regex.firstMatch(colorString);
+  final RegExpMatch? match = _kDefaultRGBRegex.firstMatch(colorString);
   if (match == null) {
     return null;
   }
@@ -94,14 +96,13 @@ int rgbaToHex(int red, int green, int blue, {double opacity = 1}) {
 
 ///A extesion to resolve more easily to decide the style of the spans
 extension TextStyleInlineExtension on pw.TextStyle {
-  pw.TextStyle resolveInline(
-      bool bold, bool italic, bool under, bool strike, bool isAllInOne) {
+  pw.TextStyle resolveInline(bool bold, bool italic, bool under, bool strike, bool isAllInOne) {
     pw.TextDecoration? decoration = null;
     if (under && strike) {
       decoration = pw.TextDecoration.combine(
         <pw.TextDecoration>[
           pw.TextDecoration.lineThrough,
-          pw.TextDecoration.underline
+          pw.TextDecoration.underline,
         ],
       );
     } else if (strike) {
@@ -142,12 +143,12 @@ extension PdfBlockBoxFitExtension on String {
 }
 
 extension PdfBlockAlignmentExtension on String {
-  pw.Alignment get resolvePdfBlockAlign {
+  pw.AlignmentDirectional get resolvePdfBlockAlign {
     return this == 'center'
-        ? pw.Alignment.center
+        ? pw.AlignmentDirectional.center
         : this == 'right'
-            ? pw.Alignment.centerRight
-            : pw.Alignment.centerLeft;
+            ? pw.AlignmentDirectional.centerStart
+            : pw.AlignmentDirectional.centerEnd;
   }
 }
 
@@ -160,5 +161,17 @@ extension TextAlignmentExtension on String? {
             : this == 'justify'
                 ? pw.TextAlign.justify
                 : pw.TextAlign.left;
+  }
+}
+
+extension TextAlignmentExtensionReverse on pw.TextAlign? {
+  pw.TextAlign get reversed {
+    return this == pw.TextAlign.center 
+        ? pw.TextAlign.center
+        : this == pw.TextAlign.right 
+            ? pw.TextAlign.left
+            : this == pw.TextAlign.justify
+                ? pw.TextAlign.justify
+                : pw.TextAlign.right;
   }
 }

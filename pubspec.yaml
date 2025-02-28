@@ -18,9 +18,9 @@ topics:
 
 screenshots:
   - description: "Delta in editor"
-    path: example/assets/delta_to_convert.jpg
+    path: assets/demo_to_pdf.png
   - description: "Delta converted in PDF"
-    path: example/assets/delta_converted.jpg
+    path: assets/result_demo_to_pdf.png
 
 platforms:
   android:
@@ -32,8 +32,9 @@ platforms:
 
 dependencies:
   dart_quill_delta: ^10.8.3
-  flutter_quill_delta_easy_parser: ^1.0.5
-  pdf: ^3.11.3
+  flutter_quill_delta_easy_parser: ^1.0.6
+  highlight: ^0.7.0
+  pdf: 3.11.1
   universal_html: ^2.2.4
   cross_file: ^0.3.3+6
   html_unescape: ^2.0.0
@@ -50,3 +51,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^4.0.0
   test:
+
+flutter:
+  assets:
+    - assets/
