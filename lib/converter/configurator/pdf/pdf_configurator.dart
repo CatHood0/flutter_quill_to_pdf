@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
@@ -494,12 +495,13 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     return pw.Directionality(
       textDirection: textDirection ?? directionality,
       child: pw.Container(
+        width: pageWidth,
+        alignment: al,
         padding: pw.EdgeInsetsDirectional.only(
           start: indentLevel * 12.5,
           top: spacing.resolvePaddingByLineHeight(),
           bottom: spacing.resolvePaddingByLineHeight(),
         ),
-        alignment: al,
         child: child,
       ),
     );
@@ -560,11 +562,10 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         final double? circleSize = firstSpanStyle?.fontSize == null ? null : firstSpanStyle!.fontSize! * 0.3;
         // we need to compute the margin size to position
         // the bullet where we expect
-        final double? effectiveCircleMargin = circleSize != null ? (circleSize / 2) * 1.11 : null;
         leadingWidget = pw.Container(
           width: circleSize ?? 0.85 * PdfPageFormat.mm,
           height: circleSize ?? 0.85 * PdfPageFormat.mm,
-          margin: pw.EdgeInsetsDirectional.only(bottom: effectiveCircleMargin ?? 0.85 * PdfPageFormat.mm),
+          margin: pw.EdgeInsetsDirectional.only(bottom: 0.85 * PdfPageFormat.mm),
           decoration: const pw.BoxDecoration(
             color: PdfColors.black,
             shape: pw.BoxShape.circle,
@@ -583,40 +584,48 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     return pw.Directionality(
       textDirection: textDirection ?? directionality,
       child: pw.Container(
-        width: pageWidth,
-        padding: pw.EdgeInsetsDirectional.only(
-          start: indentLevel > 0 ? indentLevel * 12.5 : 15,
-          bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5,
-        ),
-        child: pw.RichText(
-          textAlign: (textDirection ?? directionality) == pw.TextDirection.rtl
-              ? align.resolvePdfTextAlign.reversed
-              : align.resolvePdfTextAlign,
-          softWrap: true,
-          overflow: pw.TextOverflow.span,
-          textDirection: textDirection ?? directionality,
-          text: pw.TextSpan(
-            style: defaultTheme.defaultTextStyle,
-            children: <pw.InlineSpan>[
-              if (listType != 'ordered' || leadingWidget != null)
-                pw.WidgetSpan(
-                  child: leadingWidget!,
-                  style: firstSpanStyle?.merge(defaultTheme.defaultTextStyle) ?? defaultTheme.defaultTextStyle,
-                ),
-              if (listType == 'ordered' && leadingWidget == null)
-                pw.TextSpan(
-                  text: _getListIdentifier(indentLevel),
-                  style: firstSpanStyle ?? defaultTheme.defaultTextStyle,
-                ),
-              pw.TextSpan(
-                text: '  ',
-                style: firstSpanStyle?.merge(defaultTheme.defaultTextStyle) ?? defaultTheme.defaultTextStyle,
-              ),
-              ...spansToWrap
-            ],
+          width: pageWidth,
+          padding: pw.EdgeInsetsDirectional.only(
+            start: indentLevel > 0 ? indentLevel * 12.5 : 15,
+            bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5,
           ),
-        ),
-      ),
+          child: pw.Column(
+            mainAxisAlignment: pw.MainAxisAlignment.start,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisSize: pw.MainAxisSize.min,
+            children: <pw.Widget>[
+              ...spansToWrap.map((pw.InlineSpan span) {
+                return pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.start,
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  mainAxisSize: pw.MainAxisSize.min,
+                  children: <pw.Widget>[
+                    pw.Padding(
+                      padding: const pw.EdgeInsetsDirectional.only(
+                        end: 5.4,
+                      ),
+                      child: listType != 'ordered' || leadingWidget != null
+                          ? leadingWidget
+                          : pw.Text(
+                              _getListIdentifier(indentLevel),
+                              style: firstSpanStyle ?? defaultTheme.defaultTextStyle,
+                              overflow: pw.TextOverflow.span,
+                              textDirection: textDirection ?? directionality,
+                            ),
+                    ),
+                    pw.Expanded(
+                      child: pw.RichText(
+                        softWrap: true,
+                        overflow: pw.TextOverflow.span,
+                        textDirection: textDirection ?? directionality,
+                        text: span,
+                      ),
+                    )
+                  ],
+                );
+              }),
+            ],
+          )),
     );
   }
 

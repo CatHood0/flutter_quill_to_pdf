@@ -4,13 +4,14 @@ import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
+import 'package:flutter_quill_to_pdf/internals/universal_merger.dart';
 import 'package:meta/meta.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 ///A Manager that contains all operations for PDF services
 class PdfService extends PdfConfigurator<Delta, pw.Document> {
-  final DocumentParser _parser = DocumentParser();
+  final DocumentParser _parser = DocumentParser(mergerBuilder: UniversalMergerBuilder.instance());
   late final List<pw.Font> _fonts;
   //page configs
   late final double _marginLeft;
@@ -283,7 +284,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
             contents.add(
               codeBlockLineBuilder(
                 spans: spans,
-                codeBlockStyle: _getInlineTextStyle(blockAttributes).$1,
+                codeBlockStyle: style,
               ),
             );
             willNeedContinue = true;
@@ -374,7 +375,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       contentPerPage.add(pw.SizedBox(height: 5));
       if (align != null) {
         final pw.Widget alignedBlock = await getAlignedHeaderBlock(
-          child: lineBuilder(spans: spans),
+          child: lineBuilder(spans: spans, align: align, textDirection: textDirectionToUse),
           headerLevel: header,
           align: align,
           indentLevel: indentLevel,
@@ -425,7 +426,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
     if (align != null || indent != null) {
       final pw.Widget alignedParagraphBlock = await getAlignedParagraphBlock(
-        child: lineBuilder(spans: spans),
+        child: lineBuilder(spans: spans, align: align ?? 'left', textDirection: textDirectionToUse),
         align: align ?? 'left',
         indentLevel: indentLevel,
         firstSpanStyle: spans.firstOrNull?.style,

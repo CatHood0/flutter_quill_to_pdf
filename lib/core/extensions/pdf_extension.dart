@@ -147,8 +147,8 @@ extension PdfBlockAlignmentExtension on String {
     return this == 'center'
         ? pw.AlignmentDirectional.center
         : this == 'right'
-            ? pw.AlignmentDirectional.centerStart
-            : pw.AlignmentDirectional.centerEnd;
+            ? pw.AlignmentDirectional.centerEnd
+            : pw.AlignmentDirectional.centerStart;
   }
 }
 
