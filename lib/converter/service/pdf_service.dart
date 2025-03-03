@@ -47,6 +47,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.blockQuoteTextStyle,
     super.blockQuotePaddingLeft,
     super.blockQuotePaddingRight,
+    super.inlineCodeStyle,
+    super.onDetectVideoBlock,
     super.blockQuotethicknessDividerColor,
     super.onDetectBlockquote,
     super.onDetectCodeBlock,
@@ -125,13 +127,30 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               theme: defaultTheme,
               pageFormat: pdfPageFormat,
               maxPages: 99999999,
-              build: (pw.Context context) {
-                return <pw.Widget>[...widgets];
-              },
+              build: (pw.Context context) => <pw.Widget>[...widgets],
             ),
       );
     }
     return pdf;
+  }
+
+  @override
+  Future<List<List<pw.Widget>>> generatePages({
+    required List<Delta> documents,
+  }) async {
+    LinkedHashSet<List<pw.Widget>> docMap = LinkedHashSet<List<pw.Widget>>();
+    int i = 0;
+    int totalDocuments = documents.length;
+    while (i < totalDocuments) {
+      final Delta doc = documents.elementAt(i);
+      if (doc.isNotEmpty) {
+        final Document? document = _parser.parseDelta(delta: doc);
+        if (document == null || document.paragraphs.isEmpty) continue;
+        docMap.add(List<pw.Widget>.from(await blockGenerators(document)));
+      }
+      i++;
+    }
+    return List<List<pw.Widget>>.from(docMap);
   }
 
   @override
@@ -160,25 +179,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }
 
   @override
-  Future<List<List<pw.Widget>>> generatePages({
-    required List<Delta> documents,
-  }) async {
-    LinkedHashSet<List<pw.Widget>> docMap = LinkedHashSet<List<pw.Widget>>();
-    int i = 0;
-    int totalDocuments = documents.length;
-    while (i < totalDocuments) {
-      final Delta doc = documents.elementAt(i);
-      if (doc.isNotEmpty) {
-        final Document? document = _parser.parseDelta(delta: doc);
-        if (document == null || document.paragraphs.isEmpty) continue;
-        docMap.add(List<pw.Widget>.from(await blockGenerators(document)));
-      }
-      i++;
-    }
-    return List<List<pw.Widget>>.from(docMap);
-  }
-
-  @override
   Future<List<pw.Widget>> blockGenerators(Document document) async {
     final List<Paragraph> paragraphs = <Paragraph>[...document.paragraphs];
     for (int z = 0; z < paragraphs.length; z++) {
@@ -188,49 +188,19 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       final bool added = _applyCustomBlocks(paragraph: paragraph);
       if (added) continue;
       if (paragraph.isEmbed) {
-        _updateLineNumbers(blockAttributes);
-        for (Line line in paragraph.lines) {
-          for (TextFragment fragment in line.fragments) {
-            if ((fragment.data as Map<String, dynamic>)['video'] != null) {
-              contentPerPage.add(
-                pw.RichText(
-                  textDirection: blockAttributes['direction'] ?? directionality,
-                  softWrap: true,
-                  overflow: pw.TextOverflow.span,
-                  text: pw.TextSpan(
-                    text: (fragment.data as Map<String, dynamic>)['video']?.toString(),
-                  ),
-                ),
-              );
-            }
-            //avoid any another embed that is not a image
-            if ((fragment.data as Map<String, dynamic>)['image'] != null) {
-              contentPerPage.add(
-                onDetectImageBlock?.call(
-                      fragment,
-                      paragraph.blockAttributes,
-                    ) ??
-                    await getImageBlock.call(
-                      fragment,
-                      (blockAttributes['align'] as String?)?.resolvePdfBlockAlign,
-                      blockAttributes['direction'],
-                    ),
-              );
-            }
-          }
-        }
+        _defaultEmbedLineBuilder(paragraph: paragraph);
         continue;
       }
       final bool isHeader = blockAttributes.containsKey('header');
       final bool isCodeBlock = blockAttributes.containsKey('code-block');
       final bool isBlockquote = blockAttributes.containsKey('blockquote');
       for (int k = 0; k < paragraph.lines.length; k++) {
-        _updateLineNumbers(blockAttributes);
-        final List<pw.InlineSpan> spans = <pw.InlineSpan>[];
         final Line line = paragraph.lines.elementAt(k);
-        final (pw.TextStyle style, bool addFontSize) = _getInlineTextStyle(blockAttributes);
         final bool added = _applyCustomBlocks(paragraph: paragraph, line: line);
         if (added) continue;
+        _updateLineNumbers(blockAttributes);
+        final (pw.TextStyle style, bool addFontSize) = _getInlineTextStyle(blockAttributes);
+        final List<pw.InlineSpan> spans = <pw.InlineSpan>[];
         for (int j = 0; j < line.length; j++) {
           final TextFragment fragment = line.elementAt(j);
           if (fragment.attributes != null || isHeader || isBlockquote || isCodeBlock) {
@@ -344,6 +314,39 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         ),
       ),
     );
+  }
+
+  Future<void> _defaultEmbedLineBuilder({
+    required Paragraph paragraph,
+  }) async {
+    final Map<String, dynamic> blockAttributes = paragraph.blockAttributes ?? <String, dynamic>{};
+    _updateLineNumbers(blockAttributes);
+    for (Line line in paragraph.lines) {
+      for (TextFragment fragment in line.fragments) {
+        if ((fragment.data as Map<String, dynamic>)['video'] != null) {
+          contentPerPage.add(
+            pw.RichText(
+              textDirection: blockAttributes['direction'] ?? directionality,
+              softWrap: true,
+              overflow: pw.TextOverflow.span,
+              text: pw.TextSpan(
+                text: (fragment.data as Map<String, dynamic>)['video']?.toString(),
+              ),
+            ),
+          );
+        }
+        //avoid any another embed that is not a image
+        if ((fragment.data as Map<String, dynamic>)['image'] != null) {
+          contentPerPage.add(
+            await getImageBlock.call(
+              fragment,
+              (blockAttributes['align'] as String?)?.resolvePdfBlockAlign,
+              blockAttributes['direction'],
+            ),
+          );
+        }
+      }
+    }
   }
 
   Future<void> _defaultLineBuilderForBlocks({
@@ -561,6 +564,29 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }) {
     final Map<String, dynamic> blockAttributes = paragraph.blockAttributes ?? <String, dynamic>{};
     if (line == null) {
+      if (paragraph.isEmbed && (onDetectImageBlock != null || onDetectVideoBlock != null)) {
+        bool shouldEndAsAdded = false;
+        _updateLineNumbers(blockAttributes);
+        for (Line line in paragraph.lines) {
+          for (TextFragment fragment in line.fragments) {
+            if (onDetectVideoBlock != null && (fragment.data as Map<String, dynamic>)['video'] != null) {
+              shouldEndAsAdded = true;
+              contentPerPage.add(onDetectVideoBlock!.call(fragment, paragraph.blockAttributes));
+            }
+            //avoid any another embed that is not a image
+            if (onDetectImageBlock != null && (fragment.data as Map<String, dynamic>)['image'] != null) {
+              shouldEndAsAdded = true;
+              contentPerPage.add(
+                onDetectImageBlock!.call(
+                  fragment,
+                  paragraph.blockAttributes,
+                ),
+              );
+            }
+          }
+        }
+        if (shouldEndAsAdded) return true;
+      }
       if (super.customBuilders.isNotEmpty) {
         for (CustomWidget customBuilder in super.customBuilders) {
           if (customBuilder.predicate(paragraph)) {

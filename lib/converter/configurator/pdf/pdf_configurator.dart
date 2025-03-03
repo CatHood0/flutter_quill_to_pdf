@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui';
-
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
@@ -51,6 +49,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final List<CustomWidget> customBuilders;
   final FontFamilyResponse Function(FontFamilyRequest familyRequest)? onRequestFontFamily;
   final PDFWidgetBuilder<TextFragment, pw.Widget>? onDetectImageBlock;
+  final PDFWidgetBuilder<TextFragment, pw.Widget>? onDetectVideoBlock;
   final PDFWidgetErrorBuilder<String, pw.Widget, TextFragment>? onDetectErrorInImage;
   final PDFWidgetBuilder<TextFragment, pw.InlineSpan>? onDetectInlineRichTextStyles;
   final PDFWidgetBuilder<Line, pw.Widget>? onDetectHeaderBlock;
@@ -73,6 +72,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final Map<String, pw.TextStyle>? customCodeHighlightTheme;
   final pw.Font? codeBlockFont;
   final pw.TextStyle? codeBlockTextStyle;
+  final pw.TextStyle? inlineCodeStyle;
   final PdfColor? codeBlockBackgroundColor;
   final pw.TextStyle? codeBlockNumLinesTextStyle;
   final pw.TextStyle? blockQuoteTextStyle;
@@ -88,6 +88,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   PdfConfigurator({
     required this.customBuilders,
     required super.document,
+    this.inlineCodeStyle,
     this.customHeadingSizes,
     this.enableCodeBlockHighlighting = true,
     this.isLightCodeBlockTheme = true,
@@ -115,6 +116,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     this.onDetectList,
     this.onDetectInlineRichTextStyles,
     this.onDetectImageBlock,
+    this.onDetectVideoBlock,
     this.onDetectErrorInImage,
     this.backM,
     this.frontM,
