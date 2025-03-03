@@ -254,7 +254,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       isStrike: strike,
     ));
     // Give just the necessary fallbacks for the founded fontFamily
-    final pw.TextStyle finalStyle = (style ?? defaultTheme.defaultTextStyle).copyWith(
+    pw.TextStyle finalStyle = (style ?? defaultTheme.defaultTextStyle).copyWith(
       font: fontResponse?.fontNormalV,
       fontStyle: italic ? pw.FontStyle.italic : null,
       fontWeight: bold ? pw.FontWeight.bold : null,
@@ -283,10 +283,30 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     if (headerLevel != null && headerLevel > 0) {
       final double headerFontSize =
           headerLevel.resolveHeaderLevel(headingSizes: customHeadingSizes ?? Constant.kDefaultHeadingSizes);
-      final pw.TextStyle headerStyle = finalStyle.copyWith(fontSize: headerFontSize);
-      return pw.TextSpan(
-        text: content,
-        style: headerStyle,
+      finalStyle = finalStyle.copyWith(fontSize: headerFontSize);
+    }
+
+    // we cannot build inline code in a code-block because
+    // when we convert the spans to plain text, the widget spans
+    // are always ignored
+    if (line.attributes?['code'] != null && !isCodeBlock) {
+      finalStyle = inlineCodeStyle?.merge(finalStyle) ??
+          finalStyle.copyWith(
+            color: const PdfColor.fromInt(0xCCFFC240),
+            background: const pw.BoxDecoration(color: null),
+          );
+      return pw.WidgetSpan(
+        child: pw.Container(
+          padding: const pw.EdgeInsetsDirectional.only(start: 2, end: 2),
+          decoration:
+              pw.BoxDecoration(color: PdfColor.fromHex('#fbfbf9'), borderRadius: pw.BorderRadius.circular(6)),
+          child: pw.Text(
+            content,
+            style: finalStyle,
+            softWrap: true,
+            overflow: pw.TextOverflow.span,
+          ),
+        ),
       );
     }
 
