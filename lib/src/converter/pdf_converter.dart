@@ -4,11 +4,12 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart' as ep;
-import 'package:flutter_quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
-import 'package:flutter_quill_to_pdf/core/request/font_family_request.dart';
-import 'package:flutter_quill_to_pdf/core/response/font_family_response.dart';
-import 'package:flutter_quill_to_pdf/utils/extensions.dart';
-import 'package:flutter_quill_to_pdf/utils/typedefs.dart';
+import 'package:flutter_quill_to_pdf/src/core/delta_processor/delta_attributes_options.dart';
+import 'package:flutter_quill_to_pdf/src/core/enums/list_type_widget.dart';
+import 'package:flutter_quill_to_pdf/src/core/request/font_family_request.dart';
+import 'package:flutter_quill_to_pdf/src/core/response/font_family_response.dart';
+import 'package:flutter_quill_to_pdf/src/utils/extensions.dart';
+import 'package:flutter_quill_to_pdf/src/utils/typedefs.dart';
 import 'package:meta/meta.dart';
 import 'package:pdf/pdf.dart' show PdfColor;
 import 'package:pdf/widgets.dart' as pw;
@@ -16,13 +17,13 @@ import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' as qpdf;
 import 'package:universal_html/html.dart' as web;
 
 class PDFConverter {
-  //Is the main body of the PDF document
+  // This is the main body of the PDF document
   final Delta document;
 
-  ///This [delta] is used before the main content
+  /// This [delta] is used before the main content
   final Delta? frontMatterDelta;
 
-  ///This [delta] is used after the main content
+  /// This [delta] is used after the main content
   final Delta? backMatterDelta;
 
   final qpdf.PDFPageFormat pageFormat;
@@ -31,45 +32,65 @@ class PDFConverter {
   /// or the common widgets if them doesn't have direction attribute
   final ui.TextDirection textDirection;
 
-  ///[CustomPDFWidget] allow devs to use builders to create custom widgets
+  /// [CustomPDFWidget] allows to use custom builders to create custom widgets
   final List<qpdf.CustomWidget> customBuilders;
 
-  ///A font when converter detect a font
+  /// A font when converter detect a font
   final FontFamilyResponse Function(FontFamilyRequest familyRequest)? onRequestFontFamily;
+
+  /// This decides how will be builded the default [List] block
+  final ListTypeWidget listTypeWidget;
 
   ///If you need to [customize] the [theme] of the [pdf document], override this param
   final pw.ThemeData? themeData;
 
-  ///If you need [customize] exactly how the [code block looks], then you use this [theme]
+  /// This customizes the code-block text style in the default implementation
   final pw.TextStyle? codeBlockTextStyle;
 
-  ///If you need just a different [font] to show your code blocks, use this font [(by default is pw.Font.courier())]
+  /// This customizes the inline-code text style in the default implementation
+  final pw.TextStyle? inlineCodeStyle;
+
+  /// This customizes the code-block font in the default implementation
   final pw.Font? codeBlockFont;
 
-  ///Customize the background color of the code block
+  /// Customize the background color of the code-block
   final PdfColor? codeBlockBackgroundColor;
 
-  ///Customize the style of the num lines in code block
+  /// Customize the style of the num lines in code block
   final pw.TextStyle? codeBlockNumLinesTextStyle;
 
-  ///Define the text style of the general blockquote. [This overrides any style detected like: line-height, size, font families, color]
-  final pw.TextStyle? blockQuoteTextStyle;
+  /// Define the text style of the general blockquote into the default implementation
+  final pw.TextStyle? blockquoteTextStyle;
 
-  ///Define the left space between divider and text
+  /// Define the left space between divider and text into the default implementation
+  @Deprecated(
+      'blockQuotePaddingLeft is not longer used and will be removed in future releases. use blockquoteEdgeInsets instead')
   final double? blockQuotePaddingLeft;
+  @Deprecated(
+      'blockQuotePaddingRight is not longer used and will be removed in future releases. use blockquotePadding instead')
   final double? blockQuotePaddingRight;
 
-  ///Define the width of the divider
-  final double? blockQuotethicknessDividerColor;
+  /// Define the padding space into the blockquote default implementation
+  final pw.EdgeInsetsGeometry? Function(int indent, pw.TextDirection direction)? blockquotePadding;
 
-  ///Customize the background of the blockquote
-  final PdfColor? blockQuoteBackgroundColor;
+  /// Define the width of the divider
+  final double? blockquotethicknessDividerColor;
 
-  ///Customize the left/right divider color to blockquotes
-  final PdfColor? blockQuoteDividerColor;
+  /// Customize the background of the blockquote
+  final PdfColor? blockquoteBackgroundColor;
 
-  /// When an image is detected, this will be called to build a custom implementation of it 
+  /// Customize the left/right divider color to blockquotes
+  @Deprecated('blockQuoteDividerColor is no longer supported. Use blockquoteBoxDecoration instead')
+  final PdfColor? blockquoteDividerColor;
+
+  /// Customize the border of the blockquote into the default implementation
+  final pw.BoxDecoration? Function(pw.TextDirection direction)? blockquoteBoxDecoration;
+
+  /// When an image is detected, this will be called to build a custom implementation of it
   final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.Widget>? onDetectImageBlock;
+
+  /// When a video is detected, this will be called to build a custom implementation of it
+  final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.Widget>? onDetectVideoBlock;
 
   /// When an image is being builded and an error is catched, this is called
   final PDFWidgetErrorBuilder<String, pw.Widget, ep.TextFragment>? onDetectErrorInImage;
@@ -130,18 +151,26 @@ class PDFConverter {
     @experimental this.isLightCodeBlockTheme = true,
     @experimental this.customCodeHighlightTheme,
     @experimental this.isWeb = false,
+    this.blockquotePadding,
+    this.blockquoteBoxDecoration,
+    this.inlineCodeStyle,
     this.textDirection = ui.TextDirection.ltr,
     this.frontMatterDelta,
+    this.listTypeWidget = ListTypeWidget.modern,
     this.backMatterDelta,
     this.customBuilders = const <qpdf.CustomWidget>[],
     this.onRequestFontFamily,
     required List<pw.Font> fallbacks,
+    @Deprecated(
+        'blockquotePaddingLeft is not longer used and will be removed in future releases. use blockquoteEdgeInsets instead')
     this.blockQuotePaddingLeft,
+    @Deprecated(
+        'blockquotePaddingLeft is not longer used and will be removed in future releases. use blockquoteEdgeInsets instead')
     this.blockQuotePaddingRight,
-    this.blockQuotethicknessDividerColor,
-    this.blockQuoteBackgroundColor,
-    this.blockQuoteDividerColor,
-    this.blockQuoteTextStyle,
+    this.blockquotethicknessDividerColor,
+    this.blockquoteBackgroundColor,
+    this.blockquoteDividerColor,
+    this.blockquoteTextStyle,
     this.codeBlockBackgroundColor,
     this.codeBlockNumLinesTextStyle,
     this.codeBlockFont,
@@ -154,6 +183,7 @@ class PDFConverter {
     this.onDetectHeaderBlock,
     this.onDetectImageBlock,
     this.onDetectErrorInImage,
+    this.onDetectVideoBlock,
     this.onDetectInlineRichTextStyles,
     this.onDetectLink,
     this.onDetectList,
@@ -186,42 +216,7 @@ class PDFConverter {
     void Function(dynamic error)? onException,
     PageBuilder? pageBuilder,
   }) async {
-    final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
-      pageFormat: pageFormat,
-      fonts: globalFontsFallbacks,
-      customTheme: themeData,
-      directionality: textDirection.toPdf(),
-      pageBuilder: pageBuilder,
-      isWeb: isWeb,
-      enableCodeBlockHighlighting: enableCodeBlockHighlighting,
-      isLightCodeBlockTheme: isLightCodeBlockTheme,
-      customCodeHighlightTheme: customCodeHighlightTheme,
-      customBuilders: customBuilders,
-      blockQuoteBackgroundColor: blockQuoteBackgroundColor,
-      blockQuoteDividerColor: blockQuoteDividerColor,
-      codeBlockBackgroundColor: codeBlockBackgroundColor,
-      codeBlockFont: codeBlockFont,
-      codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
-      codeBlockTextStyle: codeBlockTextStyle,
-      blockQuoteTextStyle: blockQuoteTextStyle,
-      onDetectAlignedParagraph: onDetectAlignedParagraph,
-      onDetectCommonText: onDetectCommonText,
-      onDetectBlockquote: onDetectBlockquote,
-      onDetectCodeBlock: onDetectCodeBlock,
-      blockQuotePaddingLeft: blockQuotePaddingLeft,
-      blockQuotePaddingRight: blockQuotePaddingRight,
-      blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
-      onDetectHeaderBlock: onDetectHeaderBlock,
-      onDetectImageBlock: onDetectImageBlock,
-      onDetectErrorInImage: onDetectErrorInImage,
-      onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
-      onDetectLink: onDetectLink,
-      onDetectList: onDetectList,
-      onRequestFontFamily: onRequestFontFamily,
-      backM: backMatterDelta,
-      frontM: frontMatterDelta,
-      document: document,
-    );
+    final qpdf.Converter<Delta, pw.Document> converter = _buildService();
     try {
       return await converter.generateDoc();
     } catch (e) {
@@ -245,42 +240,7 @@ class PDFConverter {
     void Function([Object? data])? onSucessWrite,
     PageBuilder? pageBuilder,
   }) async {
-    final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
-      pageFormat: pageFormat,
-      fonts: globalFontsFallbacks,
-      customBuilders: customBuilders,
-      pageBuilder: pageBuilder,
-      isWeb: this.isWeb,
-      onRequestFontFamily: onRequestFontFamily,
-      onDetectAlignedParagraph: onDetectAlignedParagraph,
-      onDetectCommonText: onDetectCommonText,
-      customTheme: themeData,
-      enableCodeBlockHighlighting: enableCodeBlockHighlighting,
-      isLightCodeBlockTheme: isLightCodeBlockTheme,
-      customCodeHighlightTheme: customCodeHighlightTheme,
-      blockQuoteBackgroundColor: blockQuoteBackgroundColor,
-      blockQuoteDividerColor: blockQuoteDividerColor,
-      codeBlockBackgroundColor: codeBlockBackgroundColor,
-      codeBlockFont: codeBlockFont,
-      codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
-      codeBlockTextStyle: codeBlockTextStyle,
-      onDetectErrorInImage: onDetectErrorInImage,
-      blockQuoteTextStyle: blockQuoteTextStyle,
-      directionality: textDirection.toPdf(),
-      onDetectBlockquote: onDetectBlockquote,
-      onDetectCodeBlock: onDetectCodeBlock,
-      onDetectHeaderBlock: onDetectHeaderBlock,
-      onDetectImageBlock: onDetectImageBlock,
-      blockQuotePaddingLeft: blockQuotePaddingLeft,
-      blockQuotePaddingRight: blockQuotePaddingRight,
-      blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
-      onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
-      onDetectLink: onDetectLink,
-      onDetectList: onDetectList,
-      backM: backMatterDelta,
-      frontM: frontMatterDelta,
-      document: document,
-    );
+    final qpdf.Converter<Delta, pw.Document> converter = _buildService();
     try {
       final pw.Document doc = await converter.generateDoc();
       final Uint8List bytes = await doc.save();
@@ -312,41 +272,7 @@ class PDFConverter {
     double? maxHeight,
     void Function(dynamic error)? onException,
   }) async {
-    final qpdf.Converter<Delta, pw.Document> converter = qpdf.PdfService(
-      pageFormat: pageFormat,
-      directionality: textDirection.toPdf(),
-      onRequestFontFamily: onRequestFontFamily,
-      isWeb: isWeb,
-      fonts: globalFontsFallbacks,
-      customTheme: themeData,
-      customBuilders: customBuilders,
-      blockQuoteBackgroundColor: blockQuoteBackgroundColor,
-      blockQuoteDividerColor: blockQuoteDividerColor,
-      codeBlockBackgroundColor: codeBlockBackgroundColor,
-      enableCodeBlockHighlighting: enableCodeBlockHighlighting,
-      isLightCodeBlockTheme: isLightCodeBlockTheme,
-      customCodeHighlightTheme: customCodeHighlightTheme,
-      codeBlockFont: codeBlockFont,
-      codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
-      codeBlockTextStyle: codeBlockTextStyle,
-      blockQuoteTextStyle: blockQuoteTextStyle,
-      onDetectAlignedParagraph: onDetectAlignedParagraph,
-      onDetectCommonText: onDetectCommonText,
-      onDetectBlockquote: onDetectBlockquote,
-      onDetectCodeBlock: onDetectCodeBlock,
-      blockQuotePaddingLeft: blockQuotePaddingLeft,
-      blockQuotePaddingRight: blockQuotePaddingRight,
-      onDetectErrorInImage: onDetectErrorInImage,
-      blockQuotethicknessDividerColor: blockQuotethicknessDividerColor,
-      onDetectHeaderBlock: onDetectHeaderBlock,
-      onDetectImageBlock: onDetectImageBlock,
-      onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
-      onDetectLink: onDetectLink,
-      onDetectList: onDetectList,
-      backM: backMatterDelta,
-      frontM: frontMatterDelta,
-      document: document,
-    );
+    final qpdf.Converter<Delta, pw.Document> converter = _buildService();
     try {
       return await converter.generateWidget(maxWidth: maxWidth, maxHeight: maxHeight);
     } catch (e) {
@@ -354,6 +280,46 @@ class PDFConverter {
       rethrow;
     }
   }
+
+  qpdf.PdfService _buildService() => qpdf.PdfService(
+        pageFormat: pageFormat,
+        fonts: globalFontsFallbacks,
+        customTheme: themeData,
+        directionality: textDirection.toPdf(),
+        pageBuilder: null,
+        isWeb: isWeb,
+        enableCodeBlockHighlighting: enableCodeBlockHighlighting,
+        isLightCodeBlockTheme: isLightCodeBlockTheme,
+        customCodeHighlightTheme: customCodeHighlightTheme,
+        customBuilders: customBuilders,
+        blockquoteBackgroundColor: blockquoteBackgroundColor,
+        codeBlockBackgroundColor: codeBlockBackgroundColor,
+        codeBlockFont: codeBlockFont,
+        codeBlockNumLinesTextStyle: codeBlockNumLinesTextStyle,
+        codeBlockTextStyle: codeBlockTextStyle,
+        blockquoteTextStyle: blockquoteTextStyle,
+        onDetectAlignedParagraph: onDetectAlignedParagraph,
+        onDetectCommonText: onDetectCommonText,
+        onDetectBlockquote: onDetectBlockquote,
+        onDetectCodeBlock: onDetectCodeBlock,
+        inlineCodeStyle: inlineCodeStyle,
+        onDetectVideoBlock: onDetectImageBlock,
+        blockquotethicknessDividerColor: blockquotethicknessDividerColor,
+        onDetectHeaderBlock: onDetectHeaderBlock,
+        onDetectImageBlock: onDetectImageBlock,
+        onDetectErrorInImage: onDetectErrorInImage,
+        onDetectInlineRichTextStyles: onDetectInlineRichTextStyles,
+        onDetectLink: onDetectLink,
+        onDetectList: onDetectList,
+        onRequestFontFamily: onRequestFontFamily,
+        backM: backMatterDelta,
+        frontM: frontMatterDelta,
+        document: document,
+        customHeadingSizes: customHeadingSizes,
+        listTypeWidget: listTypeWidget,
+        blockquotePadding: blockquotePadding,
+        blockquoteBoxDecoration: blockquoteBoxDecoration,
+      );
 
   @Deprecated('processDelta is no longer used. It always return null now. It will be removed in future releases.')
   static Delta? processDelta(Delta delta, DeltaAttributesOptions options, bool overrideAttributesPassedByUser) {

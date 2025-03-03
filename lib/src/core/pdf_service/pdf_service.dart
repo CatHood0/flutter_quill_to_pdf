@@ -41,17 +41,16 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     required super.document,
     pw.ThemeData? customTheme,
     super.codeBlockFont,
-    super.blockQuoteBackgroundColor,
+    super.blockquoteBackgroundColor,
     super.codeBlockBackgroundColor,
     super.codeBlockNumLinesTextStyle,
     super.codeBlockTextStyle,
-    super.blockQuoteDividerColor,
-    super.blockQuoteTextStyle,
-    super.blockQuotePaddingLeft,
-    super.blockQuotePaddingRight,
+    super.blockquoteTextStyle,
+    super.blockquotePadding,
+    super.blockquoteBoxDecoration,
     super.inlineCodeStyle,
     super.onDetectVideoBlock,
-    super.blockQuotethicknessDividerColor,
+    super.blockquotethicknessDividerColor,
     super.onDetectBlockquote,
     super.onDetectCodeBlock,
     super.onDetectAlignedParagraph,
@@ -408,7 +407,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       contentPerPage.add(codeBlock);
       return;
     } else if (blockquote) {
-      final pw.Widget blockquoteBlock = await getBlockQuote(
+      final pw.Widget blockquoteBlock = await getBlockquote(
         widgets!,
         null,
         align,

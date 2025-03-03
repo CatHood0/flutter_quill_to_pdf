@@ -76,12 +76,11 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final pw.TextStyle? inlineCodeStyle;
   final PdfColor? codeBlockBackgroundColor;
   final pw.TextStyle? codeBlockNumLinesTextStyle;
-  final pw.TextStyle? blockQuoteTextStyle;
-  final PdfColor? blockQuoteBackgroundColor;
-  final PdfColor? blockQuoteDividerColor;
-  final double? blockQuotethicknessDividerColor;
-  final double? blockQuotePaddingLeft;
-  final double? blockQuotePaddingRight;
+  final pw.TextStyle? blockquoteTextStyle;
+  final pw.EdgeInsetsGeometry? Function(int indent, pw.TextDirection direction)? blockquotePadding;
+  final pw.BoxDecoration? Function(pw.TextDirection direction)? blockquoteBoxDecoration;
+  final PdfColor? blockquoteBackgroundColor;
+  final double? blockquotethicknessDividerColor;
   final int defaultFontSize =
       Constant.DEFAULT_FONT_SIZE; //avoid spans without font sizes not appears in the document
   late final double pageWidth, pageHeight;
@@ -96,18 +95,17 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     this.isLightCodeBlockTheme = true,
     this.customCodeHighlightTheme,
     this.onRequestFontFamily,
+    this.blockquotePadding,
+    this.blockquoteBoxDecoration,
+    this.blockquoteTextStyle,
     this.isWeb = false,
     this.directionality = pw.TextDirection.ltr,
-    this.blockQuotePaddingLeft,
-    this.blockQuotePaddingRight,
-    this.blockQuotethicknessDividerColor,
-    this.blockQuoteBackgroundColor,
+    this.blockquotethicknessDividerColor,
+    this.blockquoteBackgroundColor,
     this.codeBlockBackgroundColor,
     this.listLeadingBuilder,
     this.codeBlockNumLinesTextStyle,
     this.codeBlockTextStyle,
-    this.blockQuoteDividerColor,
-    this.blockQuoteTextStyle,
     this.codeBlockFont,
     this.onDetectBlockquote,
     this.onDetectCodeBlock,
@@ -311,7 +309,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     }
 
     if (isBlockquote) {
-      final pw.TextStyle blockquoteStyle = blockQuoteTextStyle ??
+      final pw.TextStyle blockquoteStyle = blockquoteTextStyle?.merge(finalStyle) ??
           pw.TextStyle(
             color: PdfColor.fromHex("#808080"),
             lineSpacing: 1.5,
@@ -329,7 +327,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     );
   }
 
-  Future<pw.Widget> getBlockQuote(
+  Future<pw.Widget> getBlockquote(
     List<pw.Widget> spansToWrap, [
     pw.TextStyle? style,
     String? align,
@@ -341,27 +339,29 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     final pw.Widget widget = pw.Directionality(
       textDirection: textDirection ?? directionality,
       child: pw.Container(
-        padding: pw.EdgeInsetsDirectional.only(
-          start: blockQuotePaddingLeft ?? (indentLevel > 0 ? indentLevel * 12.5 : 10),
-          end: blockQuotePaddingRight ?? 10,
-        ),
-        decoration: pw.BoxDecoration(
-          color: this.blockQuoteBackgroundColor ?? PdfColor.fromHex('#fbfbf9'),
-          border: pw.Border(
-            left: (textDirection ?? directionality) == pw.TextDirection.rtl
-                ? pw.BorderSide.none
-                : pw.BorderSide(
-                    color: blockQuoteDividerColor ?? PdfColors.blue,
-                    width: blockQuotethicknessDividerColor ?? 2.5,
-                  ),
-            right: (textDirection ?? directionality) != pw.TextDirection.rtl
-                ? pw.BorderSide.none
-                : pw.BorderSide(
-                    color: blockQuoteDividerColor ?? PdfColors.blue,
-                    width: blockQuotethicknessDividerColor ?? 2.5,
-                  ),
-          ),
-        ),
+        padding: blockquotePadding?.call(indentLevel, textDirection ?? directionality) ??
+            pw.EdgeInsetsDirectional.only(
+              start: (indentLevel > 0 ? indentLevel * 12.5 : 10),
+              end: 10,
+            ),
+        decoration: blockquoteBoxDecoration?.call(textDirection ?? directionality) ??
+            pw.BoxDecoration(
+              color: this.blockquoteBackgroundColor ?? PdfColor.fromHex('#fbfbf9'),
+              border: pw.Border(
+                left: (textDirection ?? directionality) == pw.TextDirection.rtl
+                    ? pw.BorderSide.none
+                    : pw.BorderSide(
+                        color: PdfColors.blue,
+                        width: blockquotethicknessDividerColor ?? 2.5,
+                      ),
+                right: (textDirection ?? directionality) != pw.TextDirection.rtl
+                    ? pw.BorderSide.none
+                    : pw.BorderSide(
+                        color: PdfColors.blue,
+                        width: blockquotethicknessDividerColor ?? 2.5,
+                      ),
+              ),
+            ),
         child: pw.Column(
           mainAxisAlignment: pw.MainAxisAlignment.start,
           crossAxisAlignment: pw.CrossAxisAlignment.start,
