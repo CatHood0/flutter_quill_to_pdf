@@ -57,10 +57,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final PDFWidgetBuilder<Line, pw.Widget>? onDetectAlignedParagraph;
   final PDFWidgetBuilder<TextFragment, pw.InlineSpan>? onDetectCommonText;
   final PDFLeadingWidget<pw.Widget?>? listLeadingBuilder;
-
-  /// manages the directionality of the common text,
   final pw.TextDirection directionality;
-
   final PDFWidgetBuilder<TextFragment, pw.InlineSpan>? onDetectLink;
   final PDFWidgetBuilder<Paragraph, pw.Widget>? onDetectList;
   final PDFWidgetBuilder<Paragraph, pw.Widget>? onDetectCodeBlock;

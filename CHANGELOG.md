@@ -12,6 +12,9 @@
 * Chore: reorganized project structure.
 * Chore: deprecated `blockquotePaddingLeft` and `blockquotePaddingRight` and replaced with `blockquotePadding`. 
 * Chore: deprecated `blockquoteDividerColor` replaced with `blockquoteBoxDecoration`. 
+* Chore: renamed `blockQuotethicknessDividerColor` to `blockquotethicknessDividerColor`. 
+* Chore: renamed `blockQuoteBackgroundColor` to `blockquoteBackgroundColor`. 
+* Chore: renamed `blockQuoteTextStyle` to `blockquoteTextStyle`. 
 * Chore: renamed `IMAGE_FROM_URL_PATTERN` to `kDefaultImageUrlDetector` in `Constant` class. 
 * Chore: renamed `_applyBlockAttributes()` to `_defaultLineBuilderForBlocks()` in `PDFService` class. 
 * Chore: renamed `_applyInlineParagraph()` to `_defaultLineBuilderForInlines()` in `PDFService` class. 
