@@ -1,10 +1,12 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/src/extensions/string_extension.dart';
 
 extension PdfDoubleExtension on double {
-  ///Calculate based on the the current value to return the more similar line height
-  ///as should see on a PDF (and like Docx, libreoffice formatting too)
+  /// Calculate based on the the current value to return the more similar line height
+  /// as should see on a PDF (and like Docx, libreoffice formatting too)
+  ///
+  /// _This is the default implementation and should not be used outside_
   double resolveLineHeight() {
     if (this <= 0) return 0;
     if (this == 2.0) return 23.5;
@@ -14,10 +16,12 @@ extension PdfDoubleExtension on double {
     return this;
   }
 
-  ///Calculate based on the current value to return the padding
-  ///at the last of the line since pdf package
-  ///rich text, on param of lineSpacing
-  ///doesn't have effect at the top or botton of the line
+  /// Calculate based on the current value to return the padding
+  /// at the last of the line since pdf package
+  /// rich text, on param of lineSpacing
+  /// doesn't have effect at the top or botton of the line
+  ///
+  /// _This is the default implementation and should not be used outside_
   double resolvePaddingByLineHeight() {
     if (this <= 0) return 0;
     if (this == 12.5) return 6.5;
@@ -45,7 +49,16 @@ final RegExp _kDefaultRGBRegex = RegExp(
 );
 
 PdfColor? pdfColorString(String? colorString) {
-  if (colorString == null || colorString.isTotallyEmpty) return null;
+  if (colorString == null ||
+      colorString
+          .replaceAll(RegExp(r'\s+'), '')
+          .replaceAll(
+            RegExp('\\n|\n'),
+            '',
+          )
+          .isEmpty) {
+    return null;
+  }
   if (colorString.startsWith('#')) {
     return hexToColor(colorString);
   }
@@ -166,9 +179,9 @@ extension TextAlignmentExtension on String? {
 
 extension TextAlignmentExtensionReverse on pw.TextAlign? {
   pw.TextAlign get reversed {
-    return this == pw.TextAlign.center 
+    return this == pw.TextAlign.center
         ? pw.TextAlign.center
-        : this == pw.TextAlign.right 
+        : this == pw.TextAlign.right
             ? pw.TextAlign.left
             : this == pw.TextAlign.justify
                 ? pw.TextAlign.justify

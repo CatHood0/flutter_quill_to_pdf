@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
-import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
+import 'package:flutter_quill_to_pdf/src/constants.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 
 /// This is the default loader for the fonts created to the example

@@ -5,7 +5,6 @@ class Constant {
   static const String DEFAULT_FONT_FAMILY = 'Arial';
   // to encode markdown characters to avoid detection
   static const List<double> kDefaultHeadingSizes = <double>[37, 34, 28, 24, 20, 17];
-  static final RegExp newLinesInsertions = RegExp(r'^¶+');
   @Deprecated(
       'IMAGE_LOCAL_STORAGE_PATH_PATTERN is no longer used. You can use localStorageImageAndroidPattern or localStorageImageUniversalPattern instead')
   static final RegExp IMAGE_LOCAL_STORAGE_PATH_PATTERN = RegExp(r'^((\/[a-zA-Z0-9-_]+)+|\/)(\..+?)?$');
@@ -47,6 +46,6 @@ class Constant {
         localStorageFileDetectorAndroid.hasMatch(input);
   }
 
-  static final RegExp IMAGE_FROM_NETWORK_URL = RegExp(
+  static final RegExp kDefaultImageUrlDetector = RegExp(
       r'^http(s)?(?:(?<scheme>[^:\/?#]+):)?(?:\/\/(?<authority>[^\/?#]*))?(?<path>[^?#]*\/)?(?<file>[^?#]*\.(?<extension>[Jj][Pp][Ee]?[Gg]|[Pp][Nn][Gg]|[Gg][Ii][Ff]))(?:\?(?<query>[^#]*))?(?:#(?<fragment>.*))?$');
 }

@@ -1,4 +1,5 @@
-import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
+
+import 'package:flutter_quill_to_pdf/src/extensions/string_extension.dart';
 
 ///Contains all custom properties that we want in our delta
 ///Use this with together delta processor to add properties more easily without format all delta

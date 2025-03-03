@@ -4,14 +4,19 @@
 * Fix: issues related with `ThemeData` from PDF not being applied to the pdf document.
 * Fix: issues related with the font size of the `ThemeData` not being applied as expected.
 * Fix: wrong default code-block widget.
+* Fix: wrong default list widget.
 * Fix: issue where the default leading of ordered lists is not being computed correctly.
 * Fix: wrong behavior if `textDirection` is passed in `PDFConverter`.
 * Fix: bad rendering of content elements by not make an await for `_applyBlockAttributes()` in `PDFService` class. 
 * Fix(partially): bad rendering of content elements when directionality is RTL. 
+* Chore: renamed `IMAGE_FROM_URL_PATTERN` to `kDefaultImageUrlDetector` in `Constant` class. 
 * Chore: renamed `_applyBlockAttributes()` to `_defaultLineBuilderForBlocks()` in `PDFService` class. 
 * Chore: renamed `_applyInlineParagraph()` to `_defaultLineBuilderForInlines()` in `PDFService` class. 
+* Chore: deprecated `fixCommonErrorInsertsInRawDelta` and `isTotallyEmpty` methods since them are not longer used into the project.
 * Chore: moved embed implementation to `_defaultEmbedLineBuilder()` in `PDFService` class. 
 * Chore: created `_applyCustomBlocks()` to add all the necessary logic for add custom widgets from the custom callbacks in `PDFService` class. 
+* Chore: renamed `md_extension` file to `header_level_extension` in extensions.
+* Chore: renamed `MdHeaderLevelExtension` to `HeaderLevelResolverExtension` in extensions.
 * Chore(doc): added customization documention (only partially). 
 * Chore(breaking changes): added `extraArgs` param to all `PDFWidgetBuilder`.
 * Chore: deprecated `IMAGE_LOCAL_STORAGE_PATH_PATTERN` since only works for android devices. 
@@ -24,6 +29,7 @@
 * Feat: added support for code-block highlighting using `enableCodeBlockHighlighting` and `isLightMode`. 
 * Feat: added support for custom code-block highlighting theme using `customCodeHighlightTheme`. Check about [highlight_utils](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/lib/converter/configurator/utils/hightlight_themes.dart). 
 * Feat: added support for custom heading sizes using `customHeadingSizes`. 
+* Feat: added support for switch between the different versions of the default list blocks using `listTypeWidget`. 
 
 # 2.2.9
 

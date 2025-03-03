@@ -1,4 +1,4 @@
-extension MdHeaderLevelExtension on num {
+extension HeaderLevelResolverExtension on num {
   double resolveHeaderLevel({
     required List<double> headingSizes,
   }) {

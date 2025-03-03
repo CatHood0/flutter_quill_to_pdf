@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:collection';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
-import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
+import 'package:flutter_quill_to_pdf/src/constants.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
-import 'package:flutter_quill_to_pdf/internals/universal_merger.dart';
+import 'package:flutter_quill_to_pdf/src/extensions/pdf_extension.dart';
+import 'package:flutter_quill_to_pdf/src/internals/universal_merger.dart';
 import 'package:meta/meta.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -35,6 +36,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.isWeb,
     super.customHeadingSizes,
     super.onRequestFontFamily,
+    super.listTypeWidget,
     required super.customBuilders,
     required super.document,
     pw.ThemeData? customTheme,

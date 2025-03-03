@@ -6,9 +6,11 @@ import 'dart:typed_data';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
-import 'package:flutter_quill_to_pdf/converter/configurator/utils/hightlight_themes.dart';
-import 'package:flutter_quill_to_pdf/core/constant/constants.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
+import 'package:flutter_quill_to_pdf/src/constants.dart';
+import 'package:flutter_quill_to_pdf/src/core/enums/list_type_widget.dart';
+import 'package:flutter_quill_to_pdf/src/extensions/pdf_extension.dart';
+import 'package:flutter_quill_to_pdf/src/utils/css.dart';
 import 'package:highlight/highlight.dart';
 import 'package:meta/meta.dart';
 import 'package:numerus/roman/roman.dart';
@@ -16,7 +18,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart' show PdfColor, PdfColors, PdfPageFormat;
 import 'package:pdf/widgets.dart' as pw;
 
-import '../../../utils/css.dart';
 import 'document_functions.dart';
 import 'package:http/http.dart' as http;
 
@@ -42,6 +43,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   int numCodeLine = 0;
   @protected
   String? lastListType;
+  final ListTypeWidget listTypeWidget;
   final Delta? frontM;
   final Delta? backM;
   final List<double>? customHeadingSizes;
@@ -87,6 +89,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   PdfConfigurator({
     required this.customBuilders,
     required super.document,
+    this.listTypeWidget = ListTypeWidget.stable,
     this.inlineCodeStyle,
     this.customHeadingSizes,
     this.enableCodeBlockHighlighting = true,
@@ -144,7 +147,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     if (!Constant.contentUriFileDetector.hasMatch(data)) {
       if (isWeb) {
         imageBytes = await _fetchBlobAsBytes(data);
-      } else if (Constant.IMAGE_FROM_NETWORK_URL.hasMatch(data)) {
+      } else if (Constant.kDefaultImageUrlDetector.hasMatch(data)) {
         final String pathStorage =
             '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
         try {
@@ -157,13 +160,13 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       } else if (Constant.isFromLocalStorage(data)) {
         file = File(data);
       } else {
-        final Uint8List bytes = base64Decode(data);
-        final String pathStorage =
-            '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
         try {
+          final Uint8List bytes = base64Decode(data);
+          final String pathStorage =
+              '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
           file = File(pathStorage);
           await file.writeAsBytes(bytes);
-        } on DioException {
+        } on Exception {
           final pw.Widget? errorWidget = onDetectErrorInImage?.call(data, line, alignment);
           return errorWidget ?? pw.SizedBox.shrink();
         }
@@ -582,6 +585,76 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       }
     }
 
+    late final pw.Widget child;
+    if (listTypeWidget == ListTypeWidget.modern) {
+      child = pw.Column(
+        mainAxisAlignment: pw.MainAxisAlignment.start,
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        mainAxisSize: pw.MainAxisSize.min,
+        children: <pw.Widget>[
+          ...spansToWrap.map((pw.InlineSpan span) {
+            return pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.start,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              mainAxisSize: pw.MainAxisSize.min,
+              children: <pw.Widget>[
+                pw.Padding(
+                  padding: const pw.EdgeInsetsDirectional.only(
+                    end: 5.4,
+                  ),
+                  child: listType != 'ordered' || leadingWidget != null
+                      ? leadingWidget
+                      : pw.Text(
+                          _getListIdentifier(indentLevel),
+                          style: firstSpanStyle ?? defaultTheme.defaultTextStyle,
+                          overflow: pw.TextOverflow.span,
+                          textDirection: textDirection ?? directionality,
+                        ),
+                ),
+                pw.Expanded(
+                  child: pw.RichText(
+                    softWrap: true,
+                    overflow: pw.TextOverflow.span,
+                    textDirection: textDirection ?? directionality,
+                    text: span,
+                  ),
+                )
+              ],
+            );
+          }),
+        ],
+      );
+    } else {
+      child = pw.RichText(
+        textAlign: (textDirection ?? directionality) == pw.TextDirection.rtl
+            ? align.resolvePdfTextAlign.reversed
+            : align.resolvePdfTextAlign,
+        softWrap: true,
+        overflow: pw.TextOverflow.span,
+        textDirection: textDirection ?? directionality,
+        text: pw.TextSpan(
+          style: defaultTheme.defaultTextStyle,
+          children: <pw.InlineSpan>[
+            if (listType != 'ordered' || leadingWidget != null)
+              pw.WidgetSpan(
+                child: leadingWidget!,
+                style: firstSpanStyle?.merge(defaultTheme.defaultTextStyle) ?? defaultTheme.defaultTextStyle,
+              ),
+            if (listType == 'ordered' && leadingWidget == null)
+              pw.TextSpan(
+                text: _getListIdentifier(indentLevel),
+                style: firstSpanStyle ?? defaultTheme.defaultTextStyle,
+              ),
+            pw.TextSpan(
+              text: '  ',
+              style: firstSpanStyle?.merge(defaultTheme.defaultTextStyle) ?? defaultTheme.defaultTextStyle,
+            ),
+            ...spansToWrap
+          ],
+        ),
+      );
+    }
+
     return pw.Directionality(
       textDirection: textDirection ?? directionality,
       child: pw.Container(
@@ -590,43 +663,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
             start: indentLevel > 0 ? indentLevel * 12.5 : 15,
             bottom: spacing?.resolvePaddingByLineHeight() ?? 1.5,
           ),
-          child: pw.Column(
-            mainAxisAlignment: pw.MainAxisAlignment.start,
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            mainAxisSize: pw.MainAxisSize.min,
-            children: <pw.Widget>[
-              ...spansToWrap.map((pw.InlineSpan span) {
-                return pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.start,
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  mainAxisSize: pw.MainAxisSize.min,
-                  children: <pw.Widget>[
-                    pw.Padding(
-                      padding: const pw.EdgeInsetsDirectional.only(
-                        end: 5.4,
-                      ),
-                      child: listType != 'ordered' || leadingWidget != null
-                          ? leadingWidget
-                          : pw.Text(
-                              _getListIdentifier(indentLevel),
-                              style: firstSpanStyle ?? defaultTheme.defaultTextStyle,
-                              overflow: pw.TextOverflow.span,
-                              textDirection: textDirection ?? directionality,
-                            ),
-                    ),
-                    pw.Expanded(
-                      child: pw.RichText(
-                        softWrap: true,
-                        overflow: pw.TextOverflow.span,
-                        textDirection: textDirection ?? directionality,
-                        text: span,
-                      ),
-                    )
-                  ],
-                );
-              }),
-            ],
-          )),
+          child: child),
     );
   }
 
