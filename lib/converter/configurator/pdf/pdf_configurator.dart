@@ -24,7 +24,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     implements DocumentFunctions<Delta, Document, List<pw.Widget>> {
   late final pw.ThemeData defaultTheme;
   late final PdfColor defaultLinkColor;
-  //show default this on ordered list
   @protected
   int lastListIndent = 0;
   @protected
