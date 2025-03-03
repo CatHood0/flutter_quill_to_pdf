@@ -1,12 +1,6 @@
 class Constant {
   const Constant._();
-  static final List<String> kDefaultBlocksToAccumulate = List<String>.unmodifiable(
-    <String>[
-      'blockquote',
-      'code-block',
-    ],
-  );
-  static const double DEFAULT_LINE_HEIGHT = 1.0;
+  static const double kDefaultLineHeight = 1.0;
   static const int DEFAULT_FONT_SIZE = 12;
   static const String DEFAULT_FONT_FAMILY = 'Arial';
   // to encode markdown characters to avoid detection

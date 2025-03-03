@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:ui' as ui;
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart' as ep;
 import 'package:flutter_quill_to_pdf/converter/delta_processor/delta_attributes_options.dart';
@@ -29,7 +29,7 @@ class PDFConverter {
 
   /// This will set the default direction for all the document
   /// or the common widgets if them doesn't have direction attribute
-  final TextDirection textDirection;
+  final ui.TextDirection textDirection;
 
   ///[CustomPDFWidget] allow devs to use builders to create custom widgets
   final List<qpdf.CustomWidget> customBuilders;
@@ -68,35 +68,36 @@ class PDFConverter {
   ///Customize the left/right divider color to blockquotes
   final PdfColor? blockQuoteDividerColor;
 
-  final qpdf.PDFWidgetBuilder<ep.Line, pw.Widget>? onDetectImageBlock;
+  /// When an image is detected, this will be called to build a custom implementation of it 
+  final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.Widget>? onDetectImageBlock;
 
   /// When an image is being builded and an error is catched, this is called
-  final PDFWidgetErrorBuilder<String, pw.Widget, ep.Line>? onDetectErrorInImage;
+  final PDFWidgetErrorBuilder<String, pw.Widget, ep.TextFragment>? onDetectErrorInImage;
 
   /// When a rich text styles are detected, this builder is called
-  final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectInlineRichTextStyles;
+  final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.InlineSpan>? onDetectInlineRichTextStyles;
 
   /// When a header block is detected, this builder is called
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectHeaderBlock;
+  final qpdf.PDFWidgetBuilder<ep.Line, pw.Widget>? onDetectHeaderBlock;
 
   /// When a aligned block is detected, this builder is called
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectAlignedParagraph;
+  final qpdf.PDFWidgetBuilder<ep.Line, pw.Widget>? onDetectAlignedParagraph;
 
   /// When a non rich text line is detected, this builder is called
   /// Tipically this happens when the insertion has not inline attributes
-  final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectCommonText;
+  final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.InlineSpan>? onDetectCommonText;
 
   /// When a link line is detected, this builder is called
-  final qpdf.PDFWidgetBuilder<ep.Line, List<pw.InlineSpan>>? onDetectLink;
+  final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.InlineSpan>? onDetectLink;
 
   /// When a list block is detected, this builder is called
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectList;
+  final qpdf.PDFWidgetBuilder<ep.Paragraph, pw.Widget>? onDetectList;
 
   /// When a code block is detected, this builder is called
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectCodeBlock;
+  final qpdf.PDFWidgetBuilder<ep.Paragraph, pw.Widget>? onDetectCodeBlock;
 
   /// When a block quote is detected, this builder is called
-  final qpdf.PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectBlockquote;
+  final qpdf.PDFWidgetBuilder<ep.Paragraph, pw.Widget>? onDetectBlockquote;
 
   late final List<pw.Font> globalFontsFallbacks;
 
@@ -129,7 +130,7 @@ class PDFConverter {
     @experimental this.isLightCodeBlockTheme = true,
     @experimental this.customCodeHighlightTheme,
     @experimental this.isWeb = false,
-    this.textDirection = TextDirection.ltr,
+    this.textDirection = ui.TextDirection.ltr,
     this.frontMatterDelta,
     this.backMatterDelta,
     this.customBuilders = const <qpdf.CustomWidget>[],

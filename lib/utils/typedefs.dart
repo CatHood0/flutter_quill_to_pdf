@@ -1,7 +1,7 @@
 import 'package:pdf/pdf.dart' show PdfPageFormat;
 import 'package:pdf/widgets.dart' as pw;
 
-typedef PDFWidgetBuilder<T, W> = W Function(T spansToWrap, Map<String, dynamic>? blockAttributes, [Object? extraArgs]);
+typedef PDFWidgetBuilder<T, W> = W Function(T data, Map<String, dynamic>? blockAttributes, [Object? extraArgs]);
 typedef PDFLeadingWidget<W> = W Function(
   String type,
   int indentLevel,

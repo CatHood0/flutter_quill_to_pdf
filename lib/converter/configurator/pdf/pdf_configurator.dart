@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
@@ -15,19 +14,15 @@ import 'package:highlight/highlight.dart';
 import 'package:meta/meta.dart';
 import 'package:numerus/roman/roman.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart' show PdfColor, PdfColors, PdfPageFormat, PdfTextRenderingMode;
+import 'package:pdf/pdf.dart' show PdfColor, PdfColors, PdfPageFormat;
 import 'package:pdf/widgets.dart' as pw;
 
 import '../../../utils/css.dart';
-import 'attribute_functions.dart';
 import 'document_functions.dart';
 import 'package:http/http.dart' as http;
 
 abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
-    implements
-        AttrInlineFunctions<List<pw.InlineSpan>, pw.TextStyle?>,
-        AttrBlockFunctions<pw.Widget, pw.TextStyle?>,
-        DocumentFunctions<Delta, Document, List<pw.Widget>> {
+    implements DocumentFunctions<Delta, Document, List<pw.Widget>> {
   late final pw.ThemeData defaultTheme;
   late final PdfColor defaultLinkColor;
   //show default this on ordered list
@@ -54,21 +49,21 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   final List<double>? customHeadingSizes;
   final List<CustomWidget> customBuilders;
   final FontFamilyResponse Function(FontFamilyRequest familyRequest)? onRequestFontFamily;
-  final PDFWidgetBuilder<Line, pw.Widget>? onDetectImageBlock;
-  final PDFWidgetErrorBuilder<String, pw.Widget, Line>? onDetectErrorInImage;
-  final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectInlineRichTextStyles;
-  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectHeaderBlock;
-  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectAlignedParagraph;
-  final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectCommonText;
+  final PDFWidgetBuilder<TextFragment, pw.Widget>? onDetectImageBlock;
+  final PDFWidgetErrorBuilder<String, pw.Widget, TextFragment>? onDetectErrorInImage;
+  final PDFWidgetBuilder<TextFragment, pw.InlineSpan>? onDetectInlineRichTextStyles;
+  final PDFWidgetBuilder<Line, pw.Widget>? onDetectHeaderBlock;
+  final PDFWidgetBuilder<Line, pw.Widget>? onDetectAlignedParagraph;
+  final PDFWidgetBuilder<TextFragment, pw.InlineSpan>? onDetectCommonText;
   final PDFLeadingWidget<pw.Widget?>? listLeadingBuilder;
 
   /// manages the directionality of the common text,
   final pw.TextDirection directionality;
 
-  final PDFWidgetBuilder<Line, List<pw.InlineSpan>>? onDetectLink;
-  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectList;
-  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectCodeBlock;
-  final PDFWidgetBuilder<List<pw.InlineSpan>, pw.Widget>? onDetectBlockquote;
+  final PDFWidgetBuilder<TextFragment, pw.InlineSpan>? onDetectLink;
+  final PDFWidgetBuilder<Paragraph, pw.Widget>? onDetectList;
+  final PDFWidgetBuilder<Paragraph, pw.Widget>? onDetectCodeBlock;
+  final PDFWidgetBuilder<Paragraph, pw.Widget>? onDetectBlockquote;
   final bool enableCodeBlockHighlighting;
 
   /// isLightCodeBlockTheme is used when enableCodeBlockHighlighting is true
@@ -126,9 +121,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     defaultLinkColor = const PdfColor.fromInt(0x2AAB);
   }
 
-  @override
   Future<pw.Widget> getImageBlock(
-    Line line, [
+    TextFragment line, [
     pw.AlignmentDirectional? alignment,
     pw.TextDirection? textDirection,
   ]) async {
@@ -205,28 +199,28 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     );
   }
 
-  Future<Uint8List> _fetchBlobAsBytes(String blobUrl) async {
-    final http.Response response = await http.get(Uri.parse(blobUrl));
-    if (response.statusCode == 200) {
-      return response.bodyBytes;
-    } else {
-      throw Exception('Failed to load blob image');
-    }
-  }
-
-  @override
-  Future<List<pw.InlineSpan>> getRichTextInlineStyles(
-    Line line, [
+  Future<pw.InlineSpan> getRichTextInlineStyles({
+    required TextFragment line,
+    required bool isCodeBlock,
+    required bool isBlockquote,
+    required int? headerLevel,
     pw.TextStyle? style,
     bool returnContentIfNeedIt = false,
     bool addFontSize = true,
-  ]) async {
-    final List<pw.InlineSpan> spans = <pw.InlineSpan>[];
+  }) async {
+    if (isCodeBlock && enableCodeBlockHighlighting) {
+      final pw.TextStyle codeBlockStyle = getCodeBlockStyle();
+      return _getHighlight(
+        line.data as String,
+        style: codeBlockStyle.copyWith(lineSpacing: 0.5),
+      );
+    }
     final PdfColor? textColor = pdfColorString(line.attributes?['color']);
     final PdfColor? backgroundTextColor = pdfColorString(line.attributes?['background']);
     final double? spacing = line.attributes?['line-height'];
     final String? fontFamily = line.attributes?['font'];
     final Object? fontSizeMatch = line.attributes?['size'];
+    final String href = line.attributes?['link'] as String? ?? '';
     double? fontSizeHelper = defaultTheme.defaultTextStyle.fontSize ?? defaultTheme.defaultTextStyle.fontSize;
     if (fontSizeMatch != null) {
       if (fontSizeMatch == 'large') fontSizeHelper = 15.5;
@@ -255,73 +249,70 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       isStrike: strike,
     ));
     // Give just the necessary fallbacks for the founded fontFamily
-    final pw.TextStyle decided_style = style?.copyWith(
-          font: fontResponse?.fontNormalV,
-          fontStyle: italic ? pw.FontStyle.italic : null,
-          fontWeight: bold ? pw.FontWeight.bold : null,
-          decoration: pw.TextDecoration.combine(<pw.TextDecoration>[
-            if (strike) pw.TextDecoration.lineThrough,
-            if (underline) pw.TextDecoration.underline,
-          ]),
-          decorationStyle: pw.TextDecorationStyle.solid,
-          decorationColor: textColor ?? backgroundTextColor,
-          fontBold: fontResponse?.boldFontV,
-          fontItalic: fontResponse?.italicFontV,
-          fontBoldItalic: fontResponse?.boldItalicFontV,
-          fontFallback: fontResponse?.fallbacks,
-          fontSize: !addFontSize ? null : fontSize,
-          lineSpacing: lineSpacing,
-          color: textColor,
-          background: pw.BoxDecoration(color: backgroundTextColor),
-        ) ??
-        defaultTheme.defaultTextStyle.copyWith(
-          font: fontResponse?.fontNormalV,
-          decoration: pw.TextDecoration.combine(<pw.TextDecoration>[
-            if (strike) pw.TextDecoration.lineThrough,
-            if (underline) pw.TextDecoration.underline,
-          ]),
-          decorationStyle: pw.TextDecorationStyle.solid,
-          decorationColor: textColor ?? backgroundTextColor,
-          fontBold: fontResponse?.boldFontV,
-          fontItalic: fontResponse?.italicFontV,
-          fontBoldItalic: fontResponse?.boldItalicFontV,
-          fontFallback: fontResponse?.fallbacks,
-          fontSize: !addFontSize ? null : fontSize,
-          lineSpacing: lineSpacing,
-          color: textColor,
-          background: pw.BoxDecoration(color: backgroundTextColor),
-        );
-    spans.add(
-      pw.TextSpan(
-        text: content,
-        style: decided_style,
-      ),
+    final pw.TextStyle finalStyle = (style ?? defaultTheme.defaultTextStyle).copyWith(
+      font: fontResponse?.fontNormalV,
+      fontStyle: italic ? pw.FontStyle.italic : null,
+      fontWeight: bold ? pw.FontWeight.bold : null,
+      decoration: pw.TextDecoration.combine(<pw.TextDecoration>[
+        if (strike) pw.TextDecoration.lineThrough,
+        if (underline) pw.TextDecoration.underline,
+      ]),
+      decorationStyle: pw.TextDecorationStyle.solid,
+      decorationColor: href.isNotEmpty ? textColor ?? defaultLinkColor : textColor ?? backgroundTextColor,
+      color: textColor ?? (href.isNotEmpty ? defaultLinkColor : null),
+      fontBold: fontResponse?.boldFontV,
+      fontItalic: fontResponse?.italicFontV,
+      fontBoldItalic: fontResponse?.boldItalicFontV,
+      fontFallback: fontResponse?.fallbacks,
+      fontSize: !addFontSize ? null : fontSize,
+      lineSpacing: lineSpacing,
+      background: backgroundTextColor == null ? null : pw.BoxDecoration(color: backgroundTextColor),
     );
-    if (returnContentIfNeedIt && spans.isEmpty) {
-      return <pw.TextSpan>[pw.TextSpan(text: line.data as String, style: style ?? decided_style)];
+    if (returnContentIfNeedIt) {
+      return pw.TextSpan(
+        annotation: href.isNotEmpty ? pw.AnnotationLink(href) : null,
+        text: line.data as String,
+        style: style ?? finalStyle,
+      );
     }
-    return spans;
+    if (headerLevel != null && headerLevel > 0) {
+      final double headerFontSize =
+          headerLevel.resolveHeaderLevel(headingSizes: customHeadingSizes ?? Constant.kDefaultHeadingSizes);
+      final pw.TextStyle headerStyle = finalStyle.copyWith(fontSize: headerFontSize);
+      return pw.TextSpan(
+        text: content,
+        style: headerStyle,
+      );
+    }
+
+    if (isBlockquote) {
+      final pw.TextStyle blockquoteStyle = blockQuoteTextStyle ??
+          pw.TextStyle(
+            color: PdfColor.fromHex("#808080"),
+            lineSpacing: 1.5,
+          ).merge(finalStyle);
+      return pw.TextSpan(
+        annotation: href.isNotEmpty ? pw.AnnotationLink(href) : null,
+        text: content,
+        style: blockquoteStyle,
+      );
+    }
+
+    return pw.TextSpan(
+      text: content,
+      style: finalStyle,
+    );
   }
 
-  @override
   Future<pw.Widget> getBlockQuote(
-    List<pw.InlineSpan> spansToWrap, [
+    List<pw.Widget> spansToWrap, [
     pw.TextStyle? style,
     String? align,
     int? indentLevel,
     pw.TextDirection? textDirection,
-    bool isFirstBlockLine = false,
-    bool isLastBlockLine = false,
   ]) async {
     align ??= 'left';
     indentLevel ??= 0;
-    final pw.TextStyle defaultStyle = pw.TextStyle(
-      color: PdfColor.fromHex("#808080"),
-      lineSpacing: 6.5,
-    ).merge(
-      defaultTheme.defaultTextStyle,
-    );
-    final pw.TextStyle blockquoteStyle = blockQuoteTextStyle ?? defaultStyle;
     final pw.Widget widget = pw.Directionality(
       textDirection: textDirection ?? directionality,
       child: pw.Container(
@@ -329,7 +320,6 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           start: blockQuotePaddingLeft ?? (indentLevel > 0 ? indentLevel * 12.5 : 10),
           end: blockQuotePaddingRight ?? 10,
         ),
-        margin: pw.EdgeInsetsDirectional.only(top: isFirstBlockLine ? 10 : 0, bottom: isLastBlockLine ? 10 : 0),
         decoration: pw.BoxDecoration(
           color: this.blockQuoteBackgroundColor ?? PdfColor.fromHex('#fbfbf9'),
           border: pw.Border(
@@ -347,31 +337,52 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
                   ),
           ),
         ),
-        child: pw.RichText(
-          softWrap: true,
-          overflow: pw.TextOverflow.span,
-          textDirection: textDirection ?? directionality,
-          textAlign: (textDirection ?? directionality) == pw.TextDirection.rtl
-              ? align.resolvePdfTextAlign.reversed
-              : align.resolvePdfTextAlign,
-          text: pw.TextSpan(
-            style: blockquoteStyle,
-            children: <pw.InlineSpan>[...spansToWrap],
-          ),
+        child: pw.Column(
+          mainAxisAlignment: pw.MainAxisAlignment.start,
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          mainAxisSize: pw.MainAxisSize.min,
+          children: spansToWrap,
         ),
       ),
     );
     return widget;
   }
 
-  @override
   Future<pw.Widget> getCodeBlock(
-    List<pw.InlineSpan> spansToWrap, [
+    List<pw.Widget> spansToWrap, [
     pw.TextStyle? style,
     pw.TextDirection? textDirection,
     bool isFirstBlockLine = false,
     bool isLastBlockLine = false,
   ]) async {
+    final pw.Widget widget = pw.Container(
+      width: pageWidth,
+      decoration: pw.BoxDecoration(
+        color: this.codeBlockBackgroundColor ?? PdfColor.fromHex('#e1e1e166'),
+      ),
+      child: pw.Container(
+        padding: pw.EdgeInsetsDirectional.only(
+          start: 10,
+          end: 10,
+          top: isFirstBlockLine ? 10 : 2,
+          bottom: isLastBlockLine ? 10 : 2,
+        ),
+        margin: !isFirstBlockLine && !isLastBlockLine ? const pw.EdgeInsetsDirectional.only(top: -1) : null,
+        child: pw.Column(
+          mainAxisAlignment: pw.MainAxisAlignment.start,
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          mainAxisSize: pw.MainAxisSize.min,
+          children: <pw.Widget>[
+            ...spansToWrap,
+          ],
+        ),
+      ),
+    );
+    return widget;
+  }
+
+  @protected
+  pw.TextStyle getCodeBlockStyle() {
     final pw.TextStyle defaultCodeBlockStyle = pw.TextStyle(
       fontSize: 10,
       font: codeBlockFont ?? pw.Font.courier(),
@@ -386,191 +397,100 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       wordSpacing: 1.0,
       color: PdfColor.fromHex("#808080"),
     );
-    final pw.TextStyle codeBlockStyle =
-        codeBlockTextStyle ?? defaultCodeBlockStyle.merge(defaultTheme.defaultTextStyle.copyWith(lineSpacing: 1.0));
-    final Iterable<pw.InlineSpan> spans = !enableCodeBlockHighlighting
-        ? spansToWrap.map<pw.InlineSpan>((pw.InlineSpan span) => span.copyWith(style: codeBlockStyle))
-        : getHighlight(
-            spansToWrap
-                .map<String>(
-                  (pw.InlineSpan e) => e.toPlainText(),
-                )
-                .join(),
-            style: codeBlockStyle.copyWith(lineSpacing: 0.5),
-          );
-    final pw.Widget widget = pw.Container(
-      width: pageWidth,
-      decoration: pw.BoxDecoration(
-        color: this.codeBlockBackgroundColor ?? PdfColor.fromHex('#e1e1e166'),
-      ),
-      child: pw.Container(
-        padding: pw.EdgeInsetsDirectional.only(
-          start: 10,
-          end: 10,
-          top: isFirstBlockLine ? 10 : 2,
-          bottom: isLastBlockLine ? 10 : 2,
-        ),
-        margin: !isFirstBlockLine && !isLastBlockLine ? const pw.EdgeInsetsDirectional.only(top: -1) : null,
-        child: pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.start,
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          mainAxisSize: pw.MainAxisSize.min,
-          children: <pw.Widget>[
-            pw.Padding(
-              padding: const pw.EdgeInsetsDirectional.only(
-                end: 10,
-              ),
-              child: pw.Text(
-                numCodeLine.toString(),
-                style: codeBlockNumLinesTextStyle?.merge(
-                      defaultTheme.defaultTextStyle,
-                    ) ??
-                    codeBlockStyle.merge(defaultTheme.defaultTextStyle),
-                overflow: pw.TextOverflow.span,
-                textDirection: textDirection ?? directionality,
-              ),
-            ),
-            pw.Expanded(
-              child: pw.RichText(
-                softWrap: true,
-                overflow: pw.TextOverflow.span,
-                textDirection: textDirection ?? directionality,
-                text: pw.TextSpan(
-                  children: <pw.InlineSpan>[
-                    ...spans,
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-    return widget;
+    return codeBlockTextStyle ??
+        defaultCodeBlockStyle.merge(defaultTheme.defaultTextStyle.copyWith(lineSpacing: 1.0));
   }
 
-  @override
-  Future<List<pw.TextSpan>> getLinkStyle(Line line, [pw.TextStyle? style, bool addFontSize = true]) async {
-    final List<pw.TextSpan> spans = <pw.TextSpan>[];
-    final double? lineHeight = line.attributes?['line-height'];
-    final String? fontFamily = line.attributes?['font'];
-    final PdfColor? textColor = pdfColorString(line.attributes?['color']);
-    final PdfColor? backgroundTextColor = pdfColorString(line.attributes?['background']);
-    final double? lineSpacing = lineHeight?.resolveLineHeight();
-    final bool bold = line.attributes?['bold'] ?? false;
-    final bool italic = line.attributes?['italic'] ?? false;
-    final bool strike = line.attributes?['strike'] ?? false;
-    final bool underline = line.attributes?['underline'] ?? false;
-    final String href = line.attributes!['link'];
-    final String hrefContent = line.data as String;
-    final FontFamilyResponse? fontResponse = onRequestFontFamily?.call(FontFamilyRequest(
-      family: fontFamily ?? Constant.DEFAULT_FONT_FAMILY,
-      isBold: bold,
-      isItalic: italic,
-      isUnderline: underline,
-      isStrike: strike,
-    ));
-
-    double? fontSize = defaultTheme.defaultTextStyle.fontSize;
-    final Object? fontSizeMatch = line.attributes?['size'];
-    if (fontSizeMatch != null) {
-      if (fontSizeMatch == 'large') fontSize = 15.5;
-      if (fontSizeMatch == 'huge') fontSize = 18.5;
-      if (fontSizeMatch != 'huge' && fontSizeMatch != 'large' && fontSizeMatch != 'small') {
-        if (fontSizeMatch is String) {
-          fontSize = double.tryParse(fontSizeMatch) ?? fontSize;
-        }
-        if (fontSizeMatch is num) {
-          fontSize = fontSizeMatch.toDouble();
-        }
-      }
-    }
-    spans.add(
-      pw.TextSpan(
-        annotation: pw.AnnotationLink(href),
-        text: hrefContent,
-        style: (style ?? defaultTheme.defaultTextStyle).copyWith(
-          color: textColor ?? defaultLinkColor,
-          background: backgroundTextColor == null ? null : pw.BoxDecoration(color: backgroundTextColor),
-          fontStyle: italic ? pw.FontStyle.italic : null,
-          fontWeight: bold ? pw.FontWeight.bold : null,
-          decoration: pw.TextDecoration.combine(<pw.TextDecoration>[
-            if (strike) pw.TextDecoration.lineThrough,
-            if (underline) pw.TextDecoration.underline,
-          ]),
-          decorationStyle: pw.TextDecorationStyle.solid,
-          decorationColor: defaultLinkColor,
-          font: fontResponse?.fontNormalV,
-          fontBold: fontResponse?.boldFontV,
-          fontItalic: fontResponse?.italicFontV,
-          fontBoldItalic: fontResponse?.boldItalicFontV,
-          fontFallback: fontResponse?.fallbacks,
-          fontSize: !addFontSize ? null : fontSize,
-          lineSpacing: lineSpacing,
-        ),
+  pw.Widget lineBuilder({
+    required List<pw.InlineSpan> spans,
+    String align = 'left',
+    pw.TextDirection? textDirection,
+  }) {
+    return pw.RichText(
+      textAlign: (textDirection ?? directionality) == pw.TextDirection.rtl
+          ? align.resolvePdfTextAlign.reversed
+          : align.resolvePdfTextAlign,
+      softWrap: true,
+      overflow: pw.TextOverflow.span,
+      textDirection: textDirection ?? directionality,
+      text: pw.TextSpan(
+        children: <pw.InlineSpan>[...spans],
       ),
     );
-    return spans;
   }
 
-  @override
-  Future<pw.Widget> getHeaderBlock(
-    List<pw.InlineSpan> spansToWrap,
-    int headerLevel,
-    int indentLevel, [
+  @protected
+  pw.Widget codeBlockLineBuilder({
+    required List<pw.InlineSpan> spans,
+    required pw.TextStyle codeBlockStyle,
+    pw.TextDirection? textDirection,
+  }) {
+    return pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.start,
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      mainAxisSize: pw.MainAxisSize.min,
+      children: <pw.Widget>[
+        pw.Padding(
+          padding: const pw.EdgeInsetsDirectional.only(
+            end: 10,
+          ),
+          child: pw.Text(
+            numCodeLine.toString(),
+            style: codeBlockNumLinesTextStyle?.merge(
+                  defaultTheme.defaultTextStyle,
+                ) ??
+                codeBlockStyle.merge(defaultTheme.defaultTextStyle),
+            overflow: pw.TextOverflow.span,
+            textDirection: textDirection ?? directionality,
+          ),
+        ),
+        pw.Expanded(
+          child: pw.RichText(
+            softWrap: true,
+            overflow: pw.TextOverflow.span,
+            textDirection: textDirection ?? directionality,
+            text: pw.TextSpan(
+              children: <pw.InlineSpan>[...spans],
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Future<pw.Widget> getHeaderBlock({
+    required pw.Widget child,
+    required int headerLevel,
+    required int indentLevel,
     pw.TextStyle? style,
     pw.TextDirection? textDirection,
-  ]) async {
-    final double defaultFontSize =
-        headerLevel.resolveHeaderLevel(headingSizes: customHeadingSizes ?? Constant.kDefaultHeadingSizes);
-    //TODO: we should implement defaultTheme.header(level) instead change styles manually
-    final pw.TextStyle textStyle = style?.copyWith(
-          fontSize: defaultFontSize,
-          renderingMode: PdfTextRenderingMode.fill,
-        ) ??
-        defaultTheme.defaultTextStyle.copyWith(
-          fontSize: defaultFontSize,
-          renderingMode: PdfTextRenderingMode.fill,
-        );
+  }) async {
     return pw.Directionality(
       textDirection: textDirection ?? directionality,
       child: pw.Container(
+        alignment: pw.AlignmentDirectional.centerStart,
         padding: pw.EdgeInsets.only(
           left: indentLevel.toDouble() * 7,
           top: 3.5,
           bottom: 2.5,
         ),
-        child: pw.RichText(
-          softWrap: true,
-          overflow: pw.TextOverflow.span,
-          textDirection: textDirection ?? directionality,
-          textAlign:
-              (textDirection ?? directionality) == pw.TextDirection.rtl ? pw.TextAlign.end : pw.TextAlign.start,
-          text: pw.TextSpan(
-            style: textStyle,
-            children: spansToWrap,
-          ),
-        ),
+        child: child,
       ),
     );
   }
 
-  @override
-  Future<pw.Widget> getAlignedHeaderBlock(
-    List<pw.InlineSpan> spansToWrap,
-    int headerLevel,
-    String align,
-    int indentLevel, [
+  Future<pw.Widget> getAlignedHeaderBlock({
+    required pw.Widget child,
+    required int headerLevel,
+    required String align,
+    required int indentLevel,
+    pw.TextStyle? firstSpanStyle,
     pw.TextStyle? style,
     pw.TextDirection? textDirection,
-  ]) async {
+  }) async {
     final String alignment = align;
     final pw.AlignmentDirectional al = alignment.resolvePdfBlockAlign;
-    final pw.TextAlign textAlign = (textDirection ?? directionality) == pw.TextDirection.rtl
-        ? alignment.resolvePdfTextAlign.reversed
-        : alignment.resolvePdfTextAlign;
-
-    final double spacing = (spansToWrap.firstOrNull?.style?.lineSpacing ?? 1.0);
+    final double spacing = (firstSpanStyle?.lineSpacing ?? Constant.kDefaultLineHeight);
     return pw.Directionality(
       textDirection: textDirection ?? directionality,
       child: pw.Container(
@@ -580,28 +500,21 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           bottom: spacing.resolvePaddingByLineHeight(),
         ),
         alignment: al,
-        child: pw.RichText(
-          textAlign: textAlign,
-          overflow: pw.TextOverflow.span,
-          softWrap: true,
-          textDirection: textDirection ?? directionality,
-          text: pw.TextSpan(children: spansToWrap),
-        ),
+        child: child,
       ),
     );
   }
 
-  @override
-  Future<pw.Widget> getAlignedParagraphBlock(
-    List<pw.InlineSpan> spansToWrap,
-    String align,
-    int indentLevel, [
+  Future<pw.Widget> getAlignedParagraphBlock({
+    required pw.Widget child,
+    required String align,
+    required int indentLevel,
+    required pw.TextStyle? firstSpanStyle,
     pw.TextStyle? style,
     pw.TextDirection? textDirection,
-  ]) async {
-    final double spacing = (spansToWrap.firstOrNull?.style?.lineSpacing ??
-        defaultTheme.defaultTextStyle.lineSpacing ??
-        Constant.DEFAULT_LINE_HEIGHT);
+  }) async {
+    final double spacing =
+        (firstSpanStyle?.lineSpacing ?? defaultTheme.defaultTextStyle.lineSpacing ?? Constant.kDefaultLineHeight);
     return pw.Directionality(
       textDirection: textDirection ?? directionality,
       child: pw.Container(
@@ -611,22 +524,11 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           top: 1.5,
           bottom: spacing.resolvePaddingByLineHeight(),
         ),
-        child: pw.RichText(
-          textAlign: (textDirection ?? directionality) == pw.TextDirection.rtl
-              ? align.resolvePdfTextAlign.reversed
-              : align.resolvePdfTextAlign,
-          softWrap: true,
-          overflow: pw.TextOverflow.span,
-          textDirection: textDirection ?? directionality,
-          text: pw.TextSpan(
-            children: spansToWrap,
-          ),
-        ),
+        child: child,
       ),
     );
   }
 
-  @override
   Future<pw.Widget> getListBlock(
     List<pw.InlineSpan> spansToWrap,
     String listType,
@@ -751,7 +653,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     return result;
   }
 
-  List<pw.TextSpan> getHighlight(
+  pw.TextSpan _getHighlight(
     String source, {
     String? language,
     required pw.TextStyle style,
@@ -771,7 +673,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
 
   // Copy from flutter.highlight package.
   // https://github.com/git-touch/highlight.dart/blob/master/flutter_highlight/lib/flutter_highlight.dart
-  List<pw.TextSpan> _convertResultToSpans(
+  pw.TextSpan _convertResultToSpans(
     List<Node> nodes, {
     required pw.TextStyle style,
   }) {
@@ -816,6 +718,15 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       traverse(node);
     }
 
-    return spans;
+    return pw.TextSpan(children: spans);
+  }
+
+  Future<Uint8List> _fetchBlobAsBytes(String blobUrl) async {
+    final http.Response response = await http.get(Uri.parse(blobUrl));
+    if (response.statusCode == 200) {
+      return response.bodyBytes;
+    } else {
+      throw Exception('Failed to load blob image');
+    }
   }
 }

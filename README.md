@@ -1,18 +1,10 @@
 # Flutter Quill to PDF
 
-This package allow us create PDF's using `Deltas` from `Flutter Quill`.
-
-## Resources
-
-[code-block customization]()
-[blockquote customization]()
-[theme customization]()
-[header customization]()
-[custom widgets]()
+**Flutter Quill to PDF** is a powerful package designed to convert documents created with **Flutter Quill** (based on Deltas) into high-quality PDF files. This package offers a wide range of customization options, allowing developers to adjust page formatting (width, height, and margins), customize fonts, text styles, and add elements such as images, videos, lists, blockquotes, and code blocks. Additionally, it supports the generation of custom widgets to integrate PDF content directly into the **Flutter** user interface. 
 
 <details>
-    <summary>Show/Hide Screenshots</summary>
-    <img src="assets/demo_to_pdf.png" style="width: 80%; height: 60%"/>
+    <summary>Show/Hide screensthos</summary>
+    <img src="assets/demo_to_pdf.png" style="width: 65%;"/>
     <img src="assets/result_demo_to_pdf.png" style="width: 50%; height: 50%"/>
 </details>
 
@@ -20,6 +12,79 @@ This package allow us create PDF's using `Deltas` from `Flutter Quill`.
 
 ```dart
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
+```
+
+### Creating a pdf document
+
+```dart
+final pdfConverter = PDFConverter(
+    backMatterDelta: null,
+    frontMatterDelta: null,
+    textDirection: Directionality.of(context), // set a default Direction to your pdf widgets
+    // if you support web platform, you will need to pass this param, since fetching images in web works differently
+    isWeb: kIsWeb,
+    document: _quillController.document.toDelta(),
+    pageFormat: pageFormat,
+    fallbacks: [...your global fonts],
+    onRequestFontFamily: (FontFamilyRequest familyRequest) {
+        return FontFamilyResponse(
+          fontNormalV: <anyFontThatYouWant>, 
+          boldFontV: familyRequest.isBold ? <yourBoldFontFamily> : null,
+          italicFontV: familyRequest.isItalic ? <yourItalicFontFamily> : null,
+          boldItalicFontV: familyRequest.isItalic && familyRequest.isBold ? <yourBoldItalicFontFamily> : null,
+          fallbacks: const <pw.Font>[],
+        );
+    },
+);
+```
+
+## To save/get/generate your document, we have 3 options:
+
+```dart
+import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
+import 'dart:io';
+import 'package:pdf/pdf.dart';
+
+// return a pdf Document
+final doc = await pdfConverter.createDocument();
+// no have return object but creates automatically the file into the path
+await pdfConverter.createDocumentFile(path: filepath, <...other optional params>);
+// Generate a widget from the PDF converter
+final pw.Widget? pwWidget = await pdfConverter.generateWidget(
+    maxWidth: pwWidgetWidth,
+    maxHeight: pwWidgetHeight,
+);
+
+// Create a new PDF document with specific settings
+final pw.Document document = pw.Document(
+    compress: true,
+    verbose: true,
+    pageMode: PdfPageMode.outlines,
+    version: PdfVersion.pdf_1_5,
+);
+
+// Create A4 page without margins
+final PdfPageFormat pdfPageFormat = PdfPageFormat(
+      PDFPageFormat.a4.width, PDFPageFormat.a4.height,
+      marginAll: 0,
+    );
+
+// Add a page to the document with custom layout
+document.addPage(
+  pw.Page(
+    pageFormat: pdfPageFormat,
+      build: (pw.Context context) {
+        return pw.Stack(children: [
+          pw.Positioned(
+            top: PdfPageFormat.a4.marginTop,
+            left: PdfPageFormat.a4.marginLeft,
+            child: pwWidget!,
+          ),
+        ],
+      );
+    },
+  ),
+);
 ```
 
 ### Personalize the settings of the page (`height`, `width` and `margins`)
@@ -49,104 +114,15 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 );
 ```
 
-### Using `PDFConverter` to create finally our document
+## Resources
 
-```dart
-final pdfConverter = PDFConverter(
-    backMatterDelta: null,
-    frontMatterDelta: null,
-    textDirection: Directionality.of(context), // set a default Direction to your pdf widgets
-    // if you support web platform, you will need to pass this param, since fetching images in web works differently
-    isWeb: kIsWeb,
-    document: _quillController.document.toDelta(),
-    pageFormat: pageFormat,
-    fallbacks: [...your global fonts],
-    onRequestFontFamily: (FontFamilyRequest familyRequest) {
-        return FontFamilyResponse(
-          fontNormalV: <anyFontThatYouWant>, 
-          boldFontV: familyRequest.isBold ? <yourBoldFontFamily> : null,
-          italicFontV: familyRequest.isItalic ? <yourItalicFontFamily> : null,
-          boldItalicFontV: familyRequest.isItalic && familyRequest.isBold ? <yourBoldItalicFontFamily> : null,
-          fallbacks: const <pw.Font>[],
-        );
-    },
-);
-```
+[code-block customization]().
+[blockquote customization]().
+[theme customization]().
+[header customization]().
+[custom widgets]().
 
-## To create it, we have three options:
-
-#### `createDocument` _returns the PDF document associated_
-
-```dart
-final pw.Document? document = await pdfConverter.createDocument();
-```
-
-#### `createDocumentFile` _makes the same of the before one, write in the selected file path_
-
-```dart
-await pdfConverter.createDocumentFile(path: filepath, <...other optional params>);
-```
-
-#### `generateWidget` _returns a Widget that gives to you full control of the PDF_
-
-```dart
-import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
-import 'dart:io';
-import 'package:pdf/pdf.dart';
-
-// Generate a widget from the PDF converter
-final pw.Widget? pwWidget = await pdfConverter.generateWidget(
-    maxWidth: pwWidgetWidth,
-    maxHeight: pwWidgetHeight,
-);
-
-// Create a new PDF document with specific settings
-final pw.Document document = pw.Document(
-    compress: true,
-    verbose: true,
-    pageMode: PdfPageMode.outlines,
-    version: PdfVersion.pdf_1_5,
-);
-
-// Create A4 page without margins
-final PdfPageFormat pdfPageFormat = PdfPageFormat(
-    PDFPageFormat.a4.width, PDFPageFormat.a4.height,
-    marginAll: 0);
-
-// Add a page to the document with custom layout
-document.addPage(
-  pw.Page(
-    pageFormat: pdfPageFormat,
-      build: (pw.Context context) {
-        return pw.Stack(children: [
-          // Create a full-page blue background
-          pw.Expanded(
-            child: pw.Rectangle(
-              fillColor: PdfColor.fromHex("#5AACFE"),
-            ),
-          ),
-          // Position the editor content in the top-left corner
-          pw.Positioned(
-            top: PdfPageFormat.a4.marginTop,
-              left: PdfPageFormat.a4.marginLeft,
-              child: pwWidget!,
-          ),
-          // Position a copy of the editor content in the bottom-right corner
-          pw.Positioned(
-            bottom: PdfPageFormat.a4.marginBottom,
-              right: PdfPageFormat.a4.marginRight,
-              child: pwWidget!,
-            ),
-        ],
-      );
-    },
-  ),
-);
-// Save the document to a file
-await file.writeAsBytes(await document.save());
-```
-
-## Supported
+## Supported Attributes 
 
 - Font family
 - Size
@@ -171,7 +147,7 @@ await file.writeAsBytes(await document.save());
   - [x] CheckBox List
 - Indent
 
-## No supported
+## No supported Attributes
 
 - Superscript/Subscript (status: being planned)
 - Embed formula (status: being planned)

@@ -10,6 +10,7 @@ import 'package:pdf/widgets.dart' as pw;
 
 ///A Manager that contains all operations for PDF services
 class PdfService extends PdfConfigurator<Delta, pw.Document> {
+  final DocumentParser _parser = DocumentParser();
   late final List<pw.Font> _fonts;
   //page configs
   late final double _marginLeft;
@@ -137,7 +138,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     double? maxWidth,
     double? maxHeight,
   }) async {
-    final Document? document = RichTextParser().parseDelta(this.document);
+    final Document? document = _parser.parseDelta(delta: this.document);
     if (document == null) {
       throw StateError('The Delta passed is not valid to be parsed');
     }
@@ -167,7 +168,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     while (i < totalDocuments) {
       final Delta doc = documents.elementAt(i);
       if (doc.isNotEmpty) {
-        final Document? document = RichTextParser().parseDelta(doc);
+        final Document? document = _parser.parseDelta(delta: doc);
         if (document == null || document.paragraphs.isEmpty) continue;
         docMap.add(List<pw.Widget>.from(await blockGenerators(document)));
       }
@@ -178,193 +179,147 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
 
   @override
   Future<List<pw.Widget>> blockGenerators(Document document) async {
-    bool isFirstBlockLine = false;
-    bool isLastBlockLine = false;
     final List<Paragraph> paragraphs = <Paragraph>[...document.paragraphs];
-    final List<Paragraph> accumulatedParagraphs = <Paragraph>[];
-    final List<pw.InlineSpan> spans = <pw.InlineSpan>[];
-    String? currentAccumulatedType;
     for (int z = 0; z < paragraphs.length; z++) {
-      final Paragraph? beforeParagraph = z == 0 ? null : paragraphs.elementAtOrNull(z - 1);
       final Paragraph paragraph = paragraphs.elementAt(z);
-      final Paragraph? nextParagraph = paragraphs.elementAtOrNull(z + 1);
-
-      if (paragraph.blockAttributes?['code-block'] != null || paragraph.blockAttributes?['blockquote'] != null) {
-        if (beforeParagraph?.blockAttributes?['code-block'] == null ||
-            beforeParagraph?.blockAttributes?['blockquote'] == null) {
-          isFirstBlockLine = true;
-          isLastBlockLine = false;
-        }
-        if (beforeParagraph?.blockAttributes?['code-block'] != null) {
-          isFirstBlockLine = false;
-          isLastBlockLine = nextParagraph?.blockAttributes?['code-block'] == null;
-        }
-        if (beforeParagraph?.blockAttributes?['blockquote'] != null) {
-          isFirstBlockLine = false;
-          isLastBlockLine = nextParagraph?.blockAttributes?['blockquote'] == null;
-        }
-      }
-      if (currentAccumulatedType == null) {
-        for (final String toAccumulateBlockType in Constant.kDefaultBlocksToAccumulate) {
-          if (paragraph.blockAttributes?[toAccumulateBlockType] != null) {
-            // if next has not this block type, then just break and process as normally
-            if (nextParagraph?.blockAttributes?[toAccumulateBlockType] == null) {
-              break;
-            }
-            currentAccumulatedType = toAccumulateBlockType;
-            break;
-          }
-        }
-      }
-      if (currentAccumulatedType != null) {
-        if (paragraph.blockAttributes?[currentAccumulatedType] != null) {
-          accumulatedParagraphs.add(paragraph);
-        } else {
-          _processAccumulatedParts(accumulatedParagraphs);
-          accumulatedParagraphs.clear();
-          currentAccumulatedType = null;
-        }
-        isFirstBlockLine = false;
-        isLastBlockLine = false;
-        continue;
-      }
-
-      final Map<String, dynamic>? blockAttributes = paragraph.blockAttributes;
-      bool goToNextParagraph = false;
-      if (super.customBuilders.isNotEmpty) {
-        for (CustomWidget customBuilder in super.customBuilders) {
-          if (customBuilder.predicate(paragraph)) {
-            contentPerPage.add(
-              customBuilder.widgetCallback(
-                paragraph,
-                paragraph.blockAttributes,
-              ),
-            );
-            goToNextParagraph = true;
-            break;
-          }
-        }
-        spans.clear();
-        if (goToNextParagraph) continue;
-      }
-      _updateCacheIfNeeded(blockAttributes);
-      //verify if paragraph is just a simple new line
-      if (paragraph.isNewLine) {
-        final List<pw.InlineSpan> spans = await getRichTextInlineStyles.call(
-          paragraph.lines.first,
-          defaultTheme.defaultTextStyle,
-        );
-        _applyInlineParagraph(contentPerPage, spans);
-        continue;
-      }
+      final List<pw.Widget> contents = <pw.Widget>[];
+      final Map<String, dynamic> blockAttributes = paragraph.blockAttributes ?? <String, dynamic>{};
+      final bool added = _applyCustomBlocks(paragraph: paragraph);
+      if (added) continue;
       if (paragraph.isEmbed) {
-        final Line line = paragraph.lines.single;
-        spans.clear();
-        if ((line.data as Map<String, dynamic>)['video'] != null) {
-          contentPerPage.add(
-            pw.RichText(
-              textDirection: blockAttributes?['direction'] ?? directionality,
-              softWrap: true,
-              overflow: pw.TextOverflow.span,
-              text: pw.TextSpan(
-                text: (line.data as Map<String, dynamic>)['video']?.toString(),
-              ),
-            ),
-          );
-          continue;
+        _updateLineNumbers(blockAttributes);
+        for (Line line in paragraph.lines) {
+          for (TextFragment fragment in line.fragments) {
+            if ((fragment.data as Map<String, dynamic>)['video'] != null) {
+              contentPerPage.add(
+                pw.RichText(
+                  textDirection: blockAttributes['direction'] ?? directionality,
+                  softWrap: true,
+                  overflow: pw.TextOverflow.span,
+                  text: pw.TextSpan(
+                    text: (fragment.data as Map<String, dynamic>)['video']?.toString(),
+                  ),
+                ),
+              );
+            }
+            //avoid any another embed that is not a image
+            if ((fragment.data as Map<String, dynamic>)['image'] != null) {
+              contentPerPage.add(
+                onDetectImageBlock?.call(
+                      fragment,
+                      paragraph.blockAttributes,
+                    ) ??
+                    await getImageBlock.call(
+                      fragment,
+                      (blockAttributes['align'] as String?)?.resolvePdfBlockAlign,
+                      blockAttributes['direction'],
+                    ),
+              );
+            }
+          }
         }
-        //avoid any another embed that is not a image
-        if ((line.data as Map<String, dynamic>)['image'] == null) continue;
-        contentPerPage.add(
-          onDetectImageBlock?.call(
-                line,
-                paragraph.blockAttributes,
-              ) ??
-              await getImageBlock.call(
-                line,
-                (blockAttributes?['align'] as String?)?.resolvePdfBlockAlign,
-                blockAttributes?['direction'],
-              ),
-        );
         continue;
       }
+      final bool isHeader = blockAttributes.containsKey('header');
+      final bool isCodeBlock = blockAttributes.containsKey('code-block');
+      final bool isBlockquote = blockAttributes.containsKey('blockquote');
       for (int k = 0; k < paragraph.lines.length; k++) {
+        _updateLineNumbers(blockAttributes);
+        final List<pw.InlineSpan> spans = <pw.InlineSpan>[];
         final Line line = paragraph.lines.elementAt(k);
         final (pw.TextStyle style, bool addFontSize) = _getInlineTextStyle(blockAttributes);
-        if (line.attributes != null) {
-          if (line.attributes?['link'] != null) {
-            spans.addAll(
-              onDetectLink?.call(
-                    line,
-                    blockAttributes,
-                    <String, dynamic>{
-                      'currentStyle': style,
-                      'shouldApplyFontSizeAttributeFromLine': true,
-                    },
-                  ) ??
-                  await getLinkStyle.call(
-                    line,
-                    style,
-                    true,
-                  ),
-            );
-            continue;
-          }
-          spans.addAll(
-            onDetectInlineRichTextStyles?.call(
-                  line,
-                  paragraph.blockAttributes,
-                  <String, dynamic>{
-                    'currentStyle': style,
-                    'shouldApplyFontSizeAttributeFromLine': true,
-                  },
-                ) ??
-                await getRichTextInlineStyles.call(
-                  line,
-                  style,
-                  false,
-                  addFontSize,
-                ),
-          );
-          continue;
-        }
-        spans.addAll(
-          onDetectCommonText?.call(
-                line,
-                paragraph.blockAttributes,
+        final bool added = _applyCustomBlocks(paragraph: paragraph, line: line);
+        if (added) continue;
+        for (int j = 0; j < line.length; j++) {
+          final TextFragment fragment = line.elementAt(j);
+          if (fragment.attributes != null || isHeader || isBlockquote || isCodeBlock) {
+            if (fragment.attributes?['link'] != null && onDetectLink != null) {
+              spans.add(onDetectLink!.call(
+                fragment,
+                blockAttributes,
                 <String, dynamic>{
                   'currentStyle': style,
                   'shouldApplyFontSizeAttributeFromLine': true,
                 },
-              ) ??
-              <pw.InlineSpan>[
+              ));
+            }
+            spans.add(
+              onDetectInlineRichTextStyles?.call(
+                    fragment,
+                    paragraph.blockAttributes,
+                    <String, dynamic>{
+                      'currentStyle': style,
+                    },
+                  ) ??
+                  await getRichTextInlineStyles(
+                    line: fragment,
+                    isCodeBlock: isCodeBlock,
+                    isBlockquote: isBlockquote,
+                    headerLevel: blockAttributes['header'] as int?,
+                    style: style,
+                    returnContentIfNeedIt: false,
+                    addFontSize: addFontSize,
+                  ),
+            );
+            continue;
+          }
+          spans.add(
+            onDetectCommonText?.call(
+                  fragment,
+                  paragraph.blockAttributes,
+                  <String, dynamic>{
+                    'currentStyle': style,
+                  },
+                ) ??
                 pw.TextSpan(
-                  text: line.data as String,
+                  text: fragment.data as String,
                   style: style,
                 ),
-              ],
-        );
-      }
-      if (paragraph.isBlock) {
-        await _applyBlockAttributes(
-          <pw.InlineSpan>[...spans],
-          blockAttributes!,
-          isFirstBlockLine,
-          isLastBlockLine,
-        );
-      } else {
-        await _applyInlineParagraph(
+          );
+        }
+        if (paragraph.isBlock) {
+          bool willNeedContinue = false;
+          if (paragraph.blockAttributes!.containsKey('code-block')) {
+            contents.add(
+              codeBlockLineBuilder(
+                spans: spans,
+                codeBlockStyle: _getInlineTextStyle(blockAttributes).$1,
+              ),
+            );
+            willNeedContinue = true;
+          }
+          if (paragraph.blockAttributes!.containsKey('blockquote')) {
+            contents.add(
+              lineBuilder(
+                spans: spans,
+                align: blockAttributes['align'] as String? ?? 'left',
+                textDirection: blockAttributes['direction'] == 'rtl' ? pw.TextDirection.rtl : null,
+              ),
+            );
+            willNeedContinue = true;
+          }
+          final bool isLast = k + 1 >= paragraph.length;
+          if (willNeedContinue && !isLast) {
+            continue;
+          }
+          await _defaultLineBuilderForBlocks(
+            line: line,
+            spans: spans,
+            widgets: contents,
+            blockAttributes: blockAttributes,
+          );
+          continue;
+        }
+        await _defaultLineBuilderForInlines(
           contentPerPage,
           <pw.InlineSpan>[...spans],
         );
       }
-
-      spans.clear();
     }
     return contentPerPage;
   }
 
-  Future<void> _applyInlineParagraph(
+  Future<void> _defaultLineBuilderForInlines(
     List<pw.Widget> contentPerPage,
     List<pw.InlineSpan> inlineSpansToMerge,
   ) async {
@@ -390,12 +345,16 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     );
   }
 
-  Future<void> _applyBlockAttributes(
-    List<pw.InlineSpan> currentSpans,
-    Map<String, dynamic> blockAttributes, [
-    bool isFirstBlockLine = false,
-    bool isLastBlockLine = false,
-  ]) async {
+  Future<void> _defaultLineBuilderForBlocks({
+    required Line line,
+    required List<pw.InlineSpan> spans,
+    required List<pw.Widget>? widgets,
+    Map<String, dynamic> blockAttributes = const <String, dynamic>{},
+  }) async {
+    if (blockAttributes.isEmpty) {
+      _defaultLineBuilderForInlines(contentPerPage, spans);
+      return;
+    }
     final int? header = blockAttributes['header'];
     final String? direction = blockAttributes['direction'];
     final String? align = blockAttributes['align'];
@@ -413,109 +372,66 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     // and then apply correctly non exclusive attributes
     if (header != null) {
       contentPerPage.add(pw.SizedBox(height: 5));
-      if (onDetectHeaderBlock != null) {
-        final pw.Widget customBlock = onDetectHeaderBlock!.call(currentSpans, blockAttributes, <String, dynamic>{
-          'indentLevel': indentLevel,
-          'direction': textDirectionToUse,
-          'align': align,
-        });
-        contentPerPage.add(customBlock);
-        return;
-      }
       if (align != null) {
         final pw.Widget alignedBlock = await getAlignedHeaderBlock(
-          currentSpans,
-          header,
-          align,
-          indentLevel,
-          null,
-          textDirectionToUse,
+          child: lineBuilder(spans: spans),
+          headerLevel: header,
+          align: align,
+          indentLevel: indentLevel,
+          style: null,
+          textDirection: textDirectionToUse,
         );
         contentPerPage.add(alignedBlock);
         return;
       }
       final pw.Widget headerBlock = await getHeaderBlock(
-        currentSpans,
-        header,
-        indentLevel,
-        null,
-        textDirectionToUse,
+        child: lineBuilder(spans: spans, align: align ?? 'left', textDirection: textDirectionToUse),
+        headerLevel: header,
+        indentLevel: indentLevel,
+        style: null,
+        textDirection: textDirectionToUse,
       );
       contentPerPage.add(headerBlock);
       return;
     } else if (codeblock) {
-      final pw.Widget codeBlock = onDetectCodeBlock?.call(currentSpans, blockAttributes, <String, dynamic>{
-            'isFirstLine': isFirstBlockLine,
-            'isLastLine': isLastBlockLine,
-            'numberLine': numCodeLine,
-            'indentLevel': indentLevel,
-            'direction': textDirectionToUse,
-            'align': align,
-          }) ??
-          await getCodeBlock(
-            currentSpans,
-            null,
-            textDirectionToUse,
-            isFirstBlockLine,
-            isLastBlockLine,
-          );
+      final pw.Widget codeBlock = await getCodeBlock(
+        widgets!,
+        null,
+        textDirectionToUse,
+      );
       contentPerPage.add(codeBlock);
       return;
     } else if (blockquote) {
-      final pw.Widget blockquoteBlock = onDetectBlockquote?.call(
-            currentSpans,
-            blockAttributes,
-            <String, dynamic>{
-              'isFirstLine': isFirstBlockLine,
-              'isLastLine': isLastBlockLine,
-              'numberLine': numCodeLine,
-              'indentLevel': indentLevel,
-              'direction': textDirectionToUse,
-              'align': align,
-            },
-          ) ??
-          await getBlockQuote(
-            currentSpans,
-            null,
-            align,
-            indentLevel,
-            textDirectionToUse,
-            isFirstBlockLine,
-            isLastBlockLine,
-          );
+      final pw.Widget blockquoteBlock = await getBlockQuote(
+        widgets!,
+        null,
+        align,
+        indentLevel,
+        textDirectionToUse,
+      );
       contentPerPage.add(blockquoteBlock);
       return;
     } else if (listType != null) {
-      contentPerPage.add(pw.SizedBox(height: 5));
-      final pw.Widget listBlock = onDetectList?.call(currentSpans, blockAttributes, <String, dynamic>{
-            'type': listType,
-            'indentLevel': indentLevel,
-            'direction': textDirectionToUse,
-            'align': align,
-          }) ??
-          await getListBlock(
-            currentSpans,
-            listType,
-            align ?? 'left',
-            indentLevel,
-            null,
-            textDirectionToUse,
-          );
+      final pw.Widget listBlock = await getListBlock(
+        spans,
+        listType,
+        align ?? 'left',
+        indentLevel,
+        null,
+        textDirectionToUse,
+      );
       contentPerPage.add(listBlock);
       return;
     }
     if (align != null || indent != null) {
-      final pw.Widget alignedParagraphBlock = onDetectAlignedParagraph?.call(
-            currentSpans,
-            blockAttributes,
-          ) ??
-          await getAlignedParagraphBlock(
-            currentSpans,
-            align ?? 'left',
-            indentLevel,
-            null,
-            textDirectionToUse,
-          );
+      final pw.Widget alignedParagraphBlock = await getAlignedParagraphBlock(
+        child: lineBuilder(spans: spans),
+        align: align ?? 'left',
+        indentLevel: indentLevel,
+        firstSpanStyle: spans.firstOrNull?.style,
+        style: null,
+        textDirection: textDirectionToUse,
+      );
       contentPerPage.add(alignedParagraphBlock);
       return;
     }
@@ -538,7 +454,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
                 style: defaultTheme.defaultTextStyle.copyWith(
                   lineSpacing: lineHeight.resolveLineHeight(),
                 ),
-                children: currentSpans,
+                children: spans,
               ),
             ),
           ),
@@ -593,7 +509,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
   }
 
-  void _updateCacheIfNeeded(Map<String, dynamic>? blockAttributes) {
+  void _updateLineNumbers(Map<String, dynamic>? blockAttributes) {
     final int? indent = blockAttributes?['indent'];
     if (blockAttributes?['list'] != null) {
       if (indent != null) {
@@ -634,10 +550,82 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       numberIndent4List = 0;
       numberIndent5List = 0;
     }
-    blockAttributes?['code-block'] != null ? numCodeLine++ : numCodeLine = 0;
+    final bool? codeBlock = blockAttributes?['code-block'] as bool?;
+    codeBlock != null && codeBlock ? numCodeLine++ : numCodeLine = 0;
   }
 
-  void _processAccumulatedParts(List<Paragraph> paragraphs) {
-    //TODO: here make a custom implementation of the blockquote and code-block
+  bool _applyCustomBlocks({
+    required Paragraph paragraph,
+    Line? line,
+  }) {
+    final Map<String, dynamic> blockAttributes = paragraph.blockAttributes ?? <String, dynamic>{};
+    if (line == null) {
+      if (super.customBuilders.isNotEmpty) {
+        for (CustomWidget customBuilder in super.customBuilders) {
+          if (customBuilder.predicate(paragraph)) {
+            contentPerPage.add(
+              customBuilder.widgetCallback(
+                paragraph,
+                paragraph.blockAttributes,
+              ),
+            );
+            return true;
+          }
+        }
+      }
+      if (paragraph.isBlock &&
+          paragraph.blockAttributes!.containsKey('blockquote') &&
+          onDetectBlockquote != null) {
+        final pw.Widget blockquoteBlock = onDetectBlockquote!.call(
+          paragraph,
+          blockAttributes,
+        );
+        contentPerPage.add(blockquoteBlock);
+        return true;
+      }
+
+      if (paragraph.isBlock && paragraph.blockAttributes!.containsKey('code-block') && onDetectCodeBlock != null) {
+        _updateLineNumbers(blockAttributes);
+        final pw.Widget codeBlock = onDetectCodeBlock!.call(
+          paragraph,
+          blockAttributes,
+        );
+        contentPerPage.add(codeBlock);
+        return true;
+      }
+
+      if (paragraph.isBlock && paragraph.blockAttributes!.containsKey('list') && onDetectList != null) {
+        _updateLineNumbers(blockAttributes);
+        final pw.Widget codeBlock = onDetectList!.call(
+          paragraph,
+          blockAttributes,
+        );
+        contentPerPage.add(codeBlock);
+        return true;
+      }
+    }
+    if (line != null) {
+      if (paragraph.isBlock &&
+          !paragraph.blockAttributes!.containsKey('align') &&
+          paragraph.blockAttributes!.containsKey('header') &&
+          onDetectHeaderBlock != null) {
+        final pw.Widget customBlock = onDetectHeaderBlock!.call(line, blockAttributes);
+        contentPerPage.add(customBlock);
+        return true;
+      }
+      if (paragraph.isBlock &&
+          paragraph.blockAttributes!.containsKey('align') &&
+          !paragraph.blockAttributes!.containsKey('header') &&
+          onDetectAlignedParagraph != null) {
+        final pw.Widget alignedParagraphBlock = onDetectAlignedParagraph!.call(
+          line,
+          blockAttributes,
+        );
+        contentPerPage.add(alignedParagraphBlock);
+        return true;
+      }
+    }
+
+    return false;
   }
 }
