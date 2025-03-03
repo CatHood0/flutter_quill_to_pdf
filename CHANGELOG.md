@@ -9,6 +9,7 @@
 * Fix: wrong behavior if `textDirection` is passed in `PDFConverter`.
 * Fix: bad rendering of content elements by not make an await for `_applyBlockAttributes()` in `PDFService` class. 
 * Fix(partially): bad rendering of content elements when directionality is RTL. 
+* Chore: reorganized project structure.
 * Chore: renamed `IMAGE_FROM_URL_PATTERN` to `kDefaultImageUrlDetector` in `Constant` class. 
 * Chore: renamed `_applyBlockAttributes()` to `_defaultLineBuilderForBlocks()` in `PDFService` class. 
 * Chore: renamed `_applyInlineParagraph()` to `_defaultLineBuilderForInlines()` in `PDFService` class. 
