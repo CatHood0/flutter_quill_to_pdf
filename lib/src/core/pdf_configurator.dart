@@ -287,21 +287,27 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     if (line.attributes?['code'] != null && !isCodeBlock) {
       finalStyle = inlineCodeStyle?.merge(finalStyle) ??
           finalStyle.copyWith(
-            color: const PdfColor.fromInt(0xCCFFC240),
-            background: const pw.BoxDecoration(color: null),
+            color: const PdfColor.fromInt(0xFF000000),
+            background: pw.BoxDecoration(
+              color: PdfColor.fromHex('#dbdbdbFF'),
+              border: pw.Border.symmetric(
+                vertical: pw.BorderSide(
+                  color: PdfColor.fromHex('#dbdbdbFF'),
+                  width: 3,
+                ),
+                horizontal: pw.BorderSide(
+                  width: 3,
+                  color: PdfColor.fromHex('#dbdbdbFF'),
+                  style: pw.BorderStyle.solid,
+                ),
+              ),
+              shape: pw.BoxShape.rectangle,
+              borderRadius: pw.BorderRadius.circular(3),
+            ),
           );
-      return pw.WidgetSpan(
-        child: pw.Container(
-          padding: const pw.EdgeInsetsDirectional.only(start: 2, end: 2),
-          decoration:
-              pw.BoxDecoration(color: PdfColor.fromHex('#fbfbf9'), borderRadius: pw.BorderRadius.circular(6)),
-          child: pw.Text(
-            content,
-            style: finalStyle,
-            softWrap: true,
-            overflow: pw.TextOverflow.span,
-          ),
-        ),
+      return pw.TextSpan(
+        text: content,
+        style: finalStyle,
       );
     }
 
@@ -581,17 +587,33 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     if (leadingWidget == null) {
       if (listType == 'bullet') {
         final double? circleSize = firstSpanStyle?.fontSize == null ? null : firstSpanStyle!.fontSize! * 0.3;
-        // we need to compute the margin size to position
-        // the bullet where we expect
-        leadingWidget = pw.Container(
-          width: circleSize ?? 0.85 * PdfPageFormat.mm,
-          height: circleSize ?? 0.85 * PdfPageFormat.mm,
-          margin: pw.EdgeInsetsDirectional.only(bottom: 0.85 * PdfPageFormat.mm),
-          decoration: const pw.BoxDecoration(
-            color: PdfColors.black,
-            shape: pw.BoxShape.circle,
-          ),
-        );
+        if (listTypeWidget == ListTypeWidget.stable) {
+          // we need to compute the margin size to position
+          // the bullet where we expect
+          final double? effectiveCircleMargin = circleSize != null ? (circleSize / 2) * 1.11 : null;
+          leadingWidget = pw.Container(
+            width: circleSize ?? 0.85 * PdfPageFormat.mm,
+            height: circleSize ?? 0.85 * PdfPageFormat.mm,
+            margin: pw.EdgeInsetsDirectional.only(bottom: effectiveCircleMargin ?? 0.85 * PdfPageFormat.mm),
+            decoration: const pw.BoxDecoration(
+              color: PdfColors.black,
+              shape: pw.BoxShape.circle,
+            ),
+          );
+        } else {
+          // we need to compute the margin size to position
+          // the bullet where we expect
+          final double effectiveCircleMargin = circleSize != null ? circleSize * 1.5 : 0.85 * PdfPageFormat.mm;
+          leadingWidget = pw.Container(
+            width: circleSize ?? 0.85 * PdfPageFormat.mm,
+            height: circleSize ?? 0.85 * PdfPageFormat.mm,
+            margin: pw.EdgeInsetsDirectional.only(top: effectiveCircleMargin),
+            decoration: const pw.BoxDecoration(
+              color: PdfColors.black,
+              shape: pw.BoxShape.circle,
+            ),
+          );
+        }
       }
       if (listType == 'checked' || listType == 'unchecked') {
         leadingWidget = pw.Checkbox(
@@ -609,36 +631,34 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         mainAxisSize: pw.MainAxisSize.min,
         children: <pw.Widget>[
-          ...spansToWrap.map((pw.InlineSpan span) {
-            return pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.start,
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              mainAxisSize: pw.MainAxisSize.min,
-              children: <pw.Widget>[
-                pw.Padding(
-                  padding: const pw.EdgeInsetsDirectional.only(
-                    end: 5.4,
-                  ),
-                  child: listType != 'ordered' || leadingWidget != null
-                      ? leadingWidget
-                      : pw.Text(
-                          _getListIdentifier(indentLevel),
-                          style: firstSpanStyle ?? defaultTheme.defaultTextStyle,
-                          overflow: pw.TextOverflow.span,
-                          textDirection: textDirection ?? directionality,
-                        ),
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.start,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisSize: pw.MainAxisSize.min,
+            children: <pw.Widget>[
+              pw.Padding(
+                padding: const pw.EdgeInsetsDirectional.only(
+                  end: 5.4,
                 ),
-                pw.Expanded(
-                  child: pw.RichText(
-                    softWrap: true,
-                    overflow: pw.TextOverflow.span,
-                    textDirection: textDirection ?? directionality,
-                    text: span,
-                  ),
-                )
-              ],
-            );
-          }),
+                child: listType != 'ordered' || leadingWidget != null
+                    ? leadingWidget
+                    : pw.Text(
+                        _getListIdentifier(indentLevel),
+                        style: firstSpanStyle ?? defaultTheme.defaultTextStyle,
+                        overflow: pw.TextOverflow.span,
+                        textDirection: textDirection ?? directionality,
+                      ),
+              ),
+              pw.Expanded(
+                child: pw.RichText(
+                  softWrap: true,
+                  overflow: pw.TextOverflow.span,
+                  textDirection: textDirection ?? directionality,
+                  text: pw.TextSpan(children: spansToWrap),
+                ),
+              )
+            ],
+          ),
         ],
       );
     } else {

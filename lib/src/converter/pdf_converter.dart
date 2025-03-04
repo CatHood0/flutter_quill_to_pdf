@@ -187,7 +187,7 @@ class PDFConverter {
     this.onDetectInlineRichTextStyles,
     this.onDetectLink,
     this.onDetectList,
-  }) {
+  }) : assert(customHeadingSizes == null || customHeadingSizes.length >= 4, 'customHeadingSizes must have minimun 4 items.') {
     globalFontsFallbacks = <pw.Font>[
       ...fallbacks,
       pw.Font.helvetica(),
