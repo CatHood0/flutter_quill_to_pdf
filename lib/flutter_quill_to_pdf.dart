@@ -8,6 +8,7 @@ export 'package:flutter_quill_to_pdf/src/core/delta_processor/delta_attributes_o
 export 'package:flutter_quill_to_pdf/src/core/converter_option/custom_converter.dart';
 //core
 export 'package:flutter_quill_to_pdf/src/core/request/font_family_request.dart';
+export 'package:flutter_quill_to_pdf/src/core/enums/list_type_widget.dart';
 export 'package:flutter_quill_to_pdf/src/core/response/font_family_response.dart';
 //converter options
 export 'package:flutter_quill_to_pdf/src/core/highlight_utils/hightlight_themes.dart';
