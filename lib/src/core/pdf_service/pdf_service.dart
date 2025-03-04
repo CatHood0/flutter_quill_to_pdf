@@ -12,7 +12,8 @@ import 'package:pdf/widgets.dart' as pw;
 
 ///A Manager that contains all operations for PDF services
 class PdfService extends PdfConfigurator<Delta, pw.Document> {
-  final DocumentParser _parser = DocumentParser(mergerBuilder: UniversalMergerBuilder.instance());
+  final DocumentParser _parser =
+      DocumentParser(mergerBuilder: UniversalMergerBuilder.instance());
   late final List<pw.Font> _fonts;
   //page configs
   late final double _marginLeft;
@@ -23,7 +24,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   late final double _height;
   final List<pw.Widget> contentPerPage = <pw.Widget>[];
   @experimental
-  final pw.Page Function(List<pw.Widget> children, pw.ThemeData theme, PdfPageFormat pageFormat)? pageBuilder;
+  final pw.Page Function(List<pw.Widget> children, pw.ThemeData theme,
+      PdfPageFormat pageFormat)? pageBuilder;
 
   PdfService({
     required PDFPageFormat pageFormat,
@@ -122,7 +124,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     );
     for (int i = 0; i < docWidgets.length; i++) {
       final List<pw.Widget> widgets = docWidgets.elementAt(i);
-      final pw.Page? pageBuilded = pageBuilder?.call(widgets, defaultTheme, pdfPageFormat);
+      final pw.Page? pageBuilded =
+          pageBuilder?.call(widgets, defaultTheme, pdfPageFormat);
       pdf.addPage(
         pageBuilded ??
             pw.MultiPage(
@@ -186,7 +189,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     for (int z = 0; z < paragraphs.length; z++) {
       final Paragraph paragraph = paragraphs.elementAt(z);
       final List<pw.Widget> contents = <pw.Widget>[];
-      final Map<String, dynamic> blockAttributes = paragraph.blockAttributes ?? <String, dynamic>{};
+      final Map<String, dynamic> blockAttributes =
+          paragraph.blockAttributes ?? <String, dynamic>{};
       final bool added = _applyCustomBlocks(paragraph: paragraph);
       if (added) continue;
       if (paragraph.isEmbed) {
@@ -201,11 +205,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         final bool added = _applyCustomBlocks(paragraph: paragraph, line: line);
         if (added) continue;
         _updateLineNumbers(blockAttributes);
-        final (pw.TextStyle style, bool addFontSize) = _getInlineTextStyle(blockAttributes);
+        final (pw.TextStyle style, bool addFontSize) =
+            _getInlineTextStyle(blockAttributes);
         final List<pw.InlineSpan> spans = <pw.InlineSpan>[];
         for (int j = 0; j < line.length; j++) {
           final TextFragment fragment = line.elementAt(j);
-          if (fragment.attributes != null || isHeader || isBlockquote || isCodeBlock) {
+          if (fragment.attributes != null ||
+              isHeader ||
+              isBlockquote ||
+              isCodeBlock) {
             if (fragment.attributes?['link'] != null && onDetectLink != null) {
               spans.add(onDetectLink!.call(
                 fragment,
@@ -266,7 +274,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               lineBuilder(
                 spans: spans,
                 align: blockAttributes['align'] as String? ?? 'left',
-                textDirection: blockAttributes['direction'] == 'rtl' ? pw.TextDirection.rtl : null,
+                textDirection: blockAttributes['direction'] == 'rtl'
+                    ? pw.TextDirection.rtl
+                    : null,
               ),
             );
             willNeedContinue = true;
@@ -297,7 +307,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     List<pw.InlineSpan> inlineSpansToMerge,
   ) async {
     if (inlineSpansToMerge.isEmpty) return;
-    final double spacing = (inlineSpansToMerge.firstOrNull?.style?.lineSpacing ?? 1.0);
+    final double spacing =
+        (inlineSpansToMerge.firstOrNull?.style?.lineSpacing ?? 1.0);
     contentPerPage.add(
       pw.Directionality(
         textDirection: directionality,
@@ -321,7 +332,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   Future<void> _defaultEmbedLineBuilder({
     required Paragraph paragraph,
   }) async {
-    final Map<String, dynamic> blockAttributes = paragraph.blockAttributes ?? <String, dynamic>{};
+    final Map<String, dynamic> blockAttributes =
+        paragraph.blockAttributes ?? <String, dynamic>{};
     _updateLineNumbers(blockAttributes);
     for (Line line in paragraph.lines) {
       for (TextFragment fragment in line.fragments) {
@@ -332,7 +344,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               softWrap: true,
               overflow: pw.TextOverflow.span,
               text: pw.TextSpan(
-                text: (fragment.data as Map<String, dynamic>)['video']?.toString(),
+                text: (fragment.data as Map<String, dynamic>)['video']
+                    ?.toString(),
               ),
             ),
           );
@@ -373,14 +386,16 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     if (indentLevel > 0) {
       indentLevel++;
     }
-    final pw.TextDirection textDirectionToUse = direction == 'rtl' ? pw.TextDirection.rtl : directionality;
+    final pw.TextDirection textDirectionToUse =
+        direction == 'rtl' ? pw.TextDirection.rtl : directionality;
     //TODO: change the conditions to only apply exclusive blocks
     // and then apply correctly non exclusive attributes
     if (header != null) {
       contentPerPage.add(pw.SizedBox(height: 5));
       if (align != null) {
         final pw.Widget alignedBlock = await getAlignedHeaderBlock(
-          child: lineBuilder(spans: spans, align: align, textDirection: textDirectionToUse),
+          child: lineBuilder(
+              spans: spans, align: align, textDirection: textDirectionToUse),
           headerLevel: header,
           align: align,
           indentLevel: indentLevel,
@@ -391,7 +406,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         return;
       }
       final pw.Widget headerBlock = await getHeaderBlock(
-        child: lineBuilder(spans: spans, align: align ?? 'left', textDirection: textDirectionToUse),
+        child: lineBuilder(
+            spans: spans,
+            align: align ?? 'left',
+            textDirection: textDirectionToUse),
         headerLevel: header,
         indentLevel: indentLevel,
         style: null,
@@ -431,7 +449,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
     if (align != null || indent != null) {
       final pw.Widget alignedParagraphBlock = await getAlignedParagraphBlock(
-        child: lineBuilder(spans: spans, align: align ?? 'left', textDirection: textDirectionToUse),
+        child: lineBuilder(
+            spans: spans,
+            align: align ?? 'left',
+            textDirection: textDirectionToUse),
         align: align ?? 'left',
         indentLevel: indentLevel,
         firstSpanStyle: spans.firstOrNull?.style,
@@ -447,7 +468,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           textDirection: textDirectionToUse,
           child: pw.Padding(
             padding: pw.EdgeInsetsDirectional.only(
-              bottom: lineHeight.resolveLineHeight().resolvePaddingByLineHeight(),
+              bottom:
+                  lineHeight.resolveLineHeight().resolvePaddingByLineHeight(),
             ),
             child: pw.RichText(
               softWrap: true,
@@ -470,14 +492,16 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
   }
 
-  (pw.TextStyle, bool) _getInlineTextStyle(Map<String, dynamic>? blockAttributes) {
+  (pw.TextStyle, bool) _getInlineTextStyle(
+      Map<String, dynamic>? blockAttributes) {
     bool addFontSize = true;
     final double? lineHeight = blockAttributes?['line-height'];
     if (blockAttributes?['header'] != null) {
       final int headerLevel = blockAttributes!['header'];
-      final double currentFontSize =
-          headerLevel.resolveHeaderLevel(headingSizes: customHeadingSizes ?? Constant.kDefaultHeadingSizes);
-      pw.TextStyle style = defaultTheme.defaultTextStyle.copyWith(fontSize: currentFontSize);
+      final double currentFontSize = headerLevel.resolveHeaderLevel(
+          headingSizes: customHeadingSizes ?? Constant.kDefaultHeadingSizes);
+      pw.TextStyle style =
+          defaultTheme.defaultTextStyle.copyWith(fontSize: currentFontSize);
       style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
       addFontSize = false;
       return (style, addFontSize);
@@ -496,7 +520,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         wordSpacing: 0.5,
         color: PdfColor.fromHex("#808080"),
       );
-      pw.TextStyle style = defaultCodeBlockStyle.merge(defaultTheme.defaultTextStyle);
+      pw.TextStyle style =
+          defaultCodeBlockStyle.merge(defaultTheme.defaultTextStyle);
       style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
       return (style, addFontSize);
     } else if (blockAttributes?['blockquote'] != null) {
@@ -509,8 +534,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
       return (style, addFontSize);
     } else {
-      final pw.TextStyle style =
-          defaultTheme.defaultTextStyle.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+      final pw.TextStyle style = defaultTheme.defaultTextStyle
+          .copyWith(lineSpacing: lineHeight?.resolveLineHeight());
       return (style, addFontSize);
     }
   }
@@ -524,7 +549,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         // if it is, then must reload the specific index counter to avoid generate
         // a bad index for the current item
         final bool itsSameIndentButDifferentListType =
-            lastListIndent == indent && lastListType != blockAttributes?['list'];
+            lastListIndent == indent &&
+                lastListType != blockAttributes?['list'];
         if (itsSameIndentButDifferentListType) {
           if (indent == 1) numberIndent1List = 0;
           if (indent == 2) numberIndent2List = 0;
@@ -564,19 +590,24 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     required Paragraph paragraph,
     Line? line,
   }) {
-    final Map<String, dynamic> blockAttributes = paragraph.blockAttributes ?? <String, dynamic>{};
+    final Map<String, dynamic> blockAttributes =
+        paragraph.blockAttributes ?? <String, dynamic>{};
     if (line == null) {
-      if (paragraph.isEmbed && (onDetectImageBlock != null || onDetectVideoBlock != null)) {
+      if (paragraph.isEmbed &&
+          (onDetectImageBlock != null || onDetectVideoBlock != null)) {
         bool shouldEndAsAdded = false;
         _updateLineNumbers(blockAttributes);
         for (Line line in paragraph.lines) {
           for (TextFragment fragment in line.fragments) {
-            if (onDetectVideoBlock != null && (fragment.data as Map<String, dynamic>)['video'] != null) {
+            if (onDetectVideoBlock != null &&
+                (fragment.data as Map<String, dynamic>)['video'] != null) {
               shouldEndAsAdded = true;
-              contentPerPage.add(onDetectVideoBlock!.call(fragment, paragraph.blockAttributes));
+              contentPerPage.add(onDetectVideoBlock!
+                  .call(fragment, paragraph.blockAttributes));
             }
             //avoid any another embed that is not a image
-            if (onDetectImageBlock != null && (fragment.data as Map<String, dynamic>)['image'] != null) {
+            if (onDetectImageBlock != null &&
+                (fragment.data as Map<String, dynamic>)['image'] != null) {
               shouldEndAsAdded = true;
               contentPerPage.add(
                 onDetectImageBlock!.call(
@@ -613,7 +644,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         return true;
       }
 
-      if (paragraph.isBlock && paragraph.blockAttributes!.containsKey('code-block') && onDetectCodeBlock != null) {
+      if (paragraph.isBlock &&
+          paragraph.blockAttributes!.containsKey('code-block') &&
+          onDetectCodeBlock != null) {
         _updateLineNumbers(blockAttributes);
         final pw.Widget codeBlock = onDetectCodeBlock!.call(
           paragraph,
@@ -623,7 +656,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         return true;
       }
 
-      if (paragraph.isBlock && paragraph.blockAttributes!.containsKey('list') && onDetectList != null) {
+      if (paragraph.isBlock &&
+          paragraph.blockAttributes!.containsKey('list') &&
+          onDetectList != null) {
         _updateLineNumbers(blockAttributes);
         final pw.Widget codeBlock = onDetectList!.call(
           paragraph,
@@ -638,7 +673,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           !paragraph.blockAttributes!.containsKey('align') &&
           paragraph.blockAttributes!.containsKey('header') &&
           onDetectHeaderBlock != null) {
-        final pw.Widget customBlock = onDetectHeaderBlock!.call(line, blockAttributes);
+        final pw.Widget customBlock =
+            onDetectHeaderBlock!.call(line, blockAttributes);
         contentPerPage.add(customBlock);
         return true;
       }

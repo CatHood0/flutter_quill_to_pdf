@@ -109,7 +109,8 @@ int rgbaToHex(int red, int green, int blue, {double opacity = 1}) {
 
 ///A extesion to resolve more easily to decide the style of the spans
 extension TextStyleInlineExtension on pw.TextStyle {
-  pw.TextStyle resolveInline(bool bold, bool italic, bool under, bool strike, bool isAllInOne) {
+  pw.TextStyle resolveInline(
+      bool bold, bool italic, bool under, bool strike, bool isAllInOne) {
     pw.TextDecoration? decoration = null;
     if (under && strike) {
       decoration = pw.TextDecoration.combine(

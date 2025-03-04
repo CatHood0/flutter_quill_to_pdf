@@ -3,8 +3,9 @@ extension HeaderLevelResolverExtension on num {
     required List<double> headingSizes,
   }) {
     final int index = toInt() - 1;
-    if(index >= headingSizes.length) {
-      throw StateError('Heading of level $this is not supported into the passed list: $headingSizes');
+    if (index >= headingSizes.length) {
+      throw StateError(
+          'Heading of level $this is not supported into the passed list: $headingSizes');
     }
     return headingSizes[index];
   }

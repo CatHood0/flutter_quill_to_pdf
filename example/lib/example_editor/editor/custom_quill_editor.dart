@@ -56,8 +56,9 @@ class _CustomQuillEditorState extends State<CustomQuillEditor> {
         autoFocus: false,
         enableSelectionToolbar: true,
         enableInteractiveSelection: true,
-        textSelectionControls:
-            Platform.isAndroid ? MaterialTextSelectionControls() : DesktopTextSelectionControls(),
+        textSelectionControls: Platform.isAndroid
+            ? MaterialTextSelectionControls()
+            : DesktopTextSelectionControls(),
         embedBuilders: FlutterQuillEmbeds.editorBuilders(),
         customStyles: DefaultStyles(
           indent: DefaultTextBlockStyle(
@@ -103,7 +104,8 @@ class _CustomQuillEditorState extends State<CustomQuillEditor> {
               const VerticalSpacing(5, 5),
               const VerticalSpacing(5, 5),
               BoxDecoration(
-                  borderRadius: BorderRadius.circular(2), color: const Color.fromARGB(255, 234, 234, 234))),
+                  borderRadius: BorderRadius.circular(2),
+                  color: const Color.fromARGB(255, 234, 234, 234))),
           quote: DefaultTextBlockStyle(
             TextStyle(
               height: 1.15,
@@ -114,8 +116,12 @@ class _CustomQuillEditorState extends State<CustomQuillEditor> {
             const VerticalSpacing(0, 1),
             const VerticalSpacing(0, 0),
             const BoxDecoration(
-              border: BorderDirectional(start: BorderSide(width: 5, color: Color.fromARGB(201, 84, 224, 255))),
-              borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15)),
+              border: BorderDirectional(
+                  start: BorderSide(
+                      width: 5, color: Color.fromARGB(201, 84, 224, 255))),
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(15),
+                  bottomRight: Radius.circular(15)),
               color: Color.fromARGB(15, 255, 255, 255),
             ),
           ),

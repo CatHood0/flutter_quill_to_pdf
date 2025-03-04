@@ -17,7 +17,8 @@ extension StringNullableExt on String? {
 }
 
 extension StringExtension on String {
-  @Deprecated('isTotallyEmpty is no longer supported and will be removed in future releases')
+  @Deprecated(
+      'isTotallyEmpty is no longer supported and will be removed in future releases')
   bool get isTotallyEmpty => false;
 
   ///Equals is a similar function that use Java or Kotlin
@@ -36,7 +37,8 @@ extension StringExtension on String {
         : this == other;
   }
 
-  @Deprecated('fixCommonErrorInsertsInRawDelta is no longer supported and will be removed in future releases')
+  @Deprecated(
+      'fixCommonErrorInsertsInRawDelta is no longer supported and will be removed in future releases')
   String fixCommonErrorInsertsInRawDelta() {
     return this;
   }

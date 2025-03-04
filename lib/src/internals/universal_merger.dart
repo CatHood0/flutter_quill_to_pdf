@@ -19,7 +19,8 @@ class UniversalMergerBuilder extends MergerBuilder {
       final Paragraph? nextParagraph = paragraphs.elementAtOrNull(i + 1);
       if (indexsIgnore.contains(i)) {
         if (nextParagraph != null) {
-          if (canMergeBothParagraphs(paragraph: curParagraph, nextParagraph: nextParagraph)) {
+          if (canMergeBothParagraphs(
+              paragraph: curParagraph, nextParagraph: nextParagraph)) {
             final Paragraph lastParagraph = result.last;
             final Paragraph paragraphResult = Paragraph(
               lines: <Line>[
@@ -40,7 +41,8 @@ class UniversalMergerBuilder extends MergerBuilder {
         result.add(curParagraph);
         break;
       }
-      if (canMergeBothParagraphs(paragraph: curParagraph, nextParagraph: nextParagraph)) {
+      if (canMergeBothParagraphs(
+          paragraph: curParagraph, nextParagraph: nextParagraph)) {
         final Paragraph paragraphResult = Paragraph(
           lines: <Line>[
             ...curParagraph.lines,
