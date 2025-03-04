@@ -1,8 +1,9 @@
 name: flutter_quill_to_pdf
 description: "Create PDF'S using deltas from Quill, with configurable attributes, fonts, and custom pdf widgets"
 version: 2.3.0
-homepage:
-repository: https://github.com/CatHood0/flutter_quill_to_pdf/
+homepage: https://github.com/CatHood0/flutter_quill_to_pdf
+documentation: https://github.com/CatHood0/flutter_quill_to_pdf 
+repository: https://github.com/CatHood0/flutter_quill_to_pdf
 issue_tracker: https://github.com/CatHood0/flutter_quill_to_pdf/issues
 
 environment:
@@ -31,25 +32,25 @@ platforms:
   windows:
 
 dependencies:
-  dart_quill_delta: ^10.8.3
-  flutter_quill_delta_easy_parser: ^1.1.4
-  highlight: ^0.7.0
-  pdf: 3.11.1
-  universal_html: ^2.2.4
-  cross_file: ^0.3.3+6
-  html_unescape: ^2.0.0
-  collection: ^1.19.1
-  html: ^0.15.5
+  dart_quill_delta: 10.8.3
+  flutter_quill_delta_easy_parser: 1.1.4
+  highlight: 0.7.0
+  pdf: ^3.11.1
+  universal_html: 2.2.4
+  cross_file: 0.3.3+6
+  html_unescape: 2.0.0
+  collection: 1.19.1
+  html: 0.15.5
   path_provider: ^2.1.5
   dio: ^5.8.0
-  numerus: ^2.3.0
-  http: ^1.3.0
-  meta: ^1.15.0
+  numerus: 2.3.0
+  http: 1.3.0
+  meta: ^1.16.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
   test:
 
 flutter:

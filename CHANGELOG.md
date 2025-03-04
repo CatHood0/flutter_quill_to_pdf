@@ -9,12 +9,12 @@
 * Fix: wrong behavior if `textDirection` is passed in `PDFConverter`.
 * Fix: bad rendering of content elements by not make an await for `_applyBlockAttributes()` in `PDFService` class. 
 * Fix(partially): bad rendering of content elements when directionality is RTL. 
-* Chore: reorganized project structure.
+* Chore(breaking changed): reorganized project structure.
 * Chore: deprecated `blockquotePaddingLeft` and `blockquotePaddingRight` and replaced with `blockquotePadding`. 
 * Chore: deprecated `blockquoteDividerColor` replaced with `blockquoteBoxDecoration`. 
-* Chore: renamed `blockQuotethicknessDividerColor` to `blockquotethicknessDividerColor`. 
-* Chore: renamed `blockQuoteBackgroundColor` to `blockquoteBackgroundColor`. 
-* Chore: renamed `blockQuoteTextStyle` to `blockquoteTextStyle`. 
+* Chore(breaking changed): renamed `blockQuotethicknessDividerColor` to `blockquotethicknessDividerColor`. 
+* Chore(breaking changed): renamed `blockQuoteBackgroundColor` to `blockquoteBackgroundColor`. 
+* Chore(breaking changed): renamed `blockQuoteTextStyle` to `blockquoteTextStyle`. 
 * Chore: renamed `IMAGE_FROM_URL_PATTERN` to `kDefaultImageUrlDetector` in `Constant` class. 
 * Chore: renamed `_applyBlockAttributes()` to `_defaultLineBuilderForBlocks()` in `PDFService` class. 
 * Chore: renamed `_applyInlineParagraph()` to `_defaultLineBuilderForInlines()` in `PDFService` class. 
@@ -22,7 +22,7 @@
 * Chore: moved embed implementation to `_defaultEmbedLineBuilder()` in `PDFService` class. 
 * Chore: created `_applyCustomBlocks()` to add all the necessary logic for add custom widgets from the custom callbacks in `PDFService` class. 
 * Chore: renamed `md_extension` file to `header_level_extension` in extensions.
-* Chore: renamed `MdHeaderLevelExtension` to `HeaderLevelResolverExtension` in extensions.
+* Chore(breaking changed): renamed `MdHeaderLevelExtension` to `HeaderLevelResolverExtension` in extensions.
 * Chore(doc): added customization documention (only partially). 
 * Chore(breaking changes): added `extraArgs` param to all `PDFWidgetBuilder`.
 * Chore: deprecated `IMAGE_LOCAL_STORAGE_PATH_PATTERN` since only works for android devices. 
