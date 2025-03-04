@@ -4,8 +4,10 @@
 
 <details>
     <summary>Show/Hide screensthos</summary>
-    <img src="assets/demo_to_pdf.png" style="width: 65%;"/>
-    <img src="assets/result_demo_to_pdf.png" style="width: 50%; height: 50%"/>
+    <h4>PDF generated</h4>
+    <img src="assets/result_demo_to_pdf.png" style="width: 60%; height: 60%"/>
+    <h4>Content used to generate the PDF</h4>
+    <img src="assets/demo_to_pdf.png" style="width: 70%;"/>
 </details>
 
 > [!TIP]
