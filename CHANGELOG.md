@@ -34,7 +34,7 @@
 * Feat: added support for build a custom TextStyle for inline-code fragments using `inlineCodeStyle`. 
 * Feat: added support for build custom leading widgets for lists using `listLeadingBuilder`. 
 * Feat: added support for code-block highlighting using `enableCodeBlockHighlighting` and `isLightMode`. 
-* Feat: added support for custom code-block highlighting theme using `customCodeHighlightTheme`. Check about [highlight_utils](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/lib/converter/configurator/utils/hightlight_themes.dart). 
+* Feat: added support for custom code-block highlighting theme using `customCodeHighlightTheme`. Check about [highlight_utils](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/lib/src/core/highlight_utils/hightlight_themes.dart). 
 * Feat: added support for custom heading sizes using `customHeadingSizes`. 
 * Feat: added support for switch between the different versions of the default list blocks using `listTypeWidget`. 
 
