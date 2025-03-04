@@ -1,3 +1,7 @@
+# 2.3.1
+
+* Fix: images url in README
+
 # 2.3.0
 
 * Fix: issues related with detecting storage images.
