@@ -20,7 +20,7 @@
 [theme customization](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/doc/theme.md)
 [header customization](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/doc/header.md)
 
-### Creating a pdf document
+### Creating a PDFConverter 
 
 ```dart
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
@@ -67,7 +67,7 @@ final pdfConverter = PDFConverter(
 );
 ```
 
-## To save/get/generate your document, we have 3 options:
+### Creating your PDF:
 
 ```dart
 import 'dart:io';
