@@ -194,7 +194,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       final bool added = _applyCustomBlocks(paragraph: paragraph);
       if (added) continue;
       if (paragraph.isEmbed) {
-        _defaultEmbedLineBuilder(paragraph: paragraph);
+        await _defaultEmbedLineBuilder(paragraph: paragraph);
         continue;
       }
       final bool isHeader = blockAttributes.containsKey('header');
@@ -293,7 +293,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           continue;
         }
         await _defaultLineBuilderForInlines(
-          contentPerPage,
           <pw.InlineSpan>[...spans],
         );
       }
@@ -302,7 +301,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   }
 
   Future<void> _defaultLineBuilderForInlines(
-    List<pw.Widget> contentPerPage,
     List<pw.InlineSpan> spans,
   ) async {
     if (spans.isEmpty) return;
@@ -369,7 +367,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     Map<String, dynamic> blockAttributes = const <String, dynamic>{},
   }) async {
     if (blockAttributes.isEmpty) {
-      _defaultLineBuilderForInlines(contentPerPage, spans);
+      _defaultLineBuilderForInlines(spans);
       return;
     }
     final int? header = blockAttributes['header'];
@@ -386,8 +384,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
     final pw.TextDirection textDirectionToUse =
         direction == 'rtl' ? pw.TextDirection.rtl : directionality;
-    //TODO: change the conditions to only apply exclusive blocks
-    // and then apply correctly non exclusive attributes
     if (header != null) {
       contentPerPage.add(pw.SizedBox(height: 5));
       if (align != null) {
@@ -498,28 +494,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       final int headerLevel = blockAttributes!['header'];
       final double currentFontSize = headerLevel.resolveHeaderLevel(
           headingSizes: customHeadingSizes ?? Constant.kDefaultHeadingSizes);
-      pw.TextStyle style =
-          defaultTheme.defaultTextStyle.copyWith(fontSize: currentFontSize);
-      style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+      pw.TextStyle style = defaultTheme.defaultTextStyle.copyWith(
+        fontSize: currentFontSize,
+        lineSpacing: lineHeight?.resolveLineHeight(),
+      );
       addFontSize = false;
       return (style, addFontSize);
     } else if (blockAttributes?['code-block'] != null) {
-      final pw.TextStyle defaultCodeBlockStyle = pw.TextStyle(
-        fontSize: 12,
-        font: pw.Font.courier(),
-        fontFallback: <pw.Font>[
-          pw.Font.courierBold(),
-          pw.Font.courierBoldOblique(),
-          pw.Font.courierOblique(),
-          pw.Font.symbol()
-        ],
-        letterSpacing: 1.5,
-        lineSpacing: 1.1,
-        wordSpacing: 0.5,
-        color: PdfColor.fromHex("#808080"),
-      );
       pw.TextStyle style =
-          defaultCodeBlockStyle.merge(defaultTheme.defaultTextStyle);
+          defaultTheme.defaultTextStyle.merge(getCodeBlockStyle());
       style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
       return (style, addFontSize);
     } else if (blockAttributes?['blockquote'] != null) {
@@ -532,8 +515,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       style = style.copyWith(lineSpacing: lineHeight?.resolveLineHeight());
       return (style, addFontSize);
     } else {
-      final pw.TextStyle style = defaultTheme.defaultTextStyle
-          .copyWith(lineSpacing: lineHeight?.resolveLineHeight());
+      final pw.TextStyle style = defaultTheme.defaultTextStyle.copyWith(
+        lineSpacing: lineHeight?.resolveLineHeight(),
+      );
       return (style, addFontSize);
     }
   }
