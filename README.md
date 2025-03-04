@@ -3,7 +3,7 @@
 **Flutter Quill to PDF** is a powerful package designed to convert documents created with **Flutter Quill** (based on Deltas) into high-quality PDF files. This package offers a wide range of customization options, allowing developers to adjust page formatting (width, height, and margins), customize fonts, text styles, and add elements such as images, videos, lists, blockquotes, and code blocks. Additionally, it supports the generation of custom widgets to integrate PDF content directly into the **Flutter** user interface. 
 
 <details>
-    <summary>Show/Hide screensthos</summary>
+    <summary>Show/Hide screenshots</summary>
     <h4>PDF generated</h4>
     <img src="assets/result_demo_to_pdf.png" style="width: 60%; height: 60%"/>
     <h4>Content used to generate the PDF</h4>
