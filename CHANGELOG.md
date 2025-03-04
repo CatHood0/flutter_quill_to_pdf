@@ -10,6 +10,7 @@
 * Fix: bad rendering of content elements by not make an await for `_applyBlockAttributes()` in `PDFService` class. 
 * Fix(partially): bad rendering of content elements when directionality is RTL. 
 * Chore(breaking changed): reorganized project structure.
+* Chore: deprecated `createDocumentFile` since we cannot manage the errors with file permissions. 
 * Chore: deprecated `blockquotePaddingLeft` and `blockquotePaddingRight` and replaced with `blockquotePadding`. 
 * Chore: deprecated `blockquoteDividerColor` replaced with `blockquoteBoxDecoration`. 
 * Chore(breaking changed): renamed `blockQuotethicknessDividerColor` to `blockquotethicknessDividerColor`. 

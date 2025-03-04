@@ -1,10 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:dart_quill_delta/dart_quill_delta.dart';
-import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart'
-    as ep;
+import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart' as ep;
 import 'package:flutter_quill_to_pdf/src/core/delta_processor/delta_attributes_options.dart';
 import 'package:flutter_quill_to_pdf/src/core/enums/list_type_widget.dart';
 import 'package:flutter_quill_to_pdf/src/core/request/font_family_request.dart';
@@ -15,7 +11,6 @@ import 'package:meta/meta.dart';
 import 'package:pdf/pdf.dart' show PdfColor, PdfPageFormat;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' as qpdf;
-import 'package:universal_html/html.dart' as web;
 
 class PDFConverter {
   // This is the main body of the PDF document
@@ -37,8 +32,7 @@ class PDFConverter {
   final List<qpdf.CustomWidget> customBuilders;
 
   /// A font when converter detect a font
-  final FontFamilyResponse Function(FontFamilyRequest familyRequest)?
-      onRequestFontFamily;
+  final FontFamilyResponse Function(FontFamilyRequest familyRequest)? onRequestFontFamily;
 
   /// This decides how will be builded the default [List] block
   final ListTypeWidget listTypeWidget;
@@ -76,8 +70,7 @@ class PDFConverter {
   final double? blockQuotePaddingRight;
 
   /// Define the padding space into the blockquote default implementation
-  final pw.EdgeInsetsGeometry? Function(int indent, pw.TextDirection direction)?
-      blockquotePadding;
+  final pw.EdgeInsetsGeometry? Function(int indent, pw.TextDirection direction)? blockquotePadding;
 
   /// Define the width of the divider
   final double? blockquotethicknessDividerColor;
@@ -86,13 +79,11 @@ class PDFConverter {
   final PdfColor? blockquoteBackgroundColor;
 
   /// Customize the left/right divider color to blockquotes
-  @Deprecated(
-      'blockQuoteDividerColor is no longer supported. Use blockquoteBoxDecoration instead')
+  @Deprecated('blockQuoteDividerColor is no longer supported. Use blockquoteBoxDecoration instead')
   final PdfColor? blockquoteDividerColor;
 
   /// Customize the border of the blockquote into the default implementation
-  final pw.BoxDecoration? Function(pw.TextDirection direction)?
-      blockquoteBoxDecoration;
+  final pw.BoxDecoration? Function(pw.TextDirection direction)? blockquoteBoxDecoration;
 
   /// When an image is detected, this will be called to build a custom implementation of it
   final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.Widget>? onDetectImageBlock;
@@ -101,12 +92,10 @@ class PDFConverter {
   final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.Widget>? onDetectVideoBlock;
 
   /// When an image is being builded and an error is catched, this is called
-  final PDFWidgetErrorBuilder<String, pw.Widget, ep.TextFragment>?
-      onDetectErrorInImage;
+  final PDFWidgetErrorBuilder<String, pw.Widget, ep.TextFragment>? onDetectErrorInImage;
 
   /// When a rich text styles are detected, this builder is called
-  final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.InlineSpan>?
-      onDetectInlineRichTextStyles;
+  final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.InlineSpan>? onDetectInlineRichTextStyles;
 
   /// When a header block is detected, this builder is called
   final qpdf.PDFWidgetBuilder<ep.Line, pw.Widget>? onDetectHeaderBlock;
@@ -116,8 +105,7 @@ class PDFConverter {
 
   /// When a non rich text line is detected, this builder is called
   /// Tipically this happens when the insertion has not inline attributes
-  final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.InlineSpan>?
-      onDetectCommonText;
+  final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.InlineSpan>? onDetectCommonText;
 
   /// When a link line is detected, this builder is called
   final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.InlineSpan>? onDetectLink;
@@ -220,20 +208,16 @@ class PDFConverter {
 
   ///Creates the PDF document an return this one
   Future<pw.Document?> createDocument({
-    @Deprecated(
-        'deltaOptionalAttr is no longer used, and will be removed in future releases.')
+    @Deprecated('deltaOptionalAttr is no longer used, and will be removed in future releases.')
     qpdf.DeltaAttributesOptions? deltaOptionalAttr,
-    @Deprecated(
-        'overrideAttributes is no longer used and will be removed in future releases.')
+    @Deprecated('overrideAttributes is no longer used and will be removed in future releases.')
     bool overrideAttributesPassedByUser = false,
-    @Deprecated(
-        'shouldProcessDeltas is no longer used and will be removed in future releases.')
+    @Deprecated('shouldProcessDeltas is no longer used and will be removed in future releases.')
     bool shouldProcessDeltas = true,
     void Function(dynamic error)? onException,
     PageBuilder? pageBuilder,
   }) async {
-    final qpdf.Converter<Delta, pw.Document> converter =
-        _buildService(pageBuilder);
+    final qpdf.Converter<Delta, pw.Document> converter = _buildService(pageBuilder);
     try {
       return await converter.generateDoc();
     } catch (e) {
@@ -244,55 +228,29 @@ class PDFConverter {
 
   /// This Create the PDF document and write it to storage path
   /// This implementation can throw PathNotFoundException or exceptions based in Storage capabilities
+  @Deprecated(
+      'createDocumentFile is no longer supported since can throw PathNotFoundException. Use createDocument instead')
   Future<void> createDocumentFile({
     required String path,
-    @Deprecated(
-        'deltaOptionalAttr is no longer used, and will be removed in future releases')
+    @Deprecated('deltaOptionalAttr is no longer used, and will be removed in future releases')
     qpdf.DeltaAttributesOptions? deltaOptionalAttr,
-    @Deprecated(
-        'overrideAttributes is no longer used and will be removed in future releases.')
+    @Deprecated('overrideAttributes is no longer used and will be removed in future releases.')
     bool overrideAttributesPassedByUser = false,
-    @Deprecated(
-        'shouldProcessDeltas is no longer used and will be removed in future releases.')
+    @Deprecated('shouldProcessDeltas is no longer used and will be removed in future releases.')
     bool shouldProcessDeltas = true,
-    @Deprecated('Use isWeb global variable from PDFConverter instead')
-    bool isWeb = false,
+    @Deprecated('Use isWeb global variable from PDFConverter instead') bool isWeb = false,
     void Function(dynamic error)? onException,
     void Function([Object? data])? onSucessWrite,
     PageBuilder? pageBuilder,
-  }) async {
-    final qpdf.Converter<Delta, pw.Document> converter =
-        _buildService(pageBuilder);
-    try {
-      final pw.Document doc = await converter.generateDoc();
-      final Uint8List bytes = await doc.save();
-      if (isWeb) {
-        List<int> fileInts = List<int>.from(bytes);
-        web.AnchorElement()
-          ..href =
-              "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}"
-          ..setAttribute("download", File(path).uri.pathSegments.last)
-          ..click();
-        onSucessWrite?.call('');
-        return;
-      }
-      await File(path).writeAsBytes(bytes);
-      onSucessWrite?.call(path);
-    } catch (e) {
-      onException?.call(e);
-    }
-  }
+  }) async {}
 
   /// Return a container with the widgets generated from the Document passed
   Future<pw.Widget?> generateWidget({
-    @Deprecated(
-        'deltaOptionalAttr is no longer used, and will be removed in future releases.')
+    @Deprecated('deltaOptionalAttr is no longer used, and will be removed in future releases.')
     qpdf.DeltaAttributesOptions? deltaOptionalAttr,
-    @Deprecated(
-        'overrideAttributes is no longer used and will be removed in future releases.')
+    @Deprecated('overrideAttributes is no longer used and will be removed in future releases.')
     bool overrideAttributesPassedByUser = false,
-    @Deprecated(
-        'shouldProcessDeltas is no longer used and will be removed in future releases.')
+    @Deprecated('shouldProcessDeltas is no longer used and will be removed in future releases.')
     bool shouldProcessDeltas = true,
     double? maxWidth,
     double? maxHeight,
@@ -300,8 +258,7 @@ class PDFConverter {
   }) async {
     final qpdf.Converter<Delta, pw.Document> converter = _buildService(null);
     try {
-      return await converter.generateWidget(
-          maxWidth: maxWidth, maxHeight: maxHeight);
+      return await converter.generateWidget(maxWidth: maxWidth, maxHeight: maxHeight);
     } catch (e) {
       onException?.call(e);
       rethrow;
@@ -309,9 +266,7 @@ class PDFConverter {
   }
 
   qpdf.PdfService _buildService(
-    pw.Page Function(List<pw.Widget> children, pw.ThemeData theme,
-            PdfPageFormat pageFormat)?
-        pageBuilder,
+    pw.Page Function(List<pw.Widget> children, pw.ThemeData theme, PdfPageFormat pageFormat)? pageBuilder,
   ) =>
       qpdf.PdfService(
         pageFormat: pageFormat,
@@ -354,10 +309,8 @@ class PDFConverter {
         listLeadingBuilder: listLeadingBuilder,
       );
 
-  @Deprecated(
-      'processDelta is no longer used. It always return null now. It will be removed in future releases.')
-  static Delta? processDelta(Delta delta, DeltaAttributesOptions options,
-      bool overrideAttributesPassedByUser) {
+  @Deprecated('processDelta is no longer used. It always return null now. It will be removed in future releases.')
+  static Delta? processDelta(Delta delta, DeltaAttributesOptions options, bool overrideAttributesPassedByUser) {
     return null;
   }
 }
