@@ -11,6 +11,7 @@ import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:flutter_quill_to_pdf/src/constants.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
+import 'package:path/path.dart';
 
 /// This is the default loader for the fonts created to the example
 /// see this class [here](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/example/lib/fonts_loader/fonts_loader.dart)
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter quill to pdf Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
               seedColor: const Color.fromARGB(255, 108, 189, 255)),
@@ -76,21 +78,28 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
               onPressed: () async {
-                final FileSaveLocation? result = await getSaveLocation(
-                  suggestedName: 'document_pdf',
-                  acceptedTypeGroups: [
-                    XTypeGroup(
-                      label: 'Pdf',
-                      extensions: ['pdf'],
-                      mimeTypes: ['application/pdf'],
-                      uniformTypeIdentifiers: ['com.adobe.pdf'],
-                    ),
-                  ],
-                );
+                final bool isAndroid = Platform.isAndroid;
+                // on android devices is not available getSaveLocation
+                final Object? result = isAndroid
+                    ? await getDirectoryPath(
+                        confirmButtonText: 'Select directory')
+                    : await getSaveLocation(
+                        suggestedName: 'document_pdf',
+                        acceptedTypeGroups: [
+                          XTypeGroup(
+                            label: 'Pdf',
+                            extensions: ['pdf'],
+                            mimeTypes: ['application/pdf'],
+                            uniformTypeIdentifiers: ['com.adobe.pdf'],
+                          ),
+                        ],
+                      );
                 if (result == null) {
                   return;
                 }
-                final File file = File(result.path);
+                final File file = isAndroid
+                    ? File(result as String)
+                    : File((result as FileSaveLocation).path);
                 PDFConverter pdfConverter = PDFConverter(
                   backMatterDelta: null,
                   frontMatterDelta: null,
@@ -138,16 +147,27 @@ class _MyHomePageState extends State<MyHomePage> {
                   _shouldShowToolbar.value = false;
                   return;
                 }
+                final String name = 'document_demo_flutter_quill_to_pdf.pdf';
                 final XFile textFile = XFile.fromData(
                   await document.save(),
-                  mimeType: Platform.isMacOS || Platform.isIOS
-                      ? result.activeFilter?.uniformTypeIdentifiers?.single ??
-                          'com.adobe.pdf'
-                      : result.activeFilter?.mimeTypes?.single ??
-                          'application/pdf',
-                  name: 'document_demo_flutter_quill_to_pdf.pdf',
+                  mimeType: isAndroid
+                      ? 'application/pdf'
+                      : Platform.isMacOS || Platform.isIOS
+                          ? (result as FileSaveLocation)
+                                  .activeFilter
+                                  ?.uniformTypeIdentifiers
+                                  ?.single ??
+                              'com.adobe.pdf'
+                          : (result as FileSaveLocation)
+                                  .activeFilter
+                                  ?.mimeTypes
+                                  ?.single ??
+                              'application/pdf',
+                  name: name,
                 );
-                await textFile.saveTo(result.path);
+                await textFile.saveTo(isAndroid
+                    ? join(result as String, name)
+                    : (result as FileSaveLocation).path);
                 _editorNode.unfocus();
                 _shouldShowToolbar.value = false;
                 ScaffoldMessenger.of(context).showSnackBar(
