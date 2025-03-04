@@ -140,7 +140,8 @@ class PDFConverter {
 
   /// This gives the ability to have our custom code-block highlight theme
   @experimental
-  final Map<String, pw.TextStyle>? Function(String? languageDetected)? customCodeHighlightTheme;
+  final Map<String, pw.TextStyle>? Function(String? languageDetected)?
+      customCodeHighlightTheme;
   // This let us create custom sizes when a Header is detected
   @experimental
   final List<double>? customHeadingSizes;

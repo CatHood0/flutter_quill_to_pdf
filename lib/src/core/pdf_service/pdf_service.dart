@@ -306,8 +306,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     List<pw.InlineSpan> spans,
   ) async {
     if (spans.isEmpty) return;
-    final double spacing =
-        (spans.firstOrNull?.style?.lineSpacing ?? 1.0);
+    final double spacing = (spans.firstOrNull?.style?.lineSpacing ?? 1.0);
     contentPerPage.add(
       pw.Directionality(
         textDirection: directionality,
