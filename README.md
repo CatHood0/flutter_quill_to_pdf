@@ -20,13 +20,9 @@
 [theme customization](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/doc/theme.md)
 [header customization](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/doc/header.md)
 
-### Creating a PDFConverter 
+### Creating your PDF file  
 
-### First, personalize the settings of the page (`height`, `width` and `margins`)
-
-We can use two types differents constructors of the same `PDFPageFormat` class
-
-##### The common, with all set params:
+#### First: personalize the settings of the page (`height`, `width` and `margins`)
 
 ```dart
 final PDFPageFormat pageFormat = PDFPageFormat(
@@ -37,17 +33,15 @@ final PDFPageFormat pageFormat = PDFPageFormat(
    marginLeft: ...,
    marginRight: ...,
 );
-```
-
-##### The factory to marginize all `PDFPageFormat`
-
-```dart
+// or use
 final PDFPageFormat pageFormat = PDFPageFormat.all(
    width: ..., //max width of the page
    height: ..., //max height of the page,
    margin: ..., //will set the property to the others margins
 );
 ```
+
+#### Second: create your PDFConverter
 
 ```dart
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
@@ -94,7 +88,7 @@ final pdfConverter = PDFConverter(
 );
 ```
 
-### Creating your PDF:
+### Creating the PdfoDocument/widgets:
 
 ```dart
 import 'dart:io';
@@ -108,6 +102,7 @@ final pw.Widget? pwWidget = await pdfConverter.generateWidget(
     maxWidth: pwWidgetWidth,
     maxHeight: pwWidgetHeight,
 );
+// with this, we can use doc.save() to write the bytes into a File in a Storage Path
 ```
 
 ## Supported Attributes 
@@ -135,11 +130,11 @@ final pw.Widget? pwWidget = await pdfConverter.generateWidget(
 
 ##### Exclusives
 
+- Header
+- Code-block
 - Blockquote
-- Code block
 - Embed image (Base64, URL, and common storage paths)
 - Embed video (Just the URL of the Video will be pasted as a text)
-- Header
 - List (Multilevel List too)
   1. Ordered List 
   *  Bullet List
