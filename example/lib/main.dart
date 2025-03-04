@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   frontMatterDelta: null,
                   isWeb: kIsWeb,
                   document: _quillController.document.toDelta(),
-                  enableCodeBlockHighlighting: true,
+                  listTypeWidget: ListTypeWidget.modern,
                   fallbacks: [...loader.allFonts()],
                   onRequestFontFamily: (FontFamilyRequest familyRequest) {
                     final normalFont = loader.getFontByName(fontFamily: familyRequest.family);

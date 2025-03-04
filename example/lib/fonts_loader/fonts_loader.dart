@@ -1,7 +1,7 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, implementation_imports
 import 'package:flutter/services.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:flutter_quill_to_pdf/core/extensions/string_extension.dart';
+import 'package:flutter_quill_to_pdf/src/extensions/string_extension.dart';
 
 //create just an instance and void duplicate instance
 final FontsLoader _instance = FontsLoader._();
