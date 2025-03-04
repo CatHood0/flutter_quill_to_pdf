@@ -63,6 +63,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.onDetectList,
     super.backM,
     super.frontM,
+    super.listLeadingBuilder,
   }) {
     _fonts = fonts;
     defaultTheme = customTheme ??

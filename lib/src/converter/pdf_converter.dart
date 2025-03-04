@@ -11,7 +11,7 @@ import 'package:flutter_quill_to_pdf/src/core/response/font_family_response.dart
 import 'package:flutter_quill_to_pdf/src/utils/extensions.dart';
 import 'package:flutter_quill_to_pdf/src/utils/typedefs.dart';
 import 'package:meta/meta.dart';
-import 'package:pdf/pdf.dart' show PdfColor;
+import 'package:pdf/pdf.dart' show PdfColor, PdfPageFormat;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart' as qpdf;
 import 'package:universal_html/html.dart' as web;
@@ -40,6 +40,9 @@ class PDFConverter {
 
   /// This decides how will be builded the default [List] block
   final ListTypeWidget listTypeWidget;
+
+  /// Build a custom version of the leading into the lists
+  final PDFLeadingWidget<pw.Widget?>? listLeadingBuilder;
 
   ///If you need to [customize] the [theme] of the [pdf document], override this param
   final pw.ThemeData? themeData;
@@ -151,6 +154,7 @@ class PDFConverter {
     @experimental this.isLightCodeBlockTheme = true,
     @experimental this.customCodeHighlightTheme,
     @experimental this.isWeb = false,
+    @experimental this.listLeadingBuilder,
     this.blockquotePadding,
     this.blockquoteBoxDecoration,
     this.inlineCodeStyle,
@@ -187,7 +191,8 @@ class PDFConverter {
     this.onDetectInlineRichTextStyles,
     this.onDetectLink,
     this.onDetectList,
-  }) : assert(customHeadingSizes == null || customHeadingSizes.length >= 4, 'customHeadingSizes must have minimun 4 items.') {
+  }) : assert(customHeadingSizes == null || customHeadingSizes.length >= 4,
+            'customHeadingSizes must have minimun 4 items.') {
     globalFontsFallbacks = <pw.Font>[
       ...fallbacks,
       pw.Font.helvetica(),
@@ -216,7 +221,7 @@ class PDFConverter {
     void Function(dynamic error)? onException,
     PageBuilder? pageBuilder,
   }) async {
-    final qpdf.Converter<Delta, pw.Document> converter = _buildService();
+    final qpdf.Converter<Delta, pw.Document> converter = _buildService(pageBuilder);
     try {
       return await converter.generateDoc();
     } catch (e) {
@@ -240,7 +245,7 @@ class PDFConverter {
     void Function([Object? data])? onSucessWrite,
     PageBuilder? pageBuilder,
   }) async {
-    final qpdf.Converter<Delta, pw.Document> converter = _buildService();
+    final qpdf.Converter<Delta, pw.Document> converter = _buildService(pageBuilder);
     try {
       final pw.Document doc = await converter.generateDoc();
       final Uint8List bytes = await doc.save();
@@ -272,7 +277,7 @@ class PDFConverter {
     double? maxHeight,
     void Function(dynamic error)? onException,
   }) async {
-    final qpdf.Converter<Delta, pw.Document> converter = _buildService();
+    final qpdf.Converter<Delta, pw.Document> converter = _buildService(null);
     try {
       return await converter.generateWidget(maxWidth: maxWidth, maxHeight: maxHeight);
     } catch (e) {
@@ -281,7 +286,10 @@ class PDFConverter {
     }
   }
 
-  qpdf.PdfService _buildService() => qpdf.PdfService(
+  qpdf.PdfService _buildService(
+    pw.Page Function(List<pw.Widget> children, pw.ThemeData theme, PdfPageFormat pageFormat)? pageBuilder,
+  ) =>
+      qpdf.PdfService(
         pageFormat: pageFormat,
         fonts: globalFontsFallbacks,
         customTheme: themeData,
@@ -319,6 +327,7 @@ class PDFConverter {
         listTypeWidget: listTypeWidget,
         blockquotePadding: blockquotePadding,
         blockquoteBoxDecoration: blockquoteBoxDecoration,
+        listLeadingBuilder: listLeadingBuilder,
       );
 
   @Deprecated('processDelta is no longer used. It always return null now. It will be removed in future releases.')
