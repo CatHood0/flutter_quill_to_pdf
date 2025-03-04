@@ -126,7 +126,7 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 - Background Color
 
 #### Blocks 
-##### Combinables 
+##### Combinable with other Block/Non block Attributes 
 
 - Align
 - Indent
@@ -142,6 +142,8 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 - Header
 - List (Multilevel List too)
   1. Ordered List 
+    a. Sub item 1 
+    b. Sub item 2 
   *  Bullet List
   - [x] CheckBox List
 
