@@ -790,7 +790,10 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
 
     final List<Node>? codeNodes = result.nodes;
     if (codeNodes == null) {
-      throw Exception('Code block parse error.');
+      return pw.TextSpan(
+        text: source,
+        style: style,
+      );
     }
     return _convertResultToSpans(codeNodes, style: style);
   }
@@ -824,7 +827,12 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       } else if (node.children != null) {
         final List<pw.TextSpan> tmp = <pw.TextSpan>[];
         currentSpans.add(
-          pw.TextSpan(children: tmp, style: cbTheme[node.className!]),
+          pw.TextSpan(
+              children: tmp,
+              style: cbTheme[node.className!] ??
+                  style.merge(
+                    defaultTheme.defaultTextStyle,
+                  )),
         );
         stack.add(currentSpans);
         currentSpans = tmp;
