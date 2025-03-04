@@ -5,9 +5,9 @@
 <details>
     <summary>Show/Hide screenshots</summary>
     <h4>PDF generated</h4>
-    <img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/main/assets/result_demo_to_pdf.png?raw=true" style="width: 60%; height: 60%"/>
+    <img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/assets/result_demo_to_pdf.png?raw=true" style="width: 60%; height: 60%"/>
     <h4>Content used to generate the PDF</h4>
-    <img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/main/assets/demo_to_pdf.png?raw=true" style="width: 70%;"/>
+    <img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/assets/demo_to_pdf.png?raw=true" style="width: 70%;"/>
 </details>
 
 > [!TIP]
