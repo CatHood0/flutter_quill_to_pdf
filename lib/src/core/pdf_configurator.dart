@@ -42,6 +42,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   int numCodeLine = 0;
   @protected
   String? lastListType;
+  final pw.BoxConstraints imageConstraints;
+  final Future<Uint8List?> Function(String url)? onDetectImageUrl;
   final ListTypeWidget listTypeWidget;
   final Delta? frontM;
   final Delta? backM;
@@ -84,6 +86,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   PdfConfigurator({
     required this.customBuilders,
     required super.document,
+    this.onDetectImageUrl,
+    this.imageConstraints = const pw.BoxConstraints(maxHeight: 450),
     this.listTypeWidget = ListTypeWidget.stable,
     this.inlineCodeStyle,
     this.customHeadingSizes,
@@ -142,14 +146,23 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       if (isWeb) {
         imageBytes = await _fetchBlobAsBytes(data);
       } else if (Constant.kDefaultImageUrlDetector.hasMatch(data)) {
-        final String pathStorage =
-            '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
-        try {
-          file = File(pathStorage);
-          await Dio().download(data, pathStorage);
-        } on DioException {
-          final pw.Widget? errorWidget = onDetectErrorInImage?.call(data, line, alignment);
-          return errorWidget ?? pw.SizedBox.shrink();
+        if (onDetectImageUrl != null) {
+          final Uint8List? bytes = await onDetectImageUrl?.call(data);
+          if (bytes == null) {
+            final pw.Widget? errorWidget = onDetectErrorInImage?.call(data, line, alignment);
+            return errorWidget ?? pw.SizedBox.shrink();
+          }
+          imageBytes = bytes;
+        } else {
+          final String pathStorage =
+              '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
+          try {
+            file = File(pathStorage);
+            await Dio().download(data, pathStorage);
+          } on DioException {
+            final pw.Widget? errorWidget = onDetectErrorInImage?.call(data, line, alignment);
+            return errorWidget ?? pw.SizedBox.shrink();
+          }
         }
       } else if (Constant.isFromLocalStorage(data)) {
         file = File(data);
@@ -160,11 +173,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
         imageBytes = await file.readAsBytes();
       } else {
         try {
-          final Uint8List bytes = base64Decode(data);
-          final String pathStorage =
-              '${(await getApplicationCacheDirectory()).path}/image_${Random.secure().nextInt(99999) + 50}';
-          file = File(pathStorage);
-          await file.writeAsBytes(bytes);
+          imageBytes = base64Decode(data);
         } on Exception {
           final pw.Widget? errorWidget = onDetectErrorInImage?.call(data, line, alignment);
           return errorWidget ?? pw.SizedBox.shrink();
@@ -192,7 +201,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           child: pw.Container(
             width: pageWidth,
             alignment: alignment,
-            constraints: height == null ? const pw.BoxConstraints(maxHeight: 450) : null,
+            constraints: height == null ? imageConstraints : null,
             child: pw.Image(
               pw.MemoryImage(isWeb ? imageBytes! : imageBytes ?? (await file!.readAsBytes())),
               dpi: 230,

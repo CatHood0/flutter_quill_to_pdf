@@ -26,9 +26,10 @@ screenshots:
 platforms:
   android:
   ios:
-  linux:
-  macos:
+  web:
   windows:
+  macos:
+  linux:
 
 dependencies:
   dart_quill_delta: ^10.8.3

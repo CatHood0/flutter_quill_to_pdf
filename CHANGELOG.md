@@ -7,7 +7,7 @@
 * Fix: wrong default list widget.
 * Fix: issue where the default leading of ordered lists is not being computed correctly.
 * Fix: wrong behavior if `textDirection` is passed in `PDFConverter`.
-* Fix: bad rendering of content elements by not make an await for `_applyBlockAttributes()` in `PDFService` class. 
+* Fix: bad rendering of content elements by not await for `_applyBlockAttributes()` in `PDFService` class. 
 * Fix(partially): bad rendering of content elements when directionality is RTL. 
 * Chore(breaking changes): reorganized project structure.
 * Chore: deprecated `createDocumentFile` since we cannot manage the errors with file permissions. 
@@ -22,19 +22,21 @@
 * Chore: deprecated `fixCommonErrorInsertsInRawDelta` and `isTotallyEmpty` methods since them are not longer used into the project.
 * Chore: moved embed implementation to `_defaultEmbedLineBuilder()` in `PDFService` class. 
 * Chore: created `_applyCustomBlocks()` to add all the necessary logic for add custom widgets from the custom callbacks in `PDFService` class. 
-* Chore: renamed `md_extension` file to `header_level_extension` in extensions.
+* Chore(breaking changes): renamed `md_extension` file to `header_level_extension` in extensions.
 * Chore(breaking changes): renamed `MdHeaderLevelExtension` to `HeaderLevelResolverExtension` in extensions.
 * Chore(doc): added customization documention (only partially). 
 * Chore(breaking changes): added `extraArgs` param to all `PDFWidgetBuilder`.
 * Chore: deprecated `IMAGE_LOCAL_STORAGE_PATH_PATTERN` since only works for android devices. 
 * Chore: deprecated `DeltaAttributesOptions`, `overrideAttributesPassedByUser`, `deltaOptionalAttr` and `shouldProcessDeltas` in `PDFConverter`, since its implementation is not needed for the current target of the package. 
 * Feat: added `isFromLocalStorage` method to detect is the input passed is a storage path. 
+* Feat: added `onDetectImageUrl` to allow us create our custom implementation for get bytes from a external url. 
+* Feat: added `imageConstraints` to create a default width and height for images when them has not that attributes specified. 
+* Feat: added support for custom code-block highlighting theme using `customCodeHighlightTheme`. Check about [highlight_utils](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/lib/src/core/highlight_utils/hightlight_themes.dart). 
 * Feat: added support for build error images using `onDetectErrorInImage`. 
 * Feat: added support for build video widgets `onDetectVideoBlock`. 
-* Feat: added support for build a custom TextStyle for inline-code fragments using `inlineCodeStyle`. 
+* Feat: added support for build a custom `TextStyle` for inline-code fragments using `inlineCodeStyle`. 
 * Feat: added support for build custom leading widgets for lists using `listLeadingBuilder`. 
 * Feat: added support for code-block highlighting using `enableCodeBlockHighlighting` and `isLightMode`. 
-* Feat: added support for custom code-block highlighting theme using `customCodeHighlightTheme`. Check about [highlight_utils](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/lib/src/core/highlight_utils/hightlight_themes.dart). 
 * Feat: added support for custom heading sizes using `customHeadingSizes`. 
 * Feat: added support for switch between the different versions of the default list blocks using `listTypeWidget`. 
 

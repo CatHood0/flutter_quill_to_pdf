@@ -31,6 +31,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     required PDFPageFormat pageFormat,
     required List<pw.Font> fonts,
     this.pageBuilder,
+    super.imageConstraints,
+    super.onDetectImageUrl,
     super.directionality,
     super.enableCodeBlockHighlighting,
     super.isLightCodeBlockTheme,
