@@ -1,4 +1,4 @@
-# Flutter Quill to PDF
+# 📖 Flutter Quill to PDF
 
 **Flutter Quill to PDF** is a powerful package designed to convert documents created with **Flutter Quill** (based on Deltas) into high-quality PDF files. This package offers a wide range of customization options, allowing developers to adjust page formatting (width, height, and margins), customize fonts, text styles, and add elements such as images, videos, lists, blockquotes, and code blocks. Additionally, it supports the generation of custom widgets to integrate PDF content directly into the **Flutter** user interface. 
 
@@ -13,16 +13,16 @@
 > [!TIP]
 > If you are using the version **v2.2.9** or a minor version, [see the breaking changes that were maded in **v2.3.0**](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/CHANGELOG.md#230)
 
-## Resources
+## 📚 Resources
 
 [code-block customization](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/doc/code-block.md)
 [blockquote customization](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/doc/blockquote.md)
 [theme customization](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/doc/theme.md)
 [header customization](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/doc/header.md)
 
-### Creating your PDF file  
+### 🔎 Creating your PDF file  
 
-#### First: personalize the settings of the page (`height`, `width` and `margins`)
+#### 📎 First: personalize the settings of the page (`height`, `width` and `margins`)
 
 ```dart
 final PDFPageFormat pageFormat = PDFPageFormat(
@@ -41,7 +41,7 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 );
 ```
 
-#### Second: create your PDFConverter
+#### ⚒️  Second: create your PDFConverter
 
 ```dart
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
@@ -63,19 +63,20 @@ final pdfConverter = PDFConverter(
     isLightCodeBlockTheme: false,
     // your custom theme for code-block (see code-block customization resource)
     customCodeHighlightTheme: <String, pw.TextStyle>{},
-    blockquotePadding: null, // override default implementation
-    blockquoteBoxDecoration: null, // override default implementation
-    inlineCodeStyle: null, // override default implementation
     codeBlockBackgroundColor: null, // override default implementation
-    blockquoteTextStyle: null, // override default implementation
     codeBlockNumLinesTextStyle: null, // override default implementation
     codeBlockFont: null, // override default implementation
-    onDetectBlockquote: (pr, args) {
+    inlineCodeStyle: null, // override default implementation
+    blockquoteTextStyle: null, // override default implementation
+    blockquotePadding: null, // override default implementation
+    blockquoteBoxDecoration: null, // override default implementation
+    onDetectBlockquote: (Paragraph pr, Object? args) {
       return YourPdfWidget();
     },
     onDetectCodeBlock: null,
+    onDetectVideoBlock: null,
     document: _quillController.document.toDelta(),
-    fallbacks: [...your global fonts],
+    fallbacks: <pw.Font>[], // here you can put all your pdf font fallbacks
     onRequestFontFamily: (FontFamilyRequest familyRequest) {
         return FontFamilyResponse(
           fontNormalV: <anyFontThatYouWant>, 
@@ -88,7 +89,7 @@ final pdfConverter = PDFConverter(
 );
 ```
 
-### Creating the PdfoDocument/widgets:
+### 📝 Creating the PdfDocument/widgets:
 
 ```dart
 import 'dart:io';
@@ -119,6 +120,7 @@ final pw.Widget? pwWidget = await pdfConverter.generateWidget(
 - Font family
 - Strikethrough
 - Background Color
+- Superscript/Subscript (**being planned**)
 
 #### Blocks 
 ##### Combinable with other Block/Non block Attributes 
@@ -134,15 +136,17 @@ final pw.Widget? pwWidget = await pdfConverter.generateWidget(
 - Code-block
 - Blockquote
 - Embed image (Base64, URL, and common storage paths)
-- Embed video (Just the URL of the Video will be pasted as a text)
+- Embed video (by default, just the URL of the video will be pasted as a text)
+- Embed formula (**being planned**)
 - List (Multilevel List too)
   1. Ordered List 
   *  Bullet List
   - [x] CheckBox List
 
-## No supported Attributes
+## Contributing
 
-- Superscript/Subscript (status: being planned)
-- Embed formula (status: being planned)
+We greatly appreciate your time and effort.
 
-You can contribute reporting issues or requesting to add new features on [flutter_quill_to_pdf](https://github.com/CatHood0/flutter_quill_to_pdf)
+To keep the project consistent and maintainable, we have a few guidelines that we ask all contributors to follow. These guidelines help ensure that everyone can understand and work with the code easier.
+
+See [Contributing](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/CONTRIBUTING.md) for more details.
