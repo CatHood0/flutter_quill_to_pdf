@@ -9,21 +9,21 @@
 * Fix: wrong behavior if `textDirection` is passed in `PDFConverter`.
 * Fix: bad rendering of content elements by not make an await for `_applyBlockAttributes()` in `PDFService` class. 
 * Fix(partially): bad rendering of content elements when directionality is RTL. 
-* Chore(breaking changed): reorganized project structure.
+* Chore(breaking changes): reorganized project structure.
 * Chore: deprecated `createDocumentFile` since we cannot manage the errors with file permissions. 
 * Chore: deprecated `blockquotePaddingLeft` and `blockquotePaddingRight` and replaced with `blockquotePadding`. 
 * Chore: deprecated `blockquoteDividerColor` replaced with `blockquoteBoxDecoration`. 
-* Chore(breaking changed): renamed `blockQuotethicknessDividerColor` to `blockquotethicknessDividerColor`. 
-* Chore(breaking changed): renamed `blockQuoteBackgroundColor` to `blockquoteBackgroundColor`. 
-* Chore(breaking changed): renamed `blockQuoteTextStyle` to `blockquoteTextStyle`. 
-* Chore: renamed `IMAGE_FROM_URL_PATTERN` to `kDefaultImageUrlDetector` in `Constant` class. 
+* Chore(breaking changes): renamed `blockQuotethicknessDividerColor` to `blockquotethicknessDividerColor`. 
+* Chore(breaking changes): renamed `blockQuoteBackgroundColor` to `blockquoteBackgroundColor`. 
+* Chore(breaking changes): renamed `blockQuoteTextStyle` to `blockquoteTextStyle`. 
+* Chore(breaking changes): renamed `IMAGE_FROM_URL_PATTERN` to `kDefaultImageUrlDetector` in `Constant` class. 
 * Chore: renamed `_applyBlockAttributes()` to `_defaultLineBuilderForBlocks()` in `PDFService` class. 
 * Chore: renamed `_applyInlineParagraph()` to `_defaultLineBuilderForInlines()` in `PDFService` class. 
 * Chore: deprecated `fixCommonErrorInsertsInRawDelta` and `isTotallyEmpty` methods since them are not longer used into the project.
 * Chore: moved embed implementation to `_defaultEmbedLineBuilder()` in `PDFService` class. 
 * Chore: created `_applyCustomBlocks()` to add all the necessary logic for add custom widgets from the custom callbacks in `PDFService` class. 
 * Chore: renamed `md_extension` file to `header_level_extension` in extensions.
-* Chore(breaking changed): renamed `MdHeaderLevelExtension` to `HeaderLevelResolverExtension` in extensions.
+* Chore(breaking changes): renamed `MdHeaderLevelExtension` to `HeaderLevelResolverExtension` in extensions.
 * Chore(doc): added customization documention (only partially). 
 * Chore(breaking changes): added `extraArgs` param to all `PDFWidgetBuilder`.
 * Chore: deprecated `IMAGE_LOCAL_STORAGE_PATH_PATTERN` since only works for android devices. 
