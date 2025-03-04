@@ -1,6 +1,6 @@
 # 2.3.1
 
-* Fix: images url in README
+* Fix: url of the images in README
 
 # 2.3.0
 
