@@ -22,70 +22,7 @@
 
 ### Creating a PDFConverter 
 
-```dart
-import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
-
-final pdfConverter = PDFConverter(
-    backMatterDelta: null,
-    frontMatterDelta: null,
-    // set a default Direction to your pdf widgets
-    textDirection: Directionality.of(context), 
-    // if you support web platform, you will need to pass this param, 
-    // since fetching images in web works differently
-    isWeb: kIsWeb,
-    themeData: null, // your custom theme for the document
-    listTypeWidget: ListTypeWidget.stable, // or ListTypeWidget.modern
-    listLeadingBuilder: (String type, int level, Object? args) => null,
-    enableCodeBlockHighlighting: true, 
-    customHeadingSizes: [50, 45, 40, 35, 30], // override default heading sizes
-    isLightCodeBlockTheme: false,
-    // your custom theme for code-block (see code-block customization resource)
-    customCodeHighlightTheme: <String, pw.TextStyle>{},
-    blockquotePadding: null, // override default implementation
-    blockquoteBoxDecoration: null, // override default implementation
-    inlineCodeStyle: null, // override default implementation
-    codeBlockBackgroundColor: null, // override default implementation
-    blockquoteTextStyle: null, // override default implementation
-    codeBlockNumLinesTextStyle: null, // override default implementation
-    codeBlockFont: null, // override default implementation
-    onDetectBlockquote: (pr, args) {
-      return <your-custom-blockquote-widget>;
-    },
-    onDetectCodeBlock: null,
-    document: _quillController.document.toDelta(),
-    pageFormat: pageFormat,
-    fallbacks: [...your global fonts],
-    onRequestFontFamily: (FontFamilyRequest familyRequest) {
-        return FontFamilyResponse(
-          fontNormalV: <anyFontThatYouWant>, 
-          boldFontV: familyRequest.isBold ? <yourBoldFontFamily> : null,
-          italicFontV: familyRequest.isItalic ? <yourItalicFontFamily> : null,
-          boldItalicFontV: familyRequest.isItalic && familyRequest.isBold ? <yourBoldItalicFontFamily> : null,
-          fallbacks: const <pw.Font>[],
-        );
-    },
-);
-```
-
-### Creating your PDF:
-
-```dart
-import 'dart:io';
-import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
-import 'package:pdf/pdf.dart';
-
-// return a pdf Document
-final doc = await pdfConverter.createDocument();
-// no have return object but creates automatically the file into the path
-await pdfConverter.createDocumentFile(path: filepath, <...other optional params>);
-// Generate the widgets without adding them to a pdf document
-final pw.Widget? pwWidget = await pdfConverter.generateWidget(
-    maxWidth: pwWidgetWidth,
-    maxHeight: pwWidgetHeight,
-);
-```
-
-### Personalize the settings of the page (`height`, `width` and `margins`)
+### First, personalize the settings of the page (`height`, `width` and `margins`)
 
 We can use two types differents constructors of the same `PDFPageFormat` class
 
@@ -109,6 +46,67 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
    width: ..., //max width of the page
    height: ..., //max height of the page,
    margin: ..., //will set the property to the others margins
+);
+```
+
+```dart
+import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
+
+final pdfConverter = PDFConverter(
+    backMatterDelta: null,
+    frontMatterDelta: null,
+    // set a default Direction to your pdf widgets
+    textDirection: Directionality.of(context), 
+    // if you support web platform, you will need to pass this param, 
+    // since fetching images in web works differently
+    isWeb: kIsWeb,
+    pageFormat: pageFormat, // pass your page format here
+    themeData: null, // your custom theme for the document
+    listTypeWidget: ListTypeWidget.stable, // or ListTypeWidget.modern
+    listLeadingBuilder: (String type, int level, Object? args) => null,
+    enableCodeBlockHighlighting: true, 
+    customHeadingSizes: [50, 45, 40, 35, 30], // override default heading sizes
+    isLightCodeBlockTheme: false,
+    // your custom theme for code-block (see code-block customization resource)
+    customCodeHighlightTheme: <String, pw.TextStyle>{},
+    blockquotePadding: null, // override default implementation
+    blockquoteBoxDecoration: null, // override default implementation
+    inlineCodeStyle: null, // override default implementation
+    codeBlockBackgroundColor: null, // override default implementation
+    blockquoteTextStyle: null, // override default implementation
+    codeBlockNumLinesTextStyle: null, // override default implementation
+    codeBlockFont: null, // override default implementation
+    onDetectBlockquote: (pr, args) {
+      return YourPdfWidget();
+    },
+    onDetectCodeBlock: null,
+    document: _quillController.document.toDelta(),
+    fallbacks: [...your global fonts],
+    onRequestFontFamily: (FontFamilyRequest familyRequest) {
+        return FontFamilyResponse(
+          fontNormalV: <anyFontThatYouWant>, 
+          boldFontV: familyRequest.isBold ? <yourBoldFontFamily> : null,
+          italicFontV: familyRequest.isItalic ? <yourItalicFontFamily> : null,
+          boldItalicFontV: familyRequest.isItalic && familyRequest.isBold ? <yourBoldItalicFontFamily> : null,
+          fallbacks: const <pw.Font>[],
+        );
+    },
+);
+```
+
+### Creating your PDF:
+
+```dart
+import 'dart:io';
+import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
+import 'package:pdf/pdf.dart';
+
+// return a pdf Document
+final doc = await pdfConverter.createDocument();
+// Generate the widgets without adding them to a pdf document
+final pw.Widget? pwWidget = await pdfConverter.generateWidget(
+    maxWidth: pwWidgetWidth,
+    maxHeight: pwWidgetHeight,
 );
 ```
 
