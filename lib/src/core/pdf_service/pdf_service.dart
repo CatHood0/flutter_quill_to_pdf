@@ -220,7 +220,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
                 blockAttributes,
                 <String, dynamic>{
                   'currentStyle': style,
-                  'shouldApplyFontSizeAttributeFromLine': true,
                 },
               ));
             }
@@ -304,11 +303,11 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
 
   Future<void> _defaultLineBuilderForInlines(
     List<pw.Widget> contentPerPage,
-    List<pw.InlineSpan> inlineSpansToMerge,
+    List<pw.InlineSpan> spans,
   ) async {
-    if (inlineSpansToMerge.isEmpty) return;
+    if (spans.isEmpty) return;
     final double spacing =
-        (inlineSpansToMerge.firstOrNull?.style?.lineSpacing ?? 1.0);
+        (spans.firstOrNull?.style?.lineSpacing ?? 1.0);
     contentPerPage.add(
       pw.Directionality(
         textDirection: directionality,
@@ -321,7 +320,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
             overflow: pw.TextOverflow.span,
             textDirection: directionality,
             text: pw.TextSpan(
-              children: inlineSpansToMerge,
+              children: spans,
             ),
           ),
         ),
