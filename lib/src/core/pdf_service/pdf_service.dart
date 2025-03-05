@@ -592,6 +592,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
                   paragraph.blockAttributes,
                   <String, dynamic>{
                     'pageWidth': pageWidth,
+                    'pageHeight': pageHeight,
+                    'textStyle': defaultTheme.defaultTextStyle,
                   },
                 ),
               );
@@ -606,6 +608,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
                   paragraph.blockAttributes,
                   <String, dynamic>{
                     'pageWidth': pageWidth,
+                    'pageHeight': pageHeight,
+                    'textStyle': defaultTheme.defaultTextStyle,
                   },
                 ),
               );
@@ -623,6 +627,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
                 paragraph.blockAttributes,
                 <String, dynamic>{
                   'pageWidth': pageWidth,
+                  'pageHeight': pageHeight,
+                  'textStyle': defaultTheme.defaultTextStyle,
                 },
               ),
             );
@@ -638,6 +644,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           blockAttributes,
           <String, dynamic>{
             'pageWidth': pageWidth,
+            'pageHeight': pageHeight,
+            'textStyle': defaultTheme.defaultTextStyle,
           },
         );
         contentPerPage.add(blockquoteBlock);
@@ -653,6 +661,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           blockAttributes,
           <String, dynamic>{
             'pageWidth': pageWidth,
+            'pageHeight': pageHeight,
+            'textStyle': defaultTheme.defaultTextStyle,
+            'defaultCodeblockStyle': getCodeBlockStyle(),
           },
         );
         contentPerPage.add(codeBlock);
@@ -668,6 +679,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           blockAttributes,
           <String, dynamic>{
             'pageWidth': pageWidth,
+            'pageHeight': pageHeight,
+            'textStyle': defaultTheme.defaultTextStyle,
           },
         );
         contentPerPage.add(codeBlock);
@@ -683,6 +696,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           blockAttributes,
           <String, dynamic>{
             'pageWidth': pageWidth,
+            'pageHeight': pageHeight,
+            'textStyle': defaultTheme.defaultTextStyle,
           },
         );
         contentPerPage.add(customBlock);
@@ -697,6 +712,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
           blockAttributes,
           <String, dynamic>{
             'pageWidth': pageWidth,
+            'pageHeight': pageHeight,
+            'textStyle': defaultTheme.defaultTextStyle,
           },
         );
         contentPerPage.add(alignedParagraphBlock);
