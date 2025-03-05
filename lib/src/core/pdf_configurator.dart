@@ -307,7 +307,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     );
     if (returnContentIfNeedIt) {
       return pw.TextSpan(
-        annotation: href.isNotEmpty ? pw.AnnotationLink(href) : null,
+        annotation: href.isNotEmpty ? pw.AnnotationUrl(href) : null,
         text: line.data as String,
         style: style ?? finalStyle,
       );
@@ -357,13 +357,14 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
               lineSpacing: 1.5,
             ).merge(finalStyle);
       return pw.TextSpan(
-        annotation: href.isNotEmpty ? pw.AnnotationLink(href) : null,
+        annotation: href.isNotEmpty ? pw.AnnotationUrl(href) : null,
         text: content,
         style: blockquoteStyle,
       );
     }
 
     return pw.TextSpan(
+      annotation: href.isNotEmpty ? pw.AnnotationUrl(href) : null,
       text: content,
       style: finalStyle,
     );
