@@ -4,11 +4,12 @@
 
 <details>
     <summary>Show/Hide screenshots</summary>
-    <h4>PDF generated</h4>
-    <img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/assets/result_demo_to_pdf.png?raw=true" style="width: 60%; height: 60%"/>
     <h4>Content used to generate the PDF</h4>
     <img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/assets/demo_to_pdf.png?raw=true" style="width: 70%;"/>
+    <h4>PDF generated</h4>
+    <img src="https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/assets/result_demo_to_pdf.png?raw=true" style="width: 60%; height: 60%"/>
 </details>
+<p></p>
 
 > [!TIP]
 > If you are using the version **v2.2.9** or a minor version, [see the breaking changes that were maded in **v2.3.0**](https://github.com/CatHood0/flutter_quill_to_pdf/blob/master/CHANGELOG.md#230)
