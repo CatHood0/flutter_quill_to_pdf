@@ -654,7 +654,6 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     }
     if (line != null) {
       if (paragraph.isBlock &&
-          !paragraph.blockAttributes!.containsKey('align') &&
           paragraph.blockAttributes!.containsKey('header') &&
           onDetectHeaderBlock != null) {
         final pw.Widget customBlock =
