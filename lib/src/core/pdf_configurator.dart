@@ -288,7 +288,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       fontWeight: bold ? pw.FontWeight.bold : null,
       decoration: pw.TextDecoration.combine(<pw.TextDecoration>[
         if (strike) pw.TextDecoration.lineThrough,
-        if (underline) pw.TextDecoration.underline,
+        if (underline || href.isNotEmpty) pw.TextDecoration.underline,
       ]),
       decorationStyle: pw.TextDecorationStyle.solid,
       decorationColor: href.isNotEmpty

@@ -1,6 +1,7 @@
 # 2.3.4
 
 * Fix: wrong method declaration of the `onDetectBlockquote` builder in example code of `PDFConverter`.
+* Fix: links are not showing underline decoration as expected.
 
 # 2.3.3
 
