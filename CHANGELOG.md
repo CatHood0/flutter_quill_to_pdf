@@ -1,3 +1,7 @@
+# 2.3.2
+
+* Fix: when a `Line` contains alignment and header attributes, `onDetectHeaderBlock` always will be ignored (even if it's passed)
+
 # 2.3.1
 
 * Fix: url of the images in README
