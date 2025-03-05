@@ -1,6 +1,7 @@
 # 2.3.2
 
 * Fix: when a `Line` contains alignment and header attributes, `onDetectHeaderBlock` always will be ignored (even if it's passed)
+* Chore: added some extra arguments for all methods that build custom pdf widgets in `PdfService`.
 
 # 2.3.1
 

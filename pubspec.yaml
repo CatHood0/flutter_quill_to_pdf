@@ -1,6 +1,6 @@
 name: flutter_quill_to_pdf
 description: "Create PDF'S using deltas from Quill, with configurable attributes, fonts, and custom pdf widgets"
-version: 2.3.1
+version: 2.3.2
 homepage: https://github.com/CatHood0/flutter_quill_to_pdf
 documentation: https://github.com/CatHood0/flutter_quill_to_pdf 
 repository: https://github.com/CatHood0/flutter_quill_to_pdf
@@ -18,10 +18,10 @@ topics:
   - pdf-converter
 
 screenshots:
-  - description: "Delta in editor"
-    path: assets/demo_to_pdf.png
   - description: "Delta converted in PDF"
     path: assets/result_demo_to_pdf.png
+  - description: "Delta in editor"
+    path: assets/demo_to_pdf.png
 
 platforms:
   android:
