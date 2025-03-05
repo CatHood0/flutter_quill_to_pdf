@@ -586,8 +586,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
             if (onDetectVideoBlock != null &&
                 (fragment.data as Map<String, dynamic>)['video'] != null) {
               shouldEndAsAdded = true;
-              contentPerPage.add(onDetectVideoBlock!
-                  .call(fragment, paragraph.blockAttributes));
+              contentPerPage.add(
+                onDetectVideoBlock!.call(
+                  fragment,
+                  paragraph.blockAttributes,
+                  <String, dynamic>{
+                    'pageWidth': pageWidth,
+                  },
+                ),
+              );
             }
             //avoid any another embed that is not a image
             if (onDetectImageBlock != null &&
@@ -597,6 +604,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
                 onDetectImageBlock!.call(
                   fragment,
                   paragraph.blockAttributes,
+                  <String, dynamic>{
+                    'pageWidth': pageWidth,
+                  },
                 ),
               );
             }
@@ -611,6 +621,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               customBuilder.widgetCallback(
                 paragraph,
                 paragraph.blockAttributes,
+                <String, dynamic>{
+                  'pageWidth': pageWidth,
+                },
               ),
             );
             return true;
@@ -623,6 +636,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         final pw.Widget blockquoteBlock = onDetectBlockquote!.call(
           paragraph,
           blockAttributes,
+          <String, dynamic>{
+            'pageWidth': pageWidth,
+          },
         );
         contentPerPage.add(blockquoteBlock);
         return true;
@@ -635,6 +651,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         final pw.Widget codeBlock = onDetectCodeBlock!.call(
           paragraph,
           blockAttributes,
+          <String, dynamic>{
+            'pageWidth': pageWidth,
+          },
         );
         contentPerPage.add(codeBlock);
         return true;
@@ -647,6 +666,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         final pw.Widget codeBlock = onDetectList!.call(
           paragraph,
           blockAttributes,
+          <String, dynamic>{
+            'pageWidth': pageWidth,
+          },
         );
         contentPerPage.add(codeBlock);
         return true;
@@ -656,8 +678,13 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       if (paragraph.isBlock &&
           paragraph.blockAttributes!.containsKey('header') &&
           onDetectHeaderBlock != null) {
-        final pw.Widget customBlock =
-            onDetectHeaderBlock!.call(line, blockAttributes);
+        final pw.Widget customBlock = onDetectHeaderBlock!.call(
+          line,
+          blockAttributes,
+          <String, dynamic>{
+            'pageWidth': pageWidth,
+          },
+        );
         contentPerPage.add(customBlock);
         return true;
       }
@@ -668,6 +695,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
         final pw.Widget alignedParagraphBlock = onDetectAlignedParagraph!.call(
           line,
           blockAttributes,
+          <String, dynamic>{
+            'pageWidth': pageWidth,
+          },
         );
         contentPerPage.add(alignedParagraphBlock);
         return true;
