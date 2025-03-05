@@ -9,13 +9,13 @@ final pdfConverter = PDFConverter(
   document: yourdelta,
   pageFormat: yourformat,
   blockquotePadding: (int indent, pw.TextDirection direction) => pw.EdgeInsets.only(top: 5, bottom: 5, left: 10),
-    blockquoteTextStyle: pw.TextStyle(
-      color: PdfColor.fromInt(0xFF666666),
-      font: loader.getFontByName(fontFamily: 'Ubuntu Mono'),
-      lineSpacing: 1.0,
-      fontStyle: pw.FontStyle.italic,
-    ),
-    blockquoteBoxDecoration: (pw.TextDirection direction) => pw.BoxDecoration(
+  blockquoteTextStyle: pw.TextStyle(
+    color: PdfColor.fromInt(0xFF666666),
+    font: loader.getFontByName(fontFamily: 'Ubuntu Mono'),
+    lineSpacing: 1.0,
+    fontStyle: pw.FontStyle.italic,
+  ),
+  blockquoteBoxDecoration: (pw.TextDirection direction) => pw.BoxDecoration(
     border: pw.Border(
       left: direction == pw.TextDirection.rtl
           ? pw.BorderSide.none
