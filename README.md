@@ -71,7 +71,7 @@ final pdfConverter = PDFConverter(
     blockquoteTextStyle: null, // override default implementation
     blockquotePadding: null, // override default implementation
     blockquoteBoxDecoration: null, // override default implementation
-    onDetectBlockquote: (Paragraph pr, Object? args) {
+    onDetectBlockquote: (Paragraph paragraph, Map<String, dynamic>? blockAttributes, [Object? args]) {
       return YourPdfWidget();
     },
     onDetectCodeBlock: null,

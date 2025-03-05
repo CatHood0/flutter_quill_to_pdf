@@ -1,3 +1,7 @@
+# 2.3.4
+
+* Fix: wrong method declaration of the `onDetectBlockquote` builder in example code of `PDFConverter`.
+
 # 2.3.3
 
 * Fix: links are not working as expected when try to interact with them [issue: #18](https://github.com/CatHood0/flutter_quill_to_pdf/issues/18)
