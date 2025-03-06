@@ -503,14 +503,21 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     bool addFontSize = true;
     final double? lineHeight = blockAttributes?['line-height'];
     if (blockAttributes?['header'] != null) {
+      addFontSize = false;
       final int headerLevel = blockAttributes!['header'];
+      final pw.TextStyle? headerStyle =
+          headerLevel > 5 ? null : getHeaderStyle(headerLevel);
+      // if the header level is into the range of the headers supported by ThemeData
+      // the return it
+      if (headerStyle != null) return (headerStyle, addFontSize);
+      // but, if it is out of the range, get the default styles and
+      // apply just the correct font size for the header
       final double currentFontSize = headerLevel.resolveHeaderLevel(
           headingSizes: customHeadingSizes ?? Constant.kDefaultHeadingSizes);
       pw.TextStyle style = defaultTheme.defaultTextStyle.copyWith(
         fontSize: currentFontSize,
         lineSpacing: lineHeight?.resolveLineHeight(),
       );
-      addFontSize = false;
       return (style, addFontSize);
     } else if (blockAttributes?['code-block'] != null) {
       pw.TextStyle style =
