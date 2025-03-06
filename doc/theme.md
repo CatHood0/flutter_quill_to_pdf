@@ -15,6 +15,7 @@ final pdfConverter = PDFConverter(
       fontBold: loader.getFontByName(fontFamily: 'Lora', bold: true),
       fontBoldItalic: loader.getFontByName(fontFamily: 'Lora', bold: true, italic: true),
       fontItalic: loader.getFontByName(fontFamily: 'Lora', italic: true),
+      inherit: true,
       lineSpacing: 1.0,
     ),
     header1: pw.TextStyle(
@@ -24,6 +25,7 @@ final pdfConverter = PDFConverter(
       fontBold: loader.getFontByName(fontFamily: 'Lora', bold: true),
       fontBoldItalic: loader.getFontByName(fontFamily: 'Lora', bold: true, italic: true),
       fontItalic: loader.getFontByName(fontFamily: 'Lora', italic: true),
+      inherit: true,
       letterSpacing: 1.5,
       lineSpacing: 1.0,
     ),
@@ -34,6 +36,7 @@ final pdfConverter = PDFConverter(
       fontBold: loader.getFontByName(fontFamily: 'Lora', bold: true),
       fontBoldItalic: loader.getFontByName(fontFamily: 'Lora', bold: true, italic: true),
       fontItalic: loader.getFontByName(fontFamily: 'Lora', italic: true),
+      inherit: true,
       letterSpacing: 1.5,
       lineSpacing: 1.0,
     ),
