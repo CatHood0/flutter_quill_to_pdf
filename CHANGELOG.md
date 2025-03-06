@@ -1,3 +1,8 @@
+# 2.3.5
+
+* Chore: support for header styles from `ThemeData` by @CatHood0 in https://github.com/CatHood0/flutter_quill_to_pdf/pull/23
+* Chore: improved `kDefaultHeadingSizes` in `Constant` class.
+
 # 2.3.4
 
 * Fix: wrong method declaration of the `onDetectBlockquote` builder in example code of `PDFConverter`.
