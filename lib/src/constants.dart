@@ -4,14 +4,13 @@ class Constant {
   static const double kDefaultLineHeight = 1.0;
   static const int DEFAULT_FONT_SIZE = 12;
   static const String DEFAULT_FONT_FAMILY = 'Arial';
-  // to encode markdown characters to avoid detection
   static const List<double> kDefaultHeadingSizes = <double>[
-    37,
-    34,
     28,
-    24,
-    20,
-    17
+    25,
+    23,
+    21,
+    18,
+    15,
   ];
   @Deprecated(
       'IMAGE_LOCAL_STORAGE_PATH_PATTERN is no longer used. You can use localStorageImageAndroidPattern or localStorageImageUniversalPattern instead')

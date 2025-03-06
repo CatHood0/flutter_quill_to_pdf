@@ -16,7 +16,6 @@ final pdfConverter = PDFConverter(
       fontBoldItalic: loader.getFontByName(fontFamily: 'Lora', bold: true, italic: true),
       fontItalic: loader.getFontByName(fontFamily: 'Lora', italic: true),
       inherit: true,
-      letterSpacing: 1.5,
       lineSpacing: 1.0,
     ),
     header1: pw.TextStyle(
@@ -49,4 +48,4 @@ final pdfConverter = PDFConverter(
 
 #### 🔥 Pdf document result: 
 
-<img src="https://github.com/user-attachments/assets/255525d5-a5a9-4f84-8faf-804510fa8075" style="display: block; margin-left: auto; margin-right: auto; width: 70%"/>
+<img src="https://github.com/user-attachments/assets/4fccefd6-8dbe-44ad-8045-91146c573a04" style="display: block; margin-left: auto; margin-right: auto; width: 70%"/>

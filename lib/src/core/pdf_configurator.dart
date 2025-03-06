@@ -315,7 +315,8 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     if (headerLevel != null && headerLevel > 0) {
       final double headerFontSize = headerLevel.resolveHeaderLevel(
           headingSizes: customHeadingSizes ?? Constant.kDefaultHeadingSizes);
-      finalStyle = finalStyle.copyWith(fontSize: headerFontSize);
+      finalStyle = getHeaderStyle(headerLevel) ??
+          finalStyle.copyWith(fontSize: headerFontSize);
     }
 
     // we cannot build inline code in a code-block because
@@ -452,6 +453,18 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       ),
     );
     return widget;
+  }
+
+  @protected
+  pw.TextStyle? getHeaderStyle(int level) {
+    if (level > 0 && level <= 5) {
+      if (level == 1) return defaultTheme.header1;
+      if (level == 2) return defaultTheme.header2;
+      if (level == 3) return defaultTheme.header3;
+      if (level == 4) return defaultTheme.header4;
+      if (level == 5) return defaultTheme.header5;
+    }
+    return null;
   }
 
   @protected
