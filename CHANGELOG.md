@@ -2,6 +2,7 @@
 
 * Chore: support for header styles from `ThemeData` by @CatHood0 in https://github.com/CatHood0/flutter_quill_to_pdf/pull/23
 * Chore: improved `kDefaultHeadingSizes` in `Constant` class.
+* Chore: removed `IMAGE_LOCAL_STORAGE_PATH_PATTERN`.
 
 # 2.3.4
 

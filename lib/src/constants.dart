@@ -12,10 +12,6 @@ class Constant {
     18,
     15,
   ];
-  @Deprecated(
-      'IMAGE_LOCAL_STORAGE_PATH_PATTERN is no longer used. You can use localStorageImageAndroidPattern or localStorageImageUniversalPattern instead')
-  static final RegExp IMAGE_LOCAL_STORAGE_PATH_PATTERN =
-      RegExp(r'^((\/[a-zA-Z0-9-_]+)+|\/)(\..+?)?$');
   /*
   Now can check if the input is a storage path (no fully support for android)
   Unix/Linux/macOS/iOS:
