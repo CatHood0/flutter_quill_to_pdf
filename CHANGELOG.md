@@ -2,6 +2,9 @@
 
 * Fix: wrong method declaration of the `onDetectBlockquote` builder in example code of `PDFConverter`.
 * Fix: links are not showing underline decoration as expected.
+* Fix: `ThemeData` is not being passed to the `PdfDocument`.
+* Chore: moved value that is passed to `maxPages` in `PdfService` to be part of `Constant` class, it now is called `kDefaultMaxPages`.
+* Feat: added `DocumentOptions` to add some extra information to the pdf using `documentOptions` in `PDFConverter`. 
 
 # 2.3.3
 

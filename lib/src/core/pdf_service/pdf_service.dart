@@ -14,6 +14,7 @@ import 'package:pdf/widgets.dart' as pw;
 class PdfService extends PdfConfigurator<Delta, pw.Document> {
   final DocumentParser _parser =
       DocumentParser(mergerBuilder: UniversalMergerBuilder.instance());
+  final DocumentOptions documentOptions;
   late final List<pw.Font> _fonts;
   //page configs
   late final double _marginLeft;
@@ -30,6 +31,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   PdfService({
     required PDFPageFormat pageFormat,
     required List<pw.Font> fonts,
+    required this.documentOptions,
     this.pageBuilder,
     super.imageConstraints,
     super.onDetectImageUrl,
@@ -109,8 +111,15 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     final pw.Document pdf = pw.Document(
       compress: true,
       verbose: true,
-      pageMode: PdfPageMode.outlines,
-      version: PdfVersion.pdf_1_5,
+      pageMode: documentOptions.mode,
+      version: documentOptions.version,
+      theme: defaultTheme,
+      title: documentOptions.title,
+      author: documentOptions.author,
+      creator: documentOptions.creator,
+      subject: documentOptions.subject,
+      keywords: documentOptions.keywords,
+      producer: documentOptions.producer,
     );
     final PdfPageFormat pdfPageFormat = PdfPageFormat(
       _width,
@@ -133,7 +142,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
             pw.MultiPage(
               theme: defaultTheme,
               pageFormat: pdfPageFormat,
-              maxPages: 99999999,
+              orientation: documentOptions.orientation,
+              maxPages: documentOptions.maxPages ?? Constant.kDefaultMaxPages,
               build: (pw.Context context) => <pw.Widget>[...widgets],
             ),
       );

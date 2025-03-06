@@ -4,6 +4,7 @@ import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart'
     as ep;
 import 'package:flutter_quill_to_pdf/src/core/delta_processor/delta_attributes_options.dart';
+import 'package:flutter_quill_to_pdf/src/core/document_options.dart';
 import 'package:flutter_quill_to_pdf/src/core/enums/list_type_widget.dart';
 import 'package:flutter_quill_to_pdf/src/core/request/font_family_request.dart';
 import 'package:flutter_quill_to_pdf/src/core/response/font_family_response.dart';
@@ -25,6 +26,12 @@ class PDFConverter {
   final Delta? backMatterDelta;
 
   final qpdf.PDFPageFormat pageFormat;
+
+  /// These are the general configuration for
+  /// the pdf document and general
+  /// view mode and orientation
+  @experimental
+  final DocumentOptions documentOptions;
 
   /// This will set the default direction for all the document
   /// or the common widgets if them doesn't have direction attribute
@@ -167,6 +174,7 @@ class PDFConverter {
   PDFConverter({
     required this.pageFormat,
     required this.document,
+    @experimental this.documentOptions = const DocumentOptions(),
     @experimental this.enableCodeBlockHighlighting = true,
     @experimental this.customHeadingSizes,
     @experimental this.isLightCodeBlockTheme = true,
@@ -315,6 +323,7 @@ class PDFConverter {
         isWeb: isWeb,
         enableCodeBlockHighlighting: enableCodeBlockHighlighting,
         isLightCodeBlockTheme: isLightCodeBlockTheme,
+        documentOptions: documentOptions,
         customCodeHighlightTheme: customCodeHighlightTheme,
         customBuilders: customBuilders,
         blockquoteBackgroundColor: blockquoteBackgroundColor,

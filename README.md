@@ -58,6 +58,17 @@ final pdfConverter = PDFConverter(
     pageFormat: pageFormat, // pass your page format here
     themeData: null, // your custom theme for the document
     listTypeWidget: ListTypeWidget.stable, // or ListTypeWidget.modern
+    documentOptions: DocumentOptions(
+      title: 'My fantastic document',
+      author: 'Me',
+      creator: 'Me',
+      subject: 'Another fantastic document',
+      keywords: 'my, key, words',
+      producer: 'Me',
+      version: PdfVersion.pdf_1_5,
+      orientation: pw.PageOrientation.portrait,
+      mode: PdfPageMode.thumbs,
+    ),
     listLeadingBuilder: (String type, int level, Object? args) => null,
     enableCodeBlockHighlighting: true, 
     customHeadingSizes: [50, 45, 40, 35, 30], // override default heading sizes
