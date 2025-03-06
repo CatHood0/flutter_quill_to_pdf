@@ -1,5 +1,3 @@
-import 'dart:nativewrappers/_internal/vm/lib/math_patch.dart';
-
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
