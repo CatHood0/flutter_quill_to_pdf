@@ -27,6 +27,10 @@ class PDFConverter {
 
   final qpdf.PDFPageFormat pageFormat;
 
+  /// This is a font that renderize correctly every icon into the pdf document
+  @experimental
+  final pw.Font? iconsFont;
+
   /// These are the general configuration for
   /// the pdf document and general
   /// view mode and orientation
@@ -183,6 +187,7 @@ class PDFConverter {
     @experimental this.listLeadingBuilder,
     @experimental this.imageConstraints,
     @experimental this.onDetectImageUrl,
+    @experimental this.iconsFont,
     this.blockquotePadding,
     this.blockquoteBoxDecoration,
     this.inlineCodeStyle,
@@ -319,6 +324,7 @@ class PDFConverter {
         fonts: globalFontsFallbacks,
         customTheme: themeData,
         directionality: textDirection.toPdf(),
+        iconsFont: iconsFont,
         pageBuilder: pageBuilder,
         isWeb: isWeb,
         enableCodeBlockHighlighting: enableCodeBlockHighlighting,
