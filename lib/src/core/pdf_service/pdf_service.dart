@@ -81,6 +81,55 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               : customTheme.iconTheme.copyWith(
                   font: iconsFont,
                 ),
+          // making this, avoid missed fallbacks when we pass fonts fallbacks to the PdfService
+          defaultTextStyle: customTheme.defaultTextStyle.copyWith(
+            fontFallback: <pw.Font>[
+              ...customTheme.defaultTextStyle.fontFallback,
+              ...fonts
+            ],
+          ),
+          header0: customTheme.header0.copyWith(
+            fontFallback: <pw.Font>[
+              ...customTheme.header0.fontFallback,
+              ...fonts
+            ],
+          ),
+          header1: customTheme.header1.copyWith(
+            fontFallback: <pw.Font>[
+              ...customTheme.header1.fontFallback,
+              ...fonts
+            ],
+          ),
+          header2: customTheme.header2.copyWith(
+            fontFallback: <pw.Font>[
+              ...customTheme.header2.fontFallback,
+              ...fonts
+            ],
+          ),
+          header3: customTheme.header3.copyWith(
+            fontFallback: <pw.Font>[
+              ...customTheme.header3.fontFallback,
+              ...fonts
+            ],
+          ),
+          header4: customTheme.header4.copyWith(
+            fontFallback: <pw.Font>[
+              ...customTheme.header4.fontFallback,
+              ...fonts
+            ],
+          ),
+          header5: customTheme.header5.copyWith(
+            fontFallback: <pw.Font>[
+              ...customTheme.header5.fontFallback,
+              ...fonts
+            ],
+          ),
+          paragraphStyle: customTheme.paragraphStyle.copyWith(
+            fontFallback: <pw.Font>[
+              ...customTheme.paragraphStyle.fontFallback,
+              ...fonts
+            ],
+          ),
         ) ??
         pw.ThemeData(
           softWrap: true,
