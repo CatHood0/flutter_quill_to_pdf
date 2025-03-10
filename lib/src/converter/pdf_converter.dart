@@ -227,6 +227,7 @@ class PDFConverter {
       pw.Font.helveticaBold(),
       pw.Font.helveticaOblique(),
       pw.Font.symbol(),
+      pw.Font.zapfDingbats(),
       pw.Font.times(),
       pw.Font.timesBold(),
       pw.Font.timesItalic(),
