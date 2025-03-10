@@ -1,3 +1,9 @@
+# 2.3.6
+
+* Fix: `pageBuilder` is not being passed correctly to `PdfService` class by @CatHood0 in https://github.com/CatHood0/flutter_quill_to_pdf/pull/24
+* Fix: `zapfDingBats` is not being added to the fonts by @CatHood0 in https://github.com/CatHood0/flutter_quill_to_pdf/pull/26
+* Feat: support for customize custom icons font by @CatHood0 in https://github.com/CatHood0/flutter_quill_to_pdf/pull/25
+
 # 2.3.5
 
 * Chore: support for header styles from `ThemeData` by @CatHood0 in https://github.com/CatHood0/flutter_quill_to_pdf/pull/23
