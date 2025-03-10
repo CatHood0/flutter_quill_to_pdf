@@ -25,6 +25,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   late final double _height;
   final List<pw.Widget> contentPerPage = <pw.Widget>[];
   @experimental
+  final pw.Font? iconsFont;
+  @experimental
   final pw.Page Function(List<pw.Widget> children, pw.ThemeData theme,
       PdfPageFormat pageFormat)? pageBuilder;
 
@@ -33,6 +35,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     required List<pw.Font> fonts,
     required this.documentOptions,
     this.pageBuilder,
+    this.iconsFont,
     super.imageConstraints,
     super.onDetectImageUrl,
     super.directionality,
@@ -72,11 +75,19 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.listLeadingBuilder,
   }) {
     _fonts = fonts;
-    defaultTheme = customTheme ??
+    defaultTheme = customTheme?.copyWith(
+          iconTheme: iconsFont == null
+              ? null
+              : customTheme.iconTheme.copyWith(
+                  font: iconsFont,
+                ),
+        ) ??
         pw.ThemeData(
           softWrap: true,
           textAlign: pw.TextAlign.left,
-          iconTheme: pw.IconThemeData.fallback(pw.Font.symbol()),
+          iconTheme: pw.IconThemeData.fallback(
+            iconsFont ?? pw.Font.zapfDingbats(),
+          ),
           overflow: pw.TextOverflow.span,
           defaultTextStyle: pw.TextStyle(
             color: PdfColors.black,
@@ -143,6 +154,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               theme: defaultTheme,
               pageFormat: pdfPageFormat,
               orientation: documentOptions.orientation,
+              pageTheme: pw.PageTheme(
+                pageFormat: pdfPageFormat,
+                theme: defaultTheme,
+              ),
               maxPages: documentOptions.maxPages ?? Constant.kDefaultMaxPages,
               build: (pw.Context context) => <pw.Widget>[...widgets],
             ),
