@@ -319,7 +319,7 @@ class PDFConverter {
         fonts: globalFontsFallbacks,
         customTheme: themeData,
         directionality: textDirection.toPdf(),
-        pageBuilder: null,
+        pageBuilder: pageBuilder,
         isWeb: isWeb,
         enableCodeBlockHighlighting: enableCodeBlockHighlighting,
         isLightCodeBlockTheme: isLightCodeBlockTheme,
