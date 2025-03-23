@@ -1,6 +1,7 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
+
 /// These are the general configuration for
 /// the pdf document and general view mode and orientation
 class DocumentOptions {
@@ -19,6 +20,11 @@ class DocumentOptions {
   final PdfVersion version;
   final int? maxPages;
 
+  /// The theme of the page null
+  /// Either pageTheme must be null, or
+  /// ageFormat == null && theme == null && orientation == null && margin == null && clip == false && textDirection == null
+  final PageTheme? pageTheme;
+
   const DocumentOptions({
     this.title,
     this.author,
@@ -30,6 +36,7 @@ class DocumentOptions {
     this.orientation = PageOrientation.portrait,
     this.mode = PdfPageMode.outlines,
     this.maxPages,
+    this.pageTheme,
   }) : assert(maxPages == null || maxPages > 0,
             'maxPages cannot be less than zero');
 }
