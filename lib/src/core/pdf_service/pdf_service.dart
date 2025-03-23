@@ -203,10 +203,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               theme: defaultTheme,
               pageFormat: pdfPageFormat,
               orientation: documentOptions.orientation,
-              pageTheme: pw.PageTheme(
-                pageFormat: pdfPageFormat,
-                theme: defaultTheme,
-              ),
+              pageTheme:null,
               maxPages: documentOptions.maxPages ?? Constant.kDefaultMaxPages,
               build: (pw.Context context) => <pw.Widget>[...widgets],
             ),
