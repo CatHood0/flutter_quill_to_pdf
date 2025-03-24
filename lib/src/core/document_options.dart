@@ -21,7 +21,12 @@ class DocumentOptions {
 
   /// The theme of the page null
   /// Either pageTheme must be null, or
-  /// ageFormat == null && theme == null && orientation == null && margin == null && clip == false && textDirection == null
+  /// PageFormat == null && 
+  /// theme == null && 
+  /// orientation == null && 
+  /// margin == null && 
+  /// clip == false && 
+  /// textDirection == null
   final PageTheme? pageTheme;
 
   const DocumentOptions({
