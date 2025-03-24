@@ -1,4 +1,4 @@
-library flutter_quill_to_pdf;
+library;
 
 //generators
 export 'package:flutter_quill_to_pdf/src/core/pdf_configurator.dart';
