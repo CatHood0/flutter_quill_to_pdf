@@ -48,6 +48,9 @@ final PDFPageFormat pageFormat = PDFPageFormat.all(
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart':
 
 final pdfConverter = PDFConverter(
+    document: _quillController.document.toDelta(),
+    pageFormat: pageFormat, // pass your page format here
+    // optional params 
     backMatterDelta: null,
     frontMatterDelta: null,
     // set a default Direction to your pdf widgets
@@ -55,7 +58,6 @@ final pdfConverter = PDFConverter(
     // if you support web platform, you will need to pass this param, 
     // since fetching images in web works differently
     isWeb: kIsWeb,
-    pageFormat: pageFormat, // pass your page format here
     themeData: null, // your custom theme for the document
     listTypeWidget: ListTypeWidget.stable, // or ListTypeWidget.modern
     documentOptions: DocumentOptions(
@@ -87,7 +89,6 @@ final pdfConverter = PDFConverter(
     },
     onDetectCodeBlock: null,
     onDetectVideoBlock: null,
-    document: _quillController.document.toDelta(),
     fallbacks: <pw.Font>[], // here you can put all your pdf font fallbacks
     onRequestFontFamily: (FontFamilyRequest familyRequest) {
         return FontFamilyResponse(
