@@ -1,3 +1,10 @@
+# 2.3.7
+
+* Fix: themeData on PDF creation by @Faizan-26 in https://github.com/CatHood0/flutter_quill_to_pdf/pull/28
+
+## New Contributors
+* @Faizan-26 made their first contribution in https://github.com/CatHood0/flutter_quill_to_pdf/pull/28
+
 # 2.3.6
 
 * Fix: `pageBuilder` is not being passed correctly to `PdfService` class by @CatHood0 in https://github.com/CatHood0/flutter_quill_to_pdf/pull/24
