@@ -1,7 +1,6 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
-
 /// These are the general configuration for
 /// the pdf document and general view mode and orientation
 class DocumentOptions {
