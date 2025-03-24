@@ -189,7 +189,10 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       marginRight: _marginRight,
       marginTop: _marginTop,
     );
+    //
+    final pw.PageTheme? defaultPageTheme = documentOptions.pageTheme;
     // front matter
+
     final List<List<pw.Widget>> docWidgets = await generatePages(
       documents: <Delta>[frontM ?? Delta(), document, backM ?? Delta()],
     );
@@ -203,10 +206,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               theme: defaultTheme,
               pageFormat: pdfPageFormat,
               orientation: documentOptions.orientation,
-              pageTheme: pw.PageTheme(
-                pageFormat: pdfPageFormat,
-                theme: defaultTheme,
-              ),
+              pageTheme: defaultPageTheme,
               maxPages: documentOptions.maxPages ?? Constant.kDefaultMaxPages,
               build: (pw.Context context) => <pw.Widget>[...widgets],
             ),

@@ -147,7 +147,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   _shouldShowToolbar.value = false;
                   return;
                 }
-                final String name = 'document_demo_flutter_quill_to_pdf.pdf';
+                final String name =
+                    'document_demo_flutter_quill_to_pdf${DateTime.now().millisecondsSinceEpoch.toString()}.pdf';
                 final XFile textFile = XFile.fromData(
                   await document.save(),
                   mimeType: isAndroid
