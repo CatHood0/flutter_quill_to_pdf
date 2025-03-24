@@ -71,9 +71,11 @@ final pdfConverter = PDFConverter(
       orientation: pw.PageOrientation.portrait,
       mode: PdfPageMode.thumbs,
     ),
+    // create a custom leading for your lists
     listLeadingBuilder: (String type, int level, Object? args) => null,
-    enableCodeBlockHighlighting: true, 
     customHeadingSizes: [50, 45, 40, 35, 30], // override default heading sizes
+    // code-block
+    enableCodeBlockHighlighting: true, 
     isLightCodeBlockTheme: false,
     // your custom theme for code-block (see code-block customization resource)
     customCodeHighlightTheme: <String, pw.TextStyle>{},
@@ -81,9 +83,11 @@ final pdfConverter = PDFConverter(
     codeBlockNumLinesTextStyle: null, // override default implementation
     codeBlockFont: null, // override default implementation
     inlineCodeStyle: null, // override default implementation
+    // blockquote
     blockquoteTextStyle: null, // override default implementation
     blockquotePadding: null, // override default implementation
     blockquoteBoxDecoration: null, // override default implementation
+    // custom widgets
     onDetectBlockquote: (Paragraph paragraph, Map<String, dynamic>? blockAttributes, [Object? args]) {
       return YourPdfWidget();
     },
@@ -150,7 +154,6 @@ final pw.Widget? pwWidget = await pdfConverter.generateWidget(
 - Blockquote
 - Embed image (Base64, URL, and common storage paths)
 - Embed video (by default, just the URL of the video will be pasted as a text)
-- Embed formula (**being planned**)
 - List (Multilevel List too)
   1. Ordered List 
   *  Bullet List
