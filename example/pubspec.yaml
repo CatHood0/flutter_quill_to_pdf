@@ -16,8 +16,9 @@ dependencies:
   flutter_quill_to_pdf:
     path: ../
   flutter_quill: ^11.0.0
-  pdf: ^3.11.1
+  pdf: ^3.11.3
   flutter_quill_extensions: ^11.0.0
+  http: ^1.4.0
   path:
   file_selector: ^1.0.3
   animated_text_kit: ^4.2.3 

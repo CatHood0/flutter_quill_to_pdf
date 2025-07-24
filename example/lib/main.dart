@@ -12,6 +12,7 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 // ignore: implementation_imports
 import 'package:flutter_quill_to_pdf/src/constants.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 
 /// This is the default loader for the fonts created to the example
@@ -105,6 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   backMatterDelta: null,
                   frontMatterDelta: null,
                   isWeb: kIsWeb,
+                  onDetectImageUrl: kIsWeb ? _fetchBlobAsBytes : null,
                   document: _quillController.document.toDelta(),
                   fallbacks: [...loader.allFonts()],
                   onRequestFontFamily: (FontFamilyRequest familyRequest) {
@@ -311,6 +313,12 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
     );
+  }
+
+  Future<Uint8List?> _fetchBlobAsBytes(String blobUrl) async {
+    final http.Response response = await http.get(Uri.parse(blobUrl));
+    if (response.statusCode == 200) return response.bodyBytes;
+    return null;
   }
 }
 

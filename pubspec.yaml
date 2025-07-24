@@ -33,13 +33,12 @@ platforms:
 
 dependencies:
   dart_quill_delta: ^10.8.3
-  flutter_quill_delta_easy_parser: ^1.1.5
+  flutter_quill_delta_easy_parser: ^1.1.7
   highlight: ^0.7.0
-  pdf: ^3.11.1
+  pdf: ^3.11.3
   collection: ^1.19.1
   path_provider: ^2.1.5
   dio: ^5.8.0
-  http: ^1.3.0
   meta: ^1.16.0
   numerus: ^2.3.0
 

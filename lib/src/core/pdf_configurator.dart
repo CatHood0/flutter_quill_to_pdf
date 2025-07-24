@@ -18,7 +18,6 @@ import 'package:pdf/pdf.dart' show PdfColor, PdfColors, PdfPageFormat;
 import 'package:pdf/widgets.dart' as pw;
 
 import 'document_functions.dart';
-import 'package:http/http.dart' as http;
 
 abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     implements DocumentFunctions<Delta, Document, List<pw.Widget>> {
@@ -151,7 +150,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     // if the data is a content uri we ignore it, since we have no support for them
     if (!Constant.contentUriFileDetector.hasMatch(data)) {
       if (isWeb) {
-        imageBytes = await _fetchBlobAsBytes(data);
+        imageBytes = await onDetectImageUrl?.call(data);
       } else if (Constant.kDefaultImageUrlDetector.hasMatch(data)) {
         if (onDetectImageUrl != null) {
           final Uint8List? bytes = await onDetectImageUrl?.call(data);
@@ -874,14 +873,5 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     }
 
     return pw.TextSpan(children: spans);
-  }
-
-  Future<Uint8List> _fetchBlobAsBytes(String blobUrl) async {
-    final http.Response response = await http.get(Uri.parse(blobUrl));
-    if (response.statusCode == 200) {
-      return response.bodyBytes;
-    } else {
-      throw Exception('Failed to load blob image');
-    }
   }
 }

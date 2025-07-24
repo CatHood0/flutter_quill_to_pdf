@@ -18,10 +18,6 @@ First, we would like to thank you for your time and efforts on this project, we 
 
 Make sure you have the [Requirement](#-development-prerequisites) installed and configured correctly
 
-To test your changes:
-
-1. Run the tests using your IDE or `flutter test`
-
 ## Guidelines 📝
 
 1. **Documentation**:
