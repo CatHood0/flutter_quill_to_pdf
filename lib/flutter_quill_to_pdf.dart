@@ -11,6 +11,7 @@ export 'package:flutter_quill_to_pdf/src/core/request/font_family_request.dart';
 export 'package:flutter_quill_to_pdf/src/core/document_options.dart';
 export 'package:flutter_quill_to_pdf/src/core/enums/list_type_widget.dart';
 export 'package:flutter_quill_to_pdf/src/core/response/font_family_response.dart';
+export 'package:flutter_quill_to_pdf/src/core/decorators/checkbox_decorator.dart';
 //converter options
 export 'package:flutter_quill_to_pdf/src/core/highlight_utils/hightlight_themes.dart';
 export 'package:flutter_quill_to_pdf/src/core/converter_option/pdf_page_format.dart';
