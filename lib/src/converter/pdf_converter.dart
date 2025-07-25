@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart'
     as ep;
+import 'package:flutter_quill_to_pdf/src/core/decorators/checkbox_decorator.dart';
 import 'package:flutter_quill_to_pdf/src/core/delta_processor/delta_attributes_options.dart';
 import 'package:flutter_quill_to_pdf/src/core/document_options.dart';
 import 'package:flutter_quill_to_pdf/src/core/enums/list_type_widget.dart';
@@ -170,6 +171,18 @@ class PDFConverter {
   @experimental
   final List<double>? customHeadingSizes;
 
+  /// Determines if the elements of check lists
+  /// will be painted with ~strikethough style~ when
+  /// checked is `true`
+  @experimental
+  final bool paintStrikethoughStyleOnCheckedElements;
+
+  /// Determines the appareance of the checkbox leading widget
+  ///
+  /// _Can be ignored, since is configured by default_
+  @experimental
+  final CheckboxDecorator? checkboxDecorator;
+
   /// [isWeb] is used to know is the current platform is web since the way of the fetch images files
   /// is different from the other platforms
   @experimental
@@ -178,6 +191,8 @@ class PDFConverter {
   PDFConverter({
     required this.pageFormat,
     required this.document,
+    @experimental this.checkboxDecorator,
+    @experimental this.paintStrikethoughStyleOnCheckedElements = false,
     @experimental this.documentOptions = const DocumentOptions(),
     @experimental this.enableCodeBlockHighlighting = true,
     @experimental this.customHeadingSizes,
@@ -321,6 +336,9 @@ class PDFConverter {
         pageBuilder,
   ) =>
       qpdf.PdfService(
+        paintStrikethoughStyleOnCheckedElements:
+            paintStrikethoughStyleOnCheckedElements,
+        checkboxDecorator: checkboxDecorator ?? CheckboxDecorator.base(),
         pageFormat: pageFormat,
         fonts: globalFontsFallbacks,
         customTheme: themeData,

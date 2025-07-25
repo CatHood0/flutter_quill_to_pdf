@@ -107,6 +107,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   frontMatterDelta: null,
                   isWeb: kIsWeb,
                   onDetectImageUrl: kIsWeb ? _fetchBlobAsBytes : null,
+                  paintStrikethoughStyleOnCheckedElements: true,
+                  checkboxDecorator: CheckboxDecorator.base(
+                    strikethroughColor: "#AAAAAA",
+                    italicOnStrikethrough: true,
+                  ),
                   document: _quillController.document.toDelta(),
                   fallbacks: [...loader.allFonts()],
                   onRequestFontFamily: (FontFamilyRequest familyRequest) {

@@ -31,11 +31,13 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
       PdfPageFormat pageFormat)? pageBuilder;
 
   PdfService({
+    required super.paintStrikethoughStyleOnCheckedElements,
     required PDFPageFormat pageFormat,
     required List<pw.Font> fonts,
     required this.documentOptions,
     this.pageBuilder,
     this.iconsFont,
+    super.checkboxDecorator,
     super.imageConstraints,
     super.onDetectImageUrl,
     super.directionality,

@@ -5,6 +5,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:dart_quill_delta/dart_quill_delta.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_quill_delta_easy_parser/extensions/extensions.dart';
 import 'package:flutter_quill_delta_easy_parser/flutter_quill_delta_easy_parser.dart';
 import 'package:flutter_quill_to_pdf/flutter_quill_to_pdf.dart';
 import 'package:flutter_quill_to_pdf/src/constants.dart';
@@ -16,8 +17,10 @@ import 'package:numerus/roman/roman.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart' show PdfColor, PdfColors, PdfPageFormat;
 import 'package:pdf/widgets.dart' as pw;
-
 import 'document_functions.dart';
+
+const String _checkedListElementValue = 'checked';
+const String _uncheckedListElementValue = 'unchecked';
 
 abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
     implements DocumentFunctions<Delta, Document, List<pw.Widget>> {
@@ -41,6 +44,7 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
   int numCodeLine = 0;
   @protected
   String? lastListType;
+  final bool paintStrikethoughStyleOnCheckedElements;
   final pw.BoxConstraints imageConstraints;
   final Future<Uint8List?> Function(String url)? onDetectImageUrl;
   final ListTypeWidget listTypeWidget;
@@ -88,9 +92,13 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
       .DEFAULT_FONT_SIZE; //avoid spans without font sizes not appears in the document
   late final double pageWidth, pageHeight;
   final bool isWeb;
+
+  final CheckboxDecorator checkboxDecorator;
   PdfConfigurator({
-    required this.customBuilders,
     required super.document,
+    required this.customBuilders,
+    required this.paintStrikethoughStyleOnCheckedElements,
+    this.checkboxDecorator = const CheckboxDecorator.base(),
     this.onDetectImageUrl,
     this.imageConstraints = const pw.BoxConstraints(maxHeight: 450),
     this.listTypeWidget = ListTypeWidget.stable,
@@ -673,12 +681,40 @@ abstract class PdfConfigurator<T, D> extends ConverterConfigurator<T, D>
           );
         }
       }
-      if (listType == 'checked' || listType == 'unchecked') {
+      if (listType == _checkedListElementValue ||
+          listType == _uncheckedListElementValue) {
+        final bool isChecked = listType == _checkedListElementValue;
         leadingWidget = pw.Checkbox(
           activeColor: PdfColors.blue400,
           name: 'check ${Random.secure().nextInt(9999999) + 50}',
-          value: listType == 'checked' ? true : false,
+          value: isChecked,
+          decoration: checkboxDecorator.decoration,
+          width: checkboxDecorator.width,
+          height: checkboxDecorator.height,
+          checkColor: checkboxDecorator.checkcolor,
+          tristate: checkboxDecorator.tristate,
         );
+        if (isChecked && paintStrikethoughStyleOnCheckedElements) {
+          for (int i = 0; i < spansToWrap.length; i++) {
+            final pw.InlineSpan span = spansToWrap[i];
+            if (span.castOrNull<pw.TextSpan>() != null) {
+              final pw.TextStyle? el = span.style;
+              spansToWrap[i] = span.copyWith(
+                style: el?.copyWith(
+                  color: checkboxDecorator.strikeColor,
+                  fontStyle: checkboxDecorator.italicOnStrikethrough
+                      ? pw.FontStyle.italic
+                      : null,
+                  decorationColor: checkboxDecorator.strikeColor,
+                  decoration: pw.TextDecoration.combine(<pw.TextDecoration>[
+                    if (el.decoration != null) el.decoration!,
+                    pw.TextDecoration.lineThrough,
+                  ]),
+                ),
+              );
+            }
+          }
+        }
       }
     }
 
