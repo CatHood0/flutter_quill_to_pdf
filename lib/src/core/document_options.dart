@@ -21,11 +21,11 @@ class DocumentOptions {
 
   /// The theme of the page null
   /// Either pageTheme must be null, or
-  /// PageFormat == null && 
-  /// theme == null && 
-  /// orientation == null && 
-  /// margin == null && 
-  /// clip == false && 
+  /// PageFormat == null &&
+  /// theme == null &&
+  /// orientation == null &&
+  /// margin == null &&
+  /// clip == false &&
   /// textDirection == null
   final PageTheme? pageTheme;
 
