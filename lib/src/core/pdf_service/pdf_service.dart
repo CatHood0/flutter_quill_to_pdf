@@ -10,6 +10,7 @@ import 'package:meta/meta.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+
 ///A Manager that contains all operations for PDF services
 class PdfService extends PdfConfigurator<Delta, pw.Document> {
   final DocumentParser _parser =
@@ -29,6 +30,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
   @experimental
   final pw.Page Function(List<pw.Widget> children, pw.ThemeData theme,
       PdfPageFormat pageFormat)? pageBuilder;
+  final PDFCustomEmbedBuilder? onDetectCustomEmbedBlock;    
 
   PdfService({
     required super.paintStrikethoughStyleOnCheckedElements,
@@ -75,6 +77,7 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     super.backM,
     super.frontM,
     super.listLeadingBuilder,
+    this.onDetectCustomEmbedBlock,
   }) {
     _fonts = fonts;
     defaultTheme = customTheme?.copyWith(
@@ -410,7 +413,8 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
     _updateLineNumbers(blockAttributes);
     for (Line line in paragraph.lines) {
       for (TextFragment fragment in line.fragments) {
-        if ((fragment.data as Map<String, dynamic>)['video'] != null) {
+        final Map<String, dynamic> data = fragment.data as Map<String, dynamic>;
+        if (data['video'] != null) {
           contentPerPage.add(
             pw.RichText(
               textDirection: blockAttributes['direction'] ?? directionality,
@@ -422,9 +426,9 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               ),
             ),
           );
+          continue;
         }
-        //avoid any another embed that is not a image
-        if ((fragment.data as Map<String, dynamic>)['image'] != null) {
+        if (data['image'] != null) {
           contentPerPage.add(
             await getImageBlock.call(
               fragment,
@@ -432,6 +436,12 @@ class PdfService extends PdfConfigurator<Delta, pw.Document> {
               blockAttributes['direction'],
             ),
           );
+          continue;
+        }
+        if (onDetectCustomEmbedBlock != null) {
+          // If the app provided a custom handler for other embed types, call it.
+          onDetectCustomEmbedBlock!(data, contentPerPage);
+          continue;
         }
       }
     }

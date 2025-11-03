@@ -15,3 +15,9 @@ typedef PDFWidgetErrorBuilder<T, W, R> = W Function(T data, R alternativeData,
 
 typedef PageBuilder = pw.Page Function(
     List<pw.Widget>, pw.ThemeData theme, PdfPageFormat pageFormat);
+
+/// When a custom embed is detected, this will be called to build a custom implementation of it
+typedef PDFCustomEmbedBuilder = void Function(
+  Map<String, dynamic> embedData,
+  List<pw.Widget> widgets,
+);    

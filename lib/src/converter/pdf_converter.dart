@@ -120,6 +120,9 @@ class PDFConverter {
   final qpdf.PDFWidgetBuilder<ep.TextFragment, pw.InlineSpan>?
       onDetectInlineRichTextStyles;
 
+  /// This is a callback for embed types that are not 'image' or 'video'.
+  final PDFCustomEmbedBuilder? onDetectCustomEmbedBlock;
+
   /// When a header block is detected, this builder is called
   final qpdf.PDFWidgetBuilder<ep.Line, pw.Widget>? onDetectHeaderBlock;
 
@@ -239,6 +242,7 @@ class PDFConverter {
     this.onDetectInlineRichTextStyles,
     this.onDetectLink,
     this.onDetectList,
+    this.onDetectCustomEmbedBlock,
   }) : assert(customHeadingSizes == null || customHeadingSizes.length >= 4,
             'customHeadingSizes must have minimun 4 items.') {
     globalFontsFallbacks = <pw.Font>[
@@ -382,6 +386,7 @@ class PDFConverter {
         imageConstraints:
             imageConstraints ?? const pw.BoxConstraints(maxHeight: 450),
         onDetectImageUrl: onDetectImageUrl,
+        onDetectCustomEmbedBlock: onDetectCustomEmbedBlock,
       );
 
   @Deprecated(
